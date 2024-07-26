@@ -39,7 +39,7 @@ input[type="date"], input[type="text"] {
     width: 200px;
 }
 
-input[type="submit"] {
+input[type="submit"], input[type="button"] {
     padding: 10px 20px;
     font-size: 16px;
     background-color: #28a745;
@@ -50,7 +50,7 @@ input[type="submit"] {
     transition: background-color 0.3s ease;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, input[type="button"]:hover {
     background-color: #218838;
 }
 
@@ -90,4 +90,14 @@ td a:hover {
     color: red;
     text-align: center;
     margin-top: 20px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+.team-logo {
+    height: 20px; 
+    vertical-align: middle;
+    margin-left: 10px;
 }

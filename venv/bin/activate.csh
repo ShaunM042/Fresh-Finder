@@ -9,11 +9,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-<<<<<<< HEAD
-setenv VIRTUAL_ENV "/Users/shaunmathew/Downloads/Fresh-Finder/venv"
-=======
-setenv VIRTUAL_ENV "/Users/shaunmathew/Downloads/nba_project_fresh_v3/venv"
->>>>>>> 2bfa62ba60d06db956d3d3953d8fea4124e72bd6
+setenv VIRTUAL_ENV "/Users/kevinsuarez/Desktop/Summer 2024/Fresh-Finder/venv"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

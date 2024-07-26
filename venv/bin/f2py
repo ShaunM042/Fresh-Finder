@@ -1,4 +1,6 @@
-#!/Users/shaunmathew/Downloads/Fresh-Finder-main/venv/bin/python3.12
+#!/bin/sh
+'''exec' "/Users/kevinsuarez/Desktop/Summer 2024/Fresh-Finder/venv/bin/python3.12" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

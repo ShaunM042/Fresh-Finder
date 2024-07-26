@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 TEAM_LOGOS = {
     'ATL': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
     'BOS': 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
@@ -32,15 +31,11 @@ TEAM_LOGOS = {
     'WAS': 'https://a.espncdn.com/i/teamlogos/nba/500/was.png',
 }
 
-=======
-# data_cleaning.py
->>>>>>> 2bfa62ba60d06db956d3d3953d8fea4124e72bd6
 def clean_data(data, player_name='', versus_name=''):
     cleaned_data = []
     for item in data:
         if (player_name and player_name not in item.get("name", '').lower()) and (versus_name and versus_name not in item.get("team", '').lower()):
             continue
-<<<<<<< HEAD
         team_logo = TEAM_LOGOS.get(item.get("team_for"), '')
         opposing_team_logo = TEAM_LOGOS.get(item.get("team_against"), '')
         cleaned_data.append({
@@ -52,17 +47,6 @@ def clean_data(data, player_name='', versus_name=''):
             "points_scored": int(item.get("points_scored", 0)),
             "assists": int(item.get("assists", 0)),
             "rebounds": int(item.get("rebounds", 0)),
-=======
-        cleaned_data.append({
-            "name": item.get("name"),
-            "team": item.get("team"),
-            "team_logo": item.get("team_logo"),
-            "opposing_team": item.get("opposing_team"),
-            "opposing_team_logo": item.get("opposing_team_logo"),
-            "points_scored": item.get("points_scored", 0),
-            "assists": item.get("assists", 0),
-            "rebounds": item.get("rebounds", 0),
->>>>>>> 2bfa62ba60d06db956d3d3953d8fea4124e72bd6
             "field_goal_percentage": item.get("field_goal_percentage", 0.0),
             "true_shooting_percentage": item.get("true_shooting_percentage", 0.0),
             "player_efficiency_rating": item.get("player_efficiency_rating", 0.0)
