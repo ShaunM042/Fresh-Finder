@@ -101,3 +101,63 @@ td a:hover {
     vertical-align: middle;
     margin-left: 10px;
 }
+.profile-container {
+    text-align: center;
+}
+.profile-container img {
+    height: 100px;
+    vertical-align: middle;
+}
+.profile-container h2 {
+    margin: 10px 0;
+}
+.profile-info {
+    margin: 20px auto;
+    width: 60%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.profile-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+.profile-info li {
+    margin: 10px 0;
+}
+.profile-info span {
+    font-weight: bold;
+}
+.recent-games {
+    margin: 20px auto;
+    width: 80%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.recent-games table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.recent-games th, .recent-games td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.recent-games th {
+    background-color: #4caf50;
+    color: white;
+}
+.recent-games img {
+    height: 30px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+.player-headshot {
+  width: 50px;  
+  height: 250px;  
+  display: block;
+  margin-left:  20px;
+}
