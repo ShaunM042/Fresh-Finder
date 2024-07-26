@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Team Profile</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
+      .team-header {
+        text-align: center;
+      }
+      .team-header img {
+        height: 100px;
+      }
+      .team-info {
+        margin: 20px auto;
+        width: 60%;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        text-align: center;
+      }
+      .team-info h1 {
+        margin: 10px 0;
+      }
+      .team-info ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .team-info li {
+        margin: 10px 0;
+      }
+      .roster,
+      .recent-games {
+        margin: 20px auto;
+        width: 80%;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      .roster table,
+      .recent-games table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .roster th,
+      .recent-games th,
+      .roster td,
+      .recent-games td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      .roster th,
+      .recent-games th {
+        background-color: #4caf50;
+        color: white;
+      }
+      .roster td a {
+        color: #4caf50;
+        text-decoration: none;
+      }
+      .roster td a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="team-header">
+      <img src="{{ team_info.logo }}" alt="{{ team_info.name }} logo" />
+    </div>
+    <div class="team-info">
+      <h1>{{ team_info.name }}</h1>
+      <ul>
+        <li><span>City:</span> {{ team_info.city }}</li>
+        <li><span>State:</span> {{ team_info.state }}</li>
+        <li><span>Abbreviation:</span> {{ team_info.abbreviation }}</li>
+      </ul>
+    </div>
+    <div class="roster">
+      <h2>Roster</h2>
+      <table>
+        <tr>
+          <th>Player Name</th>
+          <th>Position</th>
+          <th>Height</th>
+          <th>Weight</th>
+          <th>Jersey Number</th>
+        </tr>
+        {% for player in roster %}
+        <tr>
+          <td>
+            <a href="/player_profile/{{ player.player_name }}"
+              >{{ player.player_name }}</a
+            >
+          </td>
+          <td>{{ player.position }}</td>
+          <td>{{ player.height }}</td>
+          <td>{{ player.weight }}</td>
+          <td>{{ player.jersey_number }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="recent-games">
+      <h2>Recent Games</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Matchup</th>
+          <th>Result</th>
+          <th>Score</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG %</th>
+          <th>3P %</th>
+          <th>FT %</th>
+        </tr>
+        {% for game in recent_games %}
+        <tr>
+          <td>{{ game.date }}</td>
+          <td>{{ game.matchup }}</td>
+          <td>{{ game.result }}</td>
+          <td>{{ game.team_score }} - {{ game.opponent_score }}</td>
+          <td>{{ game.points }}</td>
+          <td>{{ game.rebounds }}</td>
+          <td>{{ game.assists }}</td>
+          <td>{{ game.fg_percent }}</td>
+          <td>{{ game.threep_percent }}</td>
+          <td>{{ game.ft_percent }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>

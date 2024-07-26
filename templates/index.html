@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NBA Player and Team Statistics</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fresh Finder</h1>
+      <h2>NBA Player Stats</h2>
+      <div class="form-container">
+        <form id="player-form">
+          <label for="player-name">Enter Player Name:</label>
+          <input
+            type="text"
+            id="player-name"
+            name="player-name"
+            placeholder="Player Name"
+            required
+          />
+          <label for="start-date">Start date:</label>
+          <input type="date" id="start-date" name="start-date" />
+          <label for="end-date">End date:</label>
+          <input type="date" id="end-date" name="end-date" />
+          <input type="submit" value="Fetch Data" />
+        </form>
+      </div>
+
+      <h2>NBA Player Stats Average</h2>
+      <div class="form-container">
+        <form id="player-average-form">
+          <label for="player-average-name">Enter Player Name:</label>
+          <input
+            type="text"
+            id="player-average-name"
+            name="player-average-name"
+            placeholder="Player Name"
+            required
+          />
+          <label for="average-start-date">Start date:</label>
+          <input
+            type="date"
+            id="average-start-date"
+            name="average-start-date"
+            required
+          />
+          <label for="average-end-date">End date:</label>
+          <input
+            type="date"
+            id="average-end-date"
+            name="average-end-date"
+            required
+          />
+          <input type="submit" value="Fetch Average Stats" />
+        </form>
+      </div>
+
+      <h2>NBA Team Search</h2>
+      <div class="form-container">
+        <form id="team-form" method="post" action="/team_search">
+          <label for="team-name">Enter Team Name:</label>
+          <input
+            type="text"
+            id="team-name"
+            name="search_term"
+            placeholder="Team Name"
+            required
+          />
+          <input type="submit" value="Search Team" />
+        </form>
+      </div>
+
+      <div class="table-container">
+        <table id="stats-table">
+          <tr>
+            <th>Name</th>
+            <th>Team For</th>
+            <th>Team Against</th>
+            <th>Minutes</th>
+            <th>Points</th>
+            <th>Rebounds</th>
+            <th>Assists</th>
+            <th>FG %</th>
+            <th>TS %</th>
+            <th>+/-</th>
+          </tr>
+        </table>
+        <div id="no-matches" class="error" style="display: none">
+          No matches played on this date
+        </div>
+        <div id="error-message" class="error" style="display: none"></div>
+      </div>
+
+      <div
+        class="table-container"
+        id="average-stats-container"
+        style="display: none"
+      >
+        <h2>Average Stats</h2>
+        <table>
+          <tr>
+            <th>Player Name</th>
+            <th>Games Played</th>
+            <th>Average Minutes</th>
+            <th>Average Points</th>
+            <th>Average Rebounds</th>
+            <th>Average Assists</th>
+            <th>Average FG %</th>
+            <th>Average TS %</th>
+            <th>Average +/-</th>
+          </tr>
+          <tr>
+            <td id="average-player-name"></td>
+            <td id="average-games-played"></td>
+            <td id="average-minutes"></td>
+            <td id="average-points"></td>
+            <td id="average-rebounds"></td>
+            <td id="average-assists"></td>
+            <td id="average-fg-percent"></td>
+            <td id="average-ts-percent"></td>
+            <td id="average-plus-minus"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      document.querySelector("#player-form").onsubmit = async function (event) {
+        event.preventDefault();
+        const playerName = document.querySelector("#player-name").value;
+        const startDate = document.querySelector("#start-date").value;
+        const endDate = document.querySelector("#end-date").value;
+        try {
+          const response = await fetch(
+            `/player_stats?player_name=${playerName}&start_date=${startDate}&end_date=${endDate}`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            document.querySelector("#error-message").textContent =
+              errorData.message || errorData.error;
+            document.querySelector("#error-message").style.display = "block";
+            document.querySelector("#no-matches").style.display = "none";
+            document.querySelector("#stats-table").style.display = "none";
+            return;
+          }
+          const stats = await response.json();
+          displayStats(stats);
+          document.querySelector("#error-message").style.display = "none";
+        } catch (error) {
+          console.error("Fetch error:", error);
+          document.querySelector("#error-message").textContent =
+            "Failed to fetch data. Please check the console for more information.";
+          document.querySelector("#error-message").style.display = "block";
+          document.querySelector("#no-matches").style.display = "none";
+          document.querySelector("#stats-table").style.display = "none";
+        }
+      };
+
+      function displayStats(stats) {
+        const statsTable = document.querySelector("#stats-table");
+        statsTable.innerHTML = `
+                <tr>
+                    <th>Name</th>
+                    <th>Team For</th>
+                    <th>Team Against</th>
+                    <th>Minutes</th>
+                    <th>Points</th>
+                    <th>Rebounds</th>
+                    <th>Assists</th>
+                    <th>FG %</th>
+                    <th>TS %</th>
+                    <th>+/-</th>
+                </tr>
+            `;
+        if (stats.length === 0) {
+          document.querySelector("#no-matches").style.display = "block";
+          statsTable.style.display = "none";
+        } else {
+          document.querySelector("#no-matches").style.display = "none";
+          statsTable.style.display = "table";
+          stats.forEach((stat) => {
+            const row = statsTable.insertRow();
+            const nameCell = row.insertCell(0);
+            nameCell.innerHTML = `<a href="/player_profile/${encodeURIComponent(
+              stat.name
+            )}">${stat.name}</a>`;
+            row.insertCell(
+              1
+            ).innerHTML = `<a href="/team_profile/${encodeURIComponent(
+              stat.team_for
+            )}"><img src="${stat.team_logo}" alt="${
+              stat.team_for
+            }" class="team-logo"> ${stat.team_for}</a>`;
+            row.insertCell(
+              2
+            ).innerHTML = `<a href="/team_profile/${encodeURIComponent(
+              stat.team_against
+            )}"><img src="${stat.opposing_team_logo}" alt="${
+              stat.team_against
+            }" class="team-logo"> ${stat.team_against}</a>`;
+            row.insertCell(3).textContent = stat.minutes;
+            row.insertCell(4).textContent = stat.points;
+            row.insertCell(5).textContent = stat.rebounds;
+            row.insertCell(6).textContent = stat.assists;
+            row.insertCell(7).textContent = stat.fg_percent.toFixed(2) + "%";
+            row.insertCell(8).textContent = stat.ts_percent.toFixed(2) + "%";
+            row.insertCell(
+              9
+            ).innerHTML = `<a href="/game_box_score/${stat.game_id}">${stat.plus_minus}</a>`;
+          });
+        }
+      }
+
+      document.querySelector("#player-average-form").onsubmit = async function (
+        event
+      ) {
+        event.preventDefault();
+        const playerName = document.querySelector("#player-average-name").value;
+        const startDate = document.querySelector("#average-start-date").value;
+        const endDate = document.querySelector("#average-end-date").value;
+        try {
+          const response = await fetch(
+            `/player_stats_average?player_name=${playerName}&start_date=${startDate}&end_date=${endDate}`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message || errorData.error);
+            return;
+          }
+          const averages = await response.json();
+          displayAverageStats(averages);
+        } catch (error) {
+          console.error("Fetch error:", error);
+          alert(
+            "Failed to fetch data. Please check the console for more information."
+          );
+        }
+      };
+
+      function displayAverageStats(averages) {
+        document.querySelector("#average-player-name").textContent =
+          averages.player_name;
+        document.querySelector("#average-games-played").textContent =
+          averages.games_played;
+        document.querySelector("#average-minutes").textContent =
+          averages.average_minutes;
+        document.querySelector("#average-points").textContent =
+          averages.average_points;
+        document.querySelector("#average-rebounds").textContent =
+          averages.average_rebounds;
+        document.querySelector("#average-assists").textContent =
+          averages.average_assists;
+        document.querySelector("#average-fg-percent").textContent =
+          averages.average_fg_percent + "%";
+        document.querySelector("#average-ts-percent").textContent =
+          averages.average_ts_percent + "%";
+        document.querySelector("#average-plus-minus").textContent =
+          averages.average_plus_minus;
+
+        document.querySelector("#average-stats-container").style.display =
+          "block";
+      }
+    </script>
+  </body>
+</html>
