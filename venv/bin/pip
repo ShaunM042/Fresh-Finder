@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 #!/Users/shaunmathew/Downloads/Fresh-Finder-main/venv/bin/python3.12
+=======
+#!/bin/sh
+'''exec' "/Users/kevinsuarez/Desktop/Summer 2024/Fresh-Finder/venv/bin/python3.12" "$0" "$@"
+' '''
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 # -*- coding: utf-8 -*-
 import re
 import sys

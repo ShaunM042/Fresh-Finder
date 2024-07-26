@@ -7,6 +7,7 @@
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+<<<<<<< HEAD
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link
@@ -14,6 +15,8 @@
       href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+=======
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </head>
   <body>
     <div class="container">
@@ -34,6 +37,10 @@
           <label for="end-date">End date:</label>
           <input type="date" id="end-date" name="end-date" />
           <input type="submit" value="Fetch Data" />
+<<<<<<< HEAD
+=======
+          <input type="button" value="Clear" id="clear-button">
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
         </form>
       </div>
 
@@ -136,6 +143,7 @@
     </div>
 
     <script>
+<<<<<<< HEAD
       $(document).ready(function () {
         $("#player-name").autocomplete({
           source: function (request, response) {
@@ -237,6 +245,81 @@
         }
       }
 
+=======
+      document.querySelector("#player-form").onsubmit = async function (event) {
+          event.preventDefault();
+          const playerName = document.querySelector("#player-name").value;
+          const startDate = document.querySelector("#start-date").value;
+          const endDate = document.querySelector("#end-date").value;
+          try {
+              const response = await fetch(`/player_stats?player_name=${playerName}&start_date=${startDate}&end_date=${endDate}`);
+              if (!response.ok) {
+                  const errorData = await response.json();
+                  document.querySelector("#error-message").textContent = errorData.message || errorData.error;
+                  document.querySelector("#error-message").style.display = "block";
+                  document.querySelector("#no-matches").style.display = "none";
+                  document.querySelector("#stats-table").style.display = "none";
+                  return;
+              }
+              const stats = await response.json();
+              displayStats(stats);
+              document.querySelector("#error-message").style.display = "none";
+          } catch (error) {
+              console.error("Fetch error:", error);
+              document.querySelector("#error-message").textContent = "Failed to fetch data. Please check the console for more information.";
+              document.querySelector("#error-message").style.display = "block";
+              document.querySelector("#no-matches").style.display = "none";
+              document.querySelector("#stats-table").style.display = "none";
+          }
+      };
+
+      function displayStats(stats) {
+          const statsTable = document.querySelector("#stats-table");
+          statsTable.innerHTML = `
+              <tr>
+                  <th>Name</th>
+                  <th>Team For</th>
+                  <th>Team Against</th>
+                  <th>Minutes</th>
+                  <th>Points</th>
+                  <th>Rebounds</th>
+                  <th>Assists</th>
+                  <th>FG %</th>
+                  <th>TS %</th>
+                  <th>+/-</th>
+              </tr>
+          `;
+          if (stats.length === 0) {
+              document.querySelector("#no-matches").style.display = "block";
+              statsTable.style.display = "none";
+          } else {
+              document.querySelector("#no-matches").style.display = "none";
+              statsTable.style.display = "table";
+              stats.forEach((stat) => {
+                  const row = statsTable.insertRow();
+                  const nameCell = row.insertCell(0);
+                  nameCell.innerHTML = `<a href="/player_profile/${encodeURIComponent(stat.name)}">${stat.name}</a>`;
+                  row.insertCell(1).innerHTML = `<a href="/team_profile/${encodeURIComponent(stat.team_for)}"><img src="${stat.team_logo}" alt="${stat.team_for}" class="team-logo"> ${stat.team_for}</a>`;
+                  row.insertCell(2).innerHTML = `<a href="/team_profile/${encodeURIComponent(stat.team_against)}"><img src="${stat.opposing_team_logo}" alt="${stat.team_against}" class="team-logo"> ${stat.team_against}</a>`;
+                  row.insertCell(3).textContent = stat.minutes;
+                  row.insertCell(4).textContent = stat.points;
+                  row.insertCell(5).textContent = stat.rebounds;
+                  row.insertCell(6).textContent = stat.assists;
+                  row.insertCell(7).textContent = stat.fg_percent.toFixed(2) + "%";
+                  row.insertCell(8).textContent = stat.ts_percent.toFixed(2) + "%";
+                  row.insertCell(9).innerHTML = `<a href="/game_box_score/${stat.game_id}">${stat.plus_minus}</a>`;
+              });
+          }
+      }
+      document.querySelector("#clear-button").onclick = function () {
+            document.querySelector("#player-form").reset();
+            document.querySelector("#stats-table").style.display = "none";
+            document.querySelector("#no-matches").style.display = "none";
+            document.querySelector("#error-message").style.display = "none";
+        };
+
+        
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
       document.querySelector("#player-average-form").onsubmit = async function (
         event
       ) {
@@ -287,6 +370,7 @@
           "block";
       }
     </script>
+<<<<<<< HEAD
 
     <style>
       body {
@@ -349,5 +433,7 @@
         }
       }
     </style>
+=======
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </body>
 </html>

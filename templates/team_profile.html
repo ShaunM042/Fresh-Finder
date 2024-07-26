@@ -7,6 +7,76 @@
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+<<<<<<< HEAD
+=======
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
+      .team-header {
+        text-align: center;
+      }
+      .team-header img {
+        height: 100px;
+      }
+      .team-info {
+        margin: 20px auto;
+        width: 60%;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        text-align: center;
+      }
+      .team-info h1 {
+        margin: 10px 0;
+      }
+      .team-info ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .team-info li {
+        margin: 10px 0;
+      }
+      .roster,
+      .recent-games {
+        margin: 20px auto;
+        width: 80%;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      .roster table,
+      .recent-games table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .roster th,
+      .recent-games th,
+      .roster td,
+      .recent-games td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      .roster th,
+      .recent-games th {
+        background-color: #4caf50;
+        color: white;
+      }
+      .roster td a {
+        color: #4caf50;
+        text-decoration: none;
+      }
+      .roster td a:hover {
+        text-decoration: underline;
+      }
+    </style>
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </head>
   <body>
     <div class="team-header">
@@ -65,6 +135,7 @@
           <td>{{ game.date }}</td>
           <td>{{ game.matchup }}</td>
           <td>{{ game.result }}</td>
+<<<<<<< HEAD
           <td>{{ game.score }}</td>
           <td>{{ game.points }}</td>
           <td>{{ game.rebounds }}</td>
@@ -72,10 +143,20 @@
           <td>{{ game.fg_percent }}%</td>
           <td>{{ game.threep_percent }}%</td>
           <td>{{ game.ft_percent }}%</td>
+=======
+          <td>{{ game.team_score }} - {{ game.opponent_score }}</td>
+          <td>{{ game.points }}</td>
+          <td>{{ game.rebounds }}</td>
+          <td>{{ game.assists }}</td>
+          <td>{{ game.fg_percent }}</td>
+          <td>{{ game.threep_percent }}</td>
+          <td>{{ game.ft_percent }}</td>
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
         </tr>
         {% endfor %}
       </table>
     </div>
+<<<<<<< HEAD
     <div class="advanced-stats">
       <h2>Advanced Team Stats</h2>
       <ul>
@@ -87,5 +168,7 @@
         <li>True Shooting Percentage: {{ advanced_stats.ts_percent }}</li>
       </ul>
     </div>
+=======
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </body>
 </html>

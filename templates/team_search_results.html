@@ -10,6 +10,7 @@
   </head>
   <body>
     <h1>Team Search Results</h1>
+<<<<<<< HEAD
     <table>
       <tr>
         <th>Team Name</th>
@@ -26,5 +27,20 @@
       </tr>
       {% endfor %}
     </table>
+=======
+    {% if teams %}
+    <ul>
+      {% for team in teams %}
+      <li>
+        <a href="/team_profile/{{ team['abbreviation'] }}"
+          >{{ team['full_name'] }}</a
+        >
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No teams found.</p>
+    {% endif %}
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </body>
 </html>

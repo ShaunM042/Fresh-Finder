@@ -39,7 +39,11 @@ input[type="date"], input[type="text"] {
     width: 200px;
 }
 
+<<<<<<< HEAD
 input[type="submit"] {
+=======
+input[type="submit"], input[type="button"] {
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
     padding: 10px 20px;
     font-size: 16px;
     background-color: #28a745;
@@ -50,7 +54,11 @@ input[type="submit"] {
     transition: background-color 0.3s ease;
 }
 
+<<<<<<< HEAD
 input[type="submit"]:hover {
+=======
+input[type="submit"]:hover, input[type="button"]:hover {
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
     background-color: #218838;
 }
 
@@ -91,8 +99,79 @@ td a:hover {
     text-align: center;
     margin-top: 20px;
 }
+<<<<<<< HEAD
+=======
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 .team-logo {
     height: 20px; 
     vertical-align: middle;
     margin-left: 10px;
+<<<<<<< HEAD
+=======
+}
+.profile-container {
+    text-align: center;
+}
+.profile-container img {
+    height: 100px;
+    vertical-align: middle;
+}
+.profile-container h2 {
+    margin: 10px 0;
+}
+.profile-info {
+    margin: 20px auto;
+    width: 60%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.profile-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+.profile-info li {
+    margin: 10px 0;
+}
+.profile-info span {
+    font-weight: bold;
+}
+.recent-games {
+    margin: 20px auto;
+    width: 80%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.recent-games table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.recent-games th, .recent-games td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.recent-games th {
+    background-color: #4caf50;
+    color: white;
+}
+.recent-games img {
+    height: 30px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+.player-headshot {
+  width: 50px;  
+  height: 250px;  
+  display: block;
+  margin-left:  20px;
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 }

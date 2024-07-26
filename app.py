@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, render_template, request
 from nba_api.stats.static import players, teams
+<<<<<<< HEAD
 from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails, leaguedashteamstats
+=======
+from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 import datetime
 import os
 
@@ -43,6 +47,7 @@ TEAM_LOGOS = {
 def index():
     return render_template('index.html')
 
+<<<<<<< HEAD
 @app.route('/autocomplete')
 def autocomplete():
     term = request.args.get('term')
@@ -50,6 +55,8 @@ def autocomplete():
     player_names = [player['full_name'] for player in results]
     return jsonify(player_names)
 
+=======
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 @app.route('/player_stats')
 def get_player_stats():
     player_name = request.args.get('player_name')
@@ -167,8 +174,13 @@ def get_player_profile(player_name):
 @app.route('/team_profile/<team_abbreviation>')
 def get_team_profile(team_abbreviation):
     try:
+<<<<<<< HEAD
         team_info, roster, recent_games, advanced_stats = fetch_team_data(team_abbreviation)
         return render_template('team_profile.html', team_info=team_info, roster=roster, recent_games=recent_games, advanced_stats=advanced_stats)
+=======
+        team_info, roster, recent_games = fetch_team_data(team_abbreviation)
+        return render_template('team_profile.html', team_info=team_info, roster=roster, recent_games=recent_games)
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
     except Exception as e:
         return jsonify(error=str(e)), 500
 
@@ -185,8 +197,11 @@ def fetch_team_data(team_abbreviation):
     game_log = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24')
     game_log_data = game_log.get_data_frames()[0].head(10)
 
+<<<<<<< HEAD
     advanced_stats = leaguedashteamstats.LeagueDashTeamStats(team_id=team_id).get_data_frames()[0]
 
+=======
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
     team_info = {
         'name': team_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_data.columns else team_info.get('full_name', 'N/A'),
         'city': team_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_data.columns else 'N/A',
@@ -222,6 +237,7 @@ def fetch_team_data(team_abbreviation):
         }
         recent_games.append(game_info)
 
+<<<<<<< HEAD
     advanced_stats = {
         'off_rating': advanced_stats['OFF_RATING'][0],
         'def_rating': advanced_stats['DEF_RATING'][0],
@@ -232,6 +248,9 @@ def fetch_team_data(team_abbreviation):
     }
 
     return team_info, roster, recent_games, advanced_stats
+=======
+    return team_info, roster, recent_games
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 
 @app.route('/team_search', methods=['GET', 'POST'])
 def team_search():
@@ -294,6 +313,11 @@ def get_player_stats_average():
 @app.route('/game_box_score/<game_id>')
 def game_box_score(game_id):
     try:
+<<<<<<< HEAD
+=======
+        # Fetch game details using game_id (This is a placeholder as NBA API might not support direct game ID lookup)
+        # Assuming playergamelog can provide game details. Replace this with the correct API call if available.
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
         game_log = playergamelog.PlayerGameLog(player_id=player_id)
         data_frame = game_log.get_data_frames()[0]
         game_details = data_frame[data_frame['Game_ID'] == game_id]
@@ -324,4 +348,8 @@ if __name__ == '__main__':
     print("App started, current directory:", os.getcwd())
     print("Templates folder exists:", os.path.isdir('templates'))
     print("player_profile.html exists:", os.path.isfile('templates/player_profile.html'))
+<<<<<<< HEAD
     app.run(debug=True, port=5001)
+=======
+    app.run(debug=True)
+>>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
