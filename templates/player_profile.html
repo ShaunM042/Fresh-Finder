@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Player Profile</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="profile-container">
+      <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" />
+      <h1>Player Profile</h1>
+      <div class="profile-info">
+        <ul>
+          <li><span>Name:</span> {{ profile.name }}</li>
+          <li><span>Position:</span> {{ profile.position }}</li>
+          <li><span>Height:</span> {{ profile.height }}</li>
+          <li><span>Weight:</span> {{ profile.weight }}</li>
+          <li>
+            <span>Team:</span>
+            <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" />
+            {{ profile.team }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="recent-games">
+      <h2>Recent Games</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Team For</th>
+          <th>Team Against</th>
+          <th>Minutes</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG %</th>
+          <th>TS %</th>
+          <th>+/-</th>
+        </tr>
+        {% for game in recent_games %}
+        <tr>
+          <td>{{ game.date }}</td>
+          <td>
+            <img
+              src="{{ game.team_for_logo }}"
+              alt="{{ game.team_for }} logo"
+            />
+            {{ game.team_for }}
+          </td>
+          <td>
+            <img
+              src="{{ game.team_against_logo }}"
+              alt="{{ game.team_against }} logo"
+            />
+            {{ game.team_against }}
+          </td>
+          <td>{{ game.minutes }}</td>
+          <td>{{ game.points }}</td>
+          <td>{{ game.rebounds }}</td>
+          <td>{{ game.assists }}</td>
+          <td>{{ game.fg_percent }}%</td>
+          <td>{{ game.ts_percent }}%</td>
+          <td>{{ game.plus_minus }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>

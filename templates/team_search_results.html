@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Team Search Results</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Team Search Results</h1>
+    <table>
+      <tr>
+        <th>Team Name</th>
+        <th>Abbreviation</th>
+      </tr>
+      {% for team in teams %}
+      <tr>
+        <td>
+          <a href="/team_profile/{{ team.abbreviation }}"
+            >{{ team.full_name }}</a
+          >
+        </td>
+        <td>{{ team.abbreviation }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

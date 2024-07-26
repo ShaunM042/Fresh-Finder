@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Team Profile</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="team-header">
+      <img src="{{ team_info.logo }}" alt="{{ team_info.name }} logo" />
+    </div>
+    <div class="team-info">
+      <h1>{{ team_info.name }}</h1>
+      <ul>
+        <li><span>City:</span> {{ team_info.city }}</li>
+        <li><span>State:</span> {{ team_info.state }}</li>
+        <li><span>Abbreviation:</span> {{ team_info.abbreviation }}</li>
+      </ul>
+    </div>
+    <div class="roster">
+      <h2>Roster</h2>
+      <table>
+        <tr>
+          <th>Player Name</th>
+          <th>Position</th>
+          <th>Height</th>
+          <th>Weight</th>
+          <th>Jersey Number</th>
+        </tr>
+        {% for player in roster %}
+        <tr>
+          <td>
+            <a href="/player_profile/{{ player.player_name }}"
+              >{{ player.player_name }}</a
+            >
+          </td>
+          <td>{{ player.position }}</td>
+          <td>{{ player.height }}</td>
+          <td>{{ player.weight }}</td>
+          <td>{{ player.jersey_number }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="recent-games">
+      <h2>Recent Games</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Matchup</th>
+          <th>Result</th>
+          <th>Score</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG %</th>
+          <th>3P %</th>
+          <th>FT %</th>
+        </tr>
+        {% for game in recent_games %}
+        <tr>
+          <td>{{ game.date }}</td>
+          <td>{{ game.matchup }}</td>
+          <td>{{ game.result }}</td>
+          <td>{{ game.score }}</td>
+          <td>{{ game.points }}</td>
+          <td>{{ game.rebounds }}</td>
+          <td>{{ game.assists }}</td>
+          <td>{{ game.fg_percent }}%</td>
+          <td>{{ game.threep_percent }}%</td>
+          <td>{{ game.ft_percent }}%</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="advanced-stats">
+      <h2>Advanced Team Stats</h2>
+      <ul>
+        <li>Offensive Rating: {{ advanced_stats.off_rating }}</li>
+        <li>Defensive Rating: {{ advanced_stats.def_rating }}</li>
+        <li>Net Rating: {{ advanced_stats.net_rating }}</li>
+        <li>Rebound Percentage: {{ advanced_stats.reb_percent }}</li>
+        <li>Assist Percentage: {{ advanced_stats.ast_percent }}</li>
+        <li>True Shooting Percentage: {{ advanced_stats.ts_percent }}</li>
+      </ul>
+    </div>
+  </body>
+</html>
