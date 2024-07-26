@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
+<<<<<<< HEAD
     <title>NBA Player and Team Statistics</title>
+=======
+    <title>NBA Player Statistics</title>
+>>>>>>> 2bfa62ba60d06db956d3d3953d8fea4124e72bd6
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+<<<<<<< HEAD
   </head>
   <body>
     <div class="container">
@@ -263,6 +268,233 @@
 
         document.querySelector("#average-stats-container").style.display =
           "block";
+=======
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      form {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      input[type="date"],
+      input[type="text"] {
+        padding: 10px;
+        margin-right: 10px;
+        font-size: 16px;
+      }
+      input[type="submit"] {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      table {
+        width: 100%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        padding: 12px;
+        background-color: #fff;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        cursor: pointer;
+      }
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+      img.team-logo {
+        height: 30px;
+        vertical-align: middle;
+        margin-left: 10px;
+      }
+      @media (max-width: 600px) {
+        table {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>NBA Player Stats</h1>
+    <form id="data-form">
+      <label for="start-date">Start date:</label>
+      <input type="date" id="start-date" name="start-date" />
+      <label for="end-date">End date:</label>
+      <input type="date" id="end-date" name="end-date" />
+      <label for="player-name">Search for a player:</label>
+      <input
+        type="text"
+        id="player-name"
+        name="player-name"
+        placeholder="Player name"
+      />
+      <input type="submit" value="Fetch Data" />
+    </form>
+    <table id="stats-table">
+      <tr>
+        <th onclick="sortTable('name')">Name</th>
+        <th onclick="sortTable('team')">Team</th>
+        <th onclick="sortTable('opposing_team')">Opposing Team</th>
+        <th onclick="sortTable('points_scored')">Points Scored</th>
+        <th onclick="sortTable('assists')">Assists</th>
+        <th onclick="sortTable('rebounds')">Rebounds</th>
+        <th onclick="sortTable('field_goal_percentage')">Field Goal %</th>
+        <th onclick="sortTable('true_shooting_percentage')">True Shooting %</th>
+        <th onclick="sortTable('player_efficiency_rating')">PER</th>
+      </tr>
+    </table>
+    <div id="no-matches" style="display: none">
+      No matches played on this date
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.querySelector("#data-form").onsubmit = async function (event) {
+        event.preventDefault();
+        const startDate = document.querySelector("#start-date").value;
+        const endDate = document.querySelector("#end-date").value;
+        const playerName = document
+          .querySelector("#player-name")
+          .value.toLowerCase();
+        try {
+          const response = await fetch("/data", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              start_date: startDate,
+              end_date: endDate,
+              player_name: playerName,
+            }),
+          });
+          if (!response.ok) {
+            throw new Error(
+              "Network response was not ok: " + response.statusText
+            );
+          }
+          const data = await response.json();
+          if (data.message) {
+            document.querySelector("#no-matches").style.display = "block";
+            document.querySelector("#stats-table").style.display = "none";
+            return;
+          } else {
+            document.querySelector("#no-matches").style.display = "none";
+            document.querySelector("#stats-table").style.display = "table";
+          }
+          const filteredData = playerName
+            ? data.filter((player) =>
+                player.name.toLowerCase().includes(playerName)
+              )
+            : data;
+          populateTable(filteredData);
+        } catch (error) {
+          console.error("Fetch error:", error);
+          alert(
+            "Failed to fetch data. Please check the console for more information."
+          );
+        }
+      };
+
+      let sortOrder = {};
+
+      function populateTable(data) {
+        const table = document.querySelector("#stats-table");
+        table.innerHTML = `
+                <tr>
+                    <th onclick="sortTable('name')">Name</th>
+                    <th onclick="sortTable('team')">Team</th>
+                    <th onclick="sortTable('opposing_team')">Opposing Team</th>
+                    <th onclick="sortTable('points_scored')">Points Scored</th>
+                    <th onclick="sortTable('assists')">Assists</th>
+                    <th onclick="sortTable('rebounds')">Rebounds</th>
+                    <th onclick="sortTable('field_goal_percentage')">Field Goal %</th>
+                    <th onclick="sortTable('true_shooting_percentage')">True Shooting %</th>
+                    <th onclick="sortTable('player_efficiency_rating')">PER</th>
+                </tr>`;
+        data.forEach((player) => {
+          const row = table.insertRow();
+          row.insertCell(0).textContent = player.name;
+          const teamCell = row.insertCell(1);
+          teamCell.innerHTML = `<img src="${player.team_logo}" alt="${player.team}" class="team-logo">${player.team}`;
+          const opponentCell = row.insertCell(2);
+          opponentCell.innerHTML = `<img src="${player.opposing_team_logo}" alt="${player.opposing_team}" class="team-logo">${player.opposing_team}`;
+          row.insertCell(3).textContent = player.points_scored;
+          row.insertCell(4).textContent = player.assists;
+          row.insertCell(5).textContent = player.rebounds;
+          row.insertCell(6).textContent =
+            player.field_goal_percentage.toFixed(2) + "%";
+          row.insertCell(7).textContent =
+            player.true_shooting_percentage.toFixed(2) + "%";
+          row.insertCell(8).textContent =
+            player.player_efficiency_rating.toFixed(2);
+        });
+      }
+
+      function sortTable(category) {
+        const table = document.querySelector("#stats-table");
+        const rows = Array.from(table.rows).slice(1);
+
+        sortOrder[category] = sortOrder[category] === "asc" ? "desc" : "asc";
+
+        rows.sort((a, b) => {
+          const aVal = a.cells[
+            {
+              name: 0,
+              team: 1,
+              opposing_team: 2,
+              points_scored: 3,
+              assists: 4,
+              rebounds: 5,
+              field_goal_percentage: 6,
+              true_shooting_percentage: 7,
+              player_efficiency_rating: 8,
+            }[category]
+          ].textContent.replace("%", "");
+
+          const bVal = b.cells[
+            {
+              name: 0,
+              team: 1,
+              opposing_team: 2,
+              points_scored: 3,
+              assists: 4,
+              rebounds: 5,
+              field_goal_percentage: 6,
+              true_shooting_percentage: 7,
+              player_efficiency_rating: 8,
+            }[category]
+          ].textContent.replace("%", "");
+
+          if (!isNaN(parseFloat(aVal)) && !isNaN(parseFloat(bVal))) {
+            return sortOrder[category] === "asc"
+              ? parseFloat(aVal) - parseFloat(bVal)
+              : parseFloat(bVal) - parseFloat(aVal);
+          } else {
+            return sortOrder[category] === "asc"
+              ? aVal.localeCompare(bVal)
+              : bVal.localeCompare(aVal);
+          }
+        });
+
+        rows.forEach((row) => table.appendChild(row));
+>>>>>>> 2bfa62ba60d06db956d3d3953d8fea4124e72bd6
       }
     </script>
   </body>
