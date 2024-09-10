@@ -34,10 +34,14 @@ end
 deactivate nondestructive
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 set -gx VIRTUAL_ENV "/Users/shaunmathew/Downloads/Fresh-Finder-main/venv"
 =======
 set -gx VIRTUAL_ENV "/Users/kevinsuarez/Desktop/Summer 2024/Fresh-Finder/venv"
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+set -gx VIRTUAL_ENV "/Users/shaunmathew/Downloads/Fresh-Finder(complete)/venv"
+>>>>>>> Final updates for Fresh Finder project
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

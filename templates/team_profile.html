@@ -8,6 +8,7 @@
       href="{{ url_for('static', filename='styles.css') }}"
     />
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     <style>
       body {
@@ -51,10 +52,98 @@
         border-radius: 8px;
       }
       .roster table,
+=======
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
+    <style>
+      nav {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 75px;
+        background: #4caf50;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      nav .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        max-width: 90%;
+        margin: auto;
+      }
+
+      nav .navbar .logo a {
+        color: #fff;
+        font-size: 27px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      nav .navbar .menu {
+        display: flex;
+      }
+
+      .navbar .menu li {
+        list-style: none;
+        margin: 0 15px;
+      }
+
+      .navbar .menu li a {
+        color: #fff;
+        font-size: 17px;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .navbar .menu li a.active {
+        background-color: #388e3c; 
+      }
+
+      .navbar .menu li a:hover {
+        background-color: #45a049;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 10px;
+        margin: 0 auto;
+        margin-top: 100px; 
+      }
+
+      .profile-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .profile-info ul {
+        list-style-type: none;
+        text-align: left;
+      }
+
+      .profile-info ul li {
+        margin-bottom: 10px;
+      }
+
+      .recent-games {
+        margin-top: 20px;
+      }
+
+>>>>>>> Final updates for Fresh Finder project
       .recent-games table {
         width: 100%;
         border-collapse: collapse;
       }
+<<<<<<< HEAD
       .roster th,
       .recent-games th,
       .roster td,
@@ -172,3 +261,126 @@
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
   </body>
 </html>
+=======
+
+      th, td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      h1, h2 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+
+      @media (max-width: 600px) {
+        nav .navbar .menu li {
+          margin: 0 10px;
+        }
+
+        .navbar .menu li a {
+          font-size: 15px;
+        }
+
+        .container {
+          margin-top: 120px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav>
+      <div class="navbar">
+        <div class="logo">
+          <a href="{{ url_for('landing') }}">Fresh Finder</a>
+        </div>
+        <ul class="menu">
+          <li><a href="{{ url_for('team_search') }}" class="{% if request.endpoint == 'team_search' %}active{% endif %}">Team Search</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="profile-container">
+        <img
+          class="team-logo"
+          src="{{ team_info.logo }}"
+          alt="{{ team_info.name }} logo"
+        />
+        <div class="profile-info">
+          <h1>{{ team_info.name }}</h1>
+          <ul>
+            <li><span>City:</span> {{ team_info.city }}</li>
+            <li><span>State:</span> {{ team_info.state }}</li>
+            <li><span>Abbreviation:</span> {{ team_info.abbreviation }}</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="recent-games">
+        <h2>Roster</h2>
+        <table>
+          <tr>
+            <th>Player Name</th>
+            <th>Position</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Jersey Number</th>
+          </tr>
+          {% for player in roster %}
+          <tr>
+            <td>
+              <a href="/player_profile/{{ player.player_name }}">{{ player.player_name }}</a>
+            </td>
+            <td>{{ player.position }}</td>
+            <td>{{ player.height }}</td>
+            <td>{{ player.weight }}</td>
+            <td>{{ player.jersey_number }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="recent-games">
+        <h2>Recent Games</h2>
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Matchup</th>
+            <th>Result</th>
+            <th>Points</th>
+            <th>Rebounds</th>
+            <th>Assists</th>
+            <th>FG %</th>
+            <th>3P %</th>
+            <th>FT %</th>
+          </tr>
+          {% for game in recent_games %}
+          <tr>
+            <td>{{ game.date }}</td>
+            <td>{{ game.matchup }}</td>
+            <td>{{ game.result }}</td>
+            <td>{{ game.points }}</td>
+            <td>{{ game.rebounds }}</td>
+            <td>{{ game.assists }}</td>
+            <td>{{ game.fg_percent }}%</td>
+            <td>{{ game.threep_percent }}%</td>
+            <td>{{ game.ft_percent }}%</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      
+>>>>>>> Final updates for Fresh Finder project

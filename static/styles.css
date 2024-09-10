@@ -1,4 +1,5 @@
 body {
+<<<<<<< HEAD
     font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;
     margin: 0;
@@ -67,10 +68,44 @@ input[type="submit"]:hover, input[type="button"]:hover {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+=======
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 40px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 36px;
+}
+
+form {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+input[type="date"],
+input[type="text"] {
+    padding: 20px;
+    margin-right: 20px;
+    font-size: 24px;
+}
+
+input[type="submit"] {
+    padding: 20px 40px;
+    font-size: 24px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+>>>>>>> Final updates for Fresh Finder project
 }
 
 table {
     width: 100%;
+<<<<<<< HEAD
     border-collapse: collapse;
     margin-bottom: 20px;
 }
@@ -132,10 +167,63 @@ td a:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
+=======
+    margin: 40px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 24px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+th {
+    background-color: #4caf50;
+    color: white;
+    font-size: 20px;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+img.team-logo-small {
+    height: 40px;
+    vertical-align: middle;
+    margin-left: 20px;
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    margin: 40px auto;
+    width: 80%;
+}
+
+.profile-container img.player-headshot {
+    margin-right: 40px;
+    width: 300px;
+    height: auto;
+    border-radius: 16px;
+}
+
+>>>>>>> Final updates for Fresh Finder project
 .profile-info ul {
     list-style-type: none;
     padding: 0;
 }
+<<<<<<< HEAD
 .profile-info li {
     margin: 10px 0;
 }
@@ -150,10 +238,32 @@ td a:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
+=======
+
+.profile-info li {
+    margin: 20px 0;
+    font-size: 24px;
+}
+
+.profile-info span {
+    font-weight: bold;
+}
+
+.recent-games {
+    margin: 40px auto;
+    width: 90%;
+    background-color: #fff;
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+}
+
+>>>>>>> Final updates for Fresh Finder project
 .recent-games table {
     width: 100%;
     border-collapse: collapse;
 }
+<<<<<<< HEAD
 .recent-games th, .recent-games td {
     padding: 10px;
     text-align: left;
@@ -175,3 +285,40 @@ td a:hover {
   margin-left:  20px;
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
 }
+=======
+
+.recent-games th, .recent-games td {
+    padding: 20px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 20px;
+}
+
+.recent-games th {
+    background-color: #4caf50;
+    color: white;
+    font-size: 22px;
+}
+
+.recent-games img {
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.team-logo {
+    height: 200px;
+    width: auto;
+}
+
+@media (max-width: 600px) {
+    .profile-container {
+        flex-direction: column;
+        width: 90%;
+    }
+
+    table {
+        width: 100%;
+    }
+}
+>>>>>>> Final updates for Fresh Finder project

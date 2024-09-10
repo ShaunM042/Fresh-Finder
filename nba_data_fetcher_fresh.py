@@ -1,7 +1,12 @@
 from nba_api.stats.static import players, teams
+<<<<<<< HEAD
 from nba_api.stats.endpoints import playergamelog, teamgamelog
 import json
 import time
+=======
+from nba_api.stats.endpoints import playergamelog, teamgamelog, teamdetails, commonteamroster
+from flask import jsonify
+>>>>>>> Final updates for Fresh Finder project
 
 TEAM_LOGOS = {
     'ATL': 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
@@ -37,7 +42,10 @@ TEAM_LOGOS = {
 }
 
 def fetch_nba_data(day, month, year):
+<<<<<<< HEAD
     # Using the nba_api to fetch player box scores
+=======
+>>>>>>> Final updates for Fresh Finder project
     target_date = f'{year}-{month:02d}-{day:02d}'
     players_stats = []
     
@@ -94,3 +102,56 @@ def fetch_nba_data(day, month, year):
         cleaned_data.append(cleaned_player)
     
     return cleaned_data
+<<<<<<< HEAD
+=======
+
+def fetch_team_data(team_abbreviation):
+    team_info = teams.find_team_by_abbreviation(team_abbreviation)
+    if not team_info:
+        return jsonify(error="Team not found"), 404
+
+    team_id = team_info['id']
+
+    team_details = teamdetails.TeamDetails(team_id=team_id)
+    team_data = team_details.get_data_frames()[0]
+    roster_data = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+    game_log = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24')
+    game_log_data = game_log.get_data_frames()[0].head(10)
+
+    team_info_dict = {
+        'name': team_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_data.columns else team_info.get('full_name', 'N/A'),
+        'city': team_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_data.columns else 'N/A',
+        'state': team_data['TEAM_STATE'].values[0] if 'TEAM_STATE' in team_data.columns else 'N/A',
+        'abbreviation': team_data['TEAM_ABBREVIATION'].values[0] if 'TEAM_ABBREVIATION' in team_data.columns else 'N/A',
+        'logo': TEAM_LOGOS.get(team_abbreviation, '')
+    }
+
+    roster = []
+    for index, row in roster_data.iterrows():
+        player_info = {
+            'player_name': row['PLAYER'],
+            'position': row['POSITION'],
+            'height': row['HEIGHT'],
+            'weight': row['WEIGHT'],
+            'jersey_number': f"#{row['NUM'].strip('#')}"
+        }
+        roster.append(player_info)
+
+    recent_games = []
+    for index, row in game_log_data.iterrows():
+        game_info = {
+            'date': row['GAME_DATE'],
+            'matchup': row['MATCHUP'],
+            'result': row['WL'],
+            'score': f"{row['PTS']} - {row.get('PTS_OPP', 'N/A')}",
+            'points': row['PTS'],
+            'rebounds': row['REB'],
+            'assists': row['AST'],
+            'fg_percent': round(row['FG_PCT'] * 100, 2),
+            'threep_percent': round(row['FG3_PCT'] * 100, 2),
+            'ft_percent': round(row['FT_PCT'] * 100, 2)
+        }
+        recent_games.append(game_info)
+
+    return team_info_dict, roster, recent_games
+>>>>>>> Final updates for Fresh Finder project

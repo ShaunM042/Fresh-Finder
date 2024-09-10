@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, jsonify, render_template, request
 from nba_api.stats.static import players, teams
 <<<<<<< HEAD
@@ -5,6 +6,11 @@ from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercaree
 =======
 from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+from flask import Flask, Flask, jsonify, render_template, request, redirect, url_for
+from nba_api.stats.static import players, teams
+from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails, leaguedashteamstats
+>>>>>>> Final updates for Fresh Finder project
 import datetime
 import os
 
@@ -43,6 +49,7 @@ TEAM_LOGOS = {
     'WAS': 'https://a.espncdn.com/i/teamlogos/nba/500/was.png',
 }
 
+<<<<<<< HEAD
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -57,6 +64,36 @@ def autocomplete():
 
 =======
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+@app.route('/autocomplete')
+def autocomplete():
+    term = request.args.get('term')
+    player_results = players.find_players_by_full_name(term)
+    team_results = teams.find_teams_by_full_name(term)
+    results = [player['full_name'] for player in player_results] + [team['full_name'] for team in team_results]
+    return jsonify(results)
+
+@app.route('/get_search_type')
+def get_search_type():
+    term = request.args.get('term')
+    if not term:
+        return jsonify(error="Search term is required"), 400
+
+    player_results = players.find_players_by_full_name(term)
+    if player_results:
+        return jsonify(type="player")
+
+    team_results = teams.find_teams_by_full_name(term)
+    if team_results:
+        return jsonify(type="team")
+
+    return jsonify(error="No match found"), 404
+
+>>>>>>> Final updates for Fresh Finder project
 @app.route('/player_stats')
 def get_player_stats():
     player_name = request.args.get('player_name')
@@ -80,7 +117,15 @@ def get_player_stats():
             end_date_obj = datetime.datetime.today()
             start_date_obj = end_date_obj - datetime.timedelta(days=7)
 
+<<<<<<< HEAD
         game_log = playergamelog.PlayerGameLog(player_id=player_id, date_from_nullable=start_date_obj.strftime('%m/%d/%Y'), date_to_nullable=end_date_obj.strftime('%m/%d/%Y'))
+=======
+        game_log = playergamelog.PlayerGameLog(
+            player_id=player_id,
+            date_from_nullable=start_date_obj.strftime('%m/%d/%Y'),
+            date_to_nullable=end_date_obj.strftime('%m/%d/%Y')
+        )
+>>>>>>> Final updates for Fresh Finder project
         data_frame = game_log.get_data_frames()[0]
 
         if data_frame.empty:
@@ -91,9 +136,18 @@ def get_player_stats():
 
         games = []
         for index, row in data_frame.iterrows():
+<<<<<<< HEAD
             ts_percent = (row['PTS'] / (2 * (row['FGA'] + 0.44 * row['FTA']))) * 100 if (row['FGA'] + 0.44 * row['FTA']) != 0 else 0
             game_stats = {
                 'game_id': row['Game_ID'],
+=======
+            turnovers = row['TO'] if 'TO' in data_frame.columns else 'N/A'
+
+            ts_percent = (row['PTS'] / (2 * (row['FGA'] + 0.44 * row['FTA']))) * 100 if (row['FGA'] + 0.44 * row['FTA']) != 0 else 0
+            game_stats = {
+                'game_id': row['Game_ID'],
+                'game_date': row['GAME_DATE'],
+>>>>>>> Final updates for Fresh Finder project
                 'name': player_name,
                 'team_for': row['TEAM_ABBREVIATION'],
                 'team_logo': TEAM_LOGOS.get(row['TEAM_ABBREVIATION'], ''),
@@ -103,6 +157,7 @@ def get_player_stats():
                 'points': row['PTS'],
                 'rebounds': row['REB'],
                 'assists': row['AST'],
+<<<<<<< HEAD
                 'fg_percent': round(row['FG_PCT'] * 100, 2),
                 'ts_percent': round(ts_percent, 2),
                 'plus_minus': row.get('PLUS_MINUS', 'N/A')
@@ -110,10 +165,30 @@ def get_player_stats():
             games.append(game_stats)
 
         return jsonify(games)
+=======
+                'steals': row['STL'],
+                'blocks': row['BLK'],
+                'fg_percent': round(row['FG_PCT'] * 100, 2),
+                'ts_percent': round(ts_percent, 2),
+                'plus_minus': row.get('PLUS_MINUS', 'N/A'),
+                'turnovers': turnovers
+            }
+            games.append(game_stats)
+
+        return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date)
+>>>>>>> Final updates for Fresh Finder project
 
     except Exception as e:
         return jsonify(error=str(e)), 500
 
+<<<<<<< HEAD
+=======
+
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+
+>>>>>>> Final updates for Fresh Finder project
 @app.route('/player_profile/<player_name>')
 def get_player_profile(player_name):
     player_info = players.find_players_by_full_name(player_name)
@@ -170,6 +245,7 @@ def get_player_profile(player_name):
 
     except Exception as e:
         return jsonify(error=str(e)), 500
+<<<<<<< HEAD
     
 @app.route('/team_profile/<team_abbreviation>')
 def get_team_profile(team_abbreviation):
@@ -184,6 +260,28 @@ def get_team_profile(team_abbreviation):
     except Exception as e:
         return jsonify(error=str(e)), 500
 
+=======
+
+@app.route('/team_profile/<team_search_term>')
+def get_team_profile(team_search_term):
+    team_info = teams.find_team_by_abbreviation(team_search_term.upper())
+    
+    if not team_info:
+        all_teams = teams.get_teams()
+        team_info = next((team for team in all_teams if team['full_name'].lower() == team_search_term.lower()), None)
+
+    if not team_info:
+        return jsonify(error="Team not found"), 404
+
+    try:
+        team_info_dict, roster, recent_games, advanced_stats = fetch_team_data(team_info['abbreviation'])
+        return render_template('team_profile.html', team_info=team_info_dict, roster=roster, recent_games=recent_games, advanced_stats=advanced_stats)
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+
+
+>>>>>>> Final updates for Fresh Finder project
 def fetch_team_data(team_abbreviation):
     team_info = teams.find_team_by_abbreviation(team_abbreviation)
     if not team_info:
@@ -198,6 +296,7 @@ def fetch_team_data(team_abbreviation):
     game_log_data = game_log.get_data_frames()[0].head(10)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     advanced_stats = leaguedashteamstats.LeagueDashTeamStats(team_id=team_id).get_data_frames()[0]
 
 =======
@@ -207,6 +306,17 @@ def fetch_team_data(team_abbreviation):
         'city': team_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_data.columns else 'N/A',
         'state': team_data['TEAM_STATE'].values[0] if 'TEAM_STATE' in team_data.columns else 'N/A',
         'abbreviation': team_data['TEAM_ABBREVIATION'].values[0] if 'TEAM_ABBREVIATION' in team_data.columns else 'N/A',
+=======
+    league_stats = leaguedashteamstats.LeagueDashTeamStats(season='2023-24')
+    advanced_stats = league_stats.get_data_frames()[0]
+    team_advanced_stats = advanced_stats[advanced_stats['TEAM_ID'] == team_id]
+
+    team_info_dict = {
+        'name': team_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_data.columns else team_info.get('full_name', 'N/A'),
+        'city': team_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_data.columns else team_info.get('city', 'N/A'),
+        'state': team_data['TEAM_STATE'].values[0] if 'TEAM_STATE' in team_data.columns else team_info.get('state', 'N/A'),
+        'abbreviation': team_data['TEAM_ABBREVIATION'].values[0] if 'TEAM_ABBREVIATION' in team_data.columns else team_info.get('abbreviation', 'N/A'),
+>>>>>>> Final updates for Fresh Finder project
         'logo': TEAM_LOGOS.get(team_abbreviation, '')
     }
 
@@ -238,6 +348,7 @@ def fetch_team_data(team_abbreviation):
         recent_games.append(game_info)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     advanced_stats = {
         'off_rating': advanced_stats['OFF_RATING'][0],
         'def_rating': advanced_stats['DEF_RATING'][0],
@@ -251,6 +362,31 @@ def fetch_team_data(team_abbreviation):
 =======
     return team_info, roster, recent_games
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+    advanced_stats_dict = {
+        'off_rating': team_advanced_stats['OFF_RATING'].values[0] if 'OFF_RATING' in team_advanced_stats.columns else 'N/A',
+        'def_rating': team_advanced_stats['DEF_RATING'].values[0] if 'DEF_RATING' in team_advanced_stats.columns else 'N/A',
+        'net_rating': team_advanced_stats['NET_RATING'].values[0] if 'NET_RATING' in team_advanced_stats.columns else 'N/A',
+        'reb_percent': team_advanced_stats['REB_PCT'].values[0] if 'REB_PCT' in team_advanced_stats.columns else 'N/A',
+        'ast_percent': team_advanced_stats['AST_PCT'].values[0] if 'AST_PCT' in team_advanced_stats.columns else 'N/A',
+        'ts_percent': team_advanced_stats['TS_PCT'].values[0] if 'TS_PCT' in team_advanced_stats.columns else 'N/A'
+    }
+
+    return team_info_dict, roster, recent_games, advanced_stats_dict
+
+
+@app.route('/team_autocomplete')
+def team_autocomplete():
+    term = request.args.get('term').lower()
+    teams_list = teams.get_teams()
+    
+    results = [
+        {'label': team['full_name'], 'value': team['abbreviation']}
+        for team in teams_list if term in team['full_name'].lower() or term in team['abbreviation'].lower()
+    ]
+    
+    return jsonify(results)
+>>>>>>> Final updates for Fresh Finder project
 
 @app.route('/team_search', methods=['GET', 'POST'])
 def team_search():
@@ -259,11 +395,31 @@ def team_search():
         if not search_term:
             return jsonify(error="Search term is required"), 400
 
+<<<<<<< HEAD
         matched_teams = [team for team in teams.get_teams() if search_term.lower() in team['full_name'].lower()]
 
         return render_template('team_search_results.html', teams=matched_teams)
 
     return render_template('team_search.html')
+=======
+        search_term = search_term.lower()
+
+        matched_team = teams.find_team_by_abbreviation(search_term.upper())
+
+        if not matched_team:
+            matched_teams = [team for team in teams.get_teams() if search_term in team['full_name'].lower()]
+            if matched_teams:
+                matched_team = matched_teams[0]  
+                
+        if matched_team:
+            return redirect(url_for('get_team_profile', team_search_term=matched_team['abbreviation']))
+        else:
+            return jsonify(error="Team not found"), 404
+
+    return redirect(url_for('landing'))
+
+
+>>>>>>> Final updates for Fresh Finder project
 
 @app.route('/player_stats_average', methods=['GET'])
 def get_player_stats_average():
@@ -314,10 +470,13 @@ def get_player_stats_average():
 def game_box_score(game_id):
     try:
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         # Fetch game details using game_id (This is a placeholder as NBA API might not support direct game ID lookup)
         # Assuming playergamelog can provide game details. Replace this with the correct API call if available.
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+>>>>>>> Final updates for Fresh Finder project
         game_log = playergamelog.PlayerGameLog(player_id=player_id)
         data_frame = game_log.get_data_frames()[0]
         game_details = data_frame[data_frame['Game_ID'] == game_id]
@@ -349,7 +508,11 @@ if __name__ == '__main__':
     print("Templates folder exists:", os.path.isdir('templates'))
     print("player_profile.html exists:", os.path.isfile('templates/player_profile.html'))
 <<<<<<< HEAD
+<<<<<<< HEAD
     app.run(debug=True, port=5001)
 =======
     app.run(debug=True)
 >>>>>>> 6e63ab058810a2cb12c8b9df2bc92d40a7769f8e
+=======
+    app.run(debug=True, port=5002)
+>>>>>>> Final updates for Fresh Finder project

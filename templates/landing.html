@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fresh Finder</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        background-color: #f8f9fa;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 4rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+      }
+
+      .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .btn-group .btn {
+        flex: 1;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        text-align: center;
+        width: 250px;
+      }
+
+      .btn:hover {
+        background-color: #45a049;
+      }
+
+      .player-input,
+      .team-input {
+        margin-top: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"],
+      input[type="date"] {
+        padding: 15px;
+        font-size: 1.2rem;
+        width: calc(100% - 40px);
+        max-width: 350px;
+        margin: 0 auto;
+        display: block;
+        margin-bottom: 20px;
+      }
+
+      #player-options {
+        margin-top: 10px;
+      }
+
+      #profile-button,
+      #team-profile-button {
+        margin-top: 10px;
+        display: block;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Fresh Finder</h1>
+
+      <div class="btn-group">
+        <button class="btn" onclick="showPlayerInput()">Player Stats</button>
+        <button class="btn" onclick="showTeamInput()">Team Stats</button>
+      </div>
+
+      <div id="player-input" class="player-input" style="display: none;">
+        <form id="player-search-form">
+          <div class="form-group">
+            <label for="player-name">Enter Player Name:</label>
+            <input
+              type="text"
+              id="player-name"
+              name="player-name"
+              placeholder="Player Name"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="start-date">Select Start Date:</label>
+            <input
+              type="date"
+              id="start-date"
+              name="start-date"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="end-date">Select End Date:</label>
+            <input
+              type="date"
+              id="end-date"
+              name="end-date"
+              class="form-control"
+            />
+          </div>
+          <div class="btn-group">
+            <button type="submit" id="search-button" class="btn">
+              Search Player Stats
+            </button>
+            <button type="button" id="clear-button" class="btn">Clear</button>
+            <a href="#" id="profile-button" class="btn">Go to Player Profile</a>
+          </div>
+        </form>
+      </div>
+
+      <div id="team-input" class="team-input" style="display: none;">
+        <form id="team-search-form">
+          <div class="form-group">
+            <label for="team-name">Enter Team Name or Abbreviation:</label>
+            <input
+              type="text"
+              id="team-name"
+              name="team-name"
+              placeholder="Team Name"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="btn-group">
+            <button type="submit" id="search-team-button" class="btn">
+              Search Team Profile
+            </button>
+            <button type="button" id="team-clear-button" class="btn">Clear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function showPlayerInput() {
+        $("#player-input").show();
+        $("#team-input").hide();
+      }
+
+      function showTeamInput() {
+        $("#team-input").show();
+        $("#player-input").hide();
+      }
+
+      $(document).ready(function () {
+        $("#player-name").autocomplete({
+          source: function (request, response) {
+            $.ajax({
+              url: "/autocomplete",
+              data: { term: request.term },
+              success: function (data) {
+                response(data);
+              },
+            });
+          },
+          minLength: 2,
+          select: function (event, ui) {
+            $("#player-name").val(ui.item.value);
+            return false;
+          },
+        });
+
+        $("#player-search-form").submit(function (event) {
+          event.preventDefault();
+          const playerName = $("#player-name").val();
+          const startDate = $("#start-date").val();
+          const endDate = $("#end-date").val();
+          const url = `/player_stats?player_name=${encodeURIComponent(
+            playerName
+          )}&start_date=${encodeURIComponent(
+            startDate
+          )}&end_date=${encodeURIComponent(endDate)}`;
+          window.location.href = url;
+        });
+
+        $("#team-name").autocomplete({
+          source: function (request, response) {
+            $.ajax({
+              url: "/team_autocomplete",
+              data: { term: request.term },
+              success: function (data) {
+                response(data);
+              },
+            });
+          },
+          minLength: 2,
+          select: function (event, ui) {
+            $("#team-name").val(ui.item.label);
+            return false;
+          },
+        });
+
+        $("#team-search-form").submit(function (event) {
+          event.preventDefault();
+          const teamName = $("#team-name").val();
+          const teamUrl = `/team_profile/${encodeURIComponent(teamName)}`;
+          window.location.href = teamUrl;
+        });
+
+        $("#clear-button").click(function () {
+          $("#player-name").val("");
+          $("#start-date").val("");
+          $("#end-date").val("");
+          $("#profile-button").hide();
+        });
+
+        $("#team-clear-button").click(function () {
+          $("#team-name").val("");
+        });
+      });
+    </script>
+  </body>
+</html>
