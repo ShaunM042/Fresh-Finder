@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fresh Finder</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Fresh Finder</h1>
+    <h2>Player Stats</h2>
+
+    {% if stats %}
+      {% for stat in stats %}
+        <ul>
+          <li>Name: {{ stat.name }}</li>
+          <li>Team For: {{ stat.team_for }}</li>
+          <li>Team Against: {{ stat.team_against }}</li>
+          <li>Points: {{ stat.points }}</li>
+          <li>Rebounds: {{ stat.rebounds }}</li>
+          <li>Assists: {{ stat.assists }}</li>
+          <li>FG %: {{ stat.fg_percent }}</li>
+          <li>TS %: {{ stat.ts_percent }}</li>
+          <li>+/-: {{ stat.plus_minus }}</li>
+          <li>PER: {{ stat.per }}</li>
+        </ul>
+        <hr>
+      {% endfor %}
+    {% else %}
+      <p>No game stats available for this player in the selected date range.</p>
+    {% endif %}
+  </body>
+</html>

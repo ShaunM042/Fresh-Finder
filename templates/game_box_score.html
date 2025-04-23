@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Game Box Score</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Game Box Score</h1>
+    <div class="box-score-container">
+      <table>
+        <tr>
+          <th>Game Date</th>
+          <th>Matchup</th>
+          <th>Result</th>
+          <th>Minutes</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG %</th>
+          <th>3P %</th>
+          <th>FT %</th>
+          <th>+/-</th>
+        </tr>
+        <tr>
+          <td>{{ game_stats.game_date }}</td>
+          <td>{{ game_stats.matchup }}</td>
+          <td>{{ game_stats.wl }}</td>
+          <td>{{ game_stats.minutes }}</td>
+          <td>{{ game_stats.points }}</td>
+          <td>{{ game_stats.rebounds }}</td>
+          <td>{{ game_stats.assists }}</td>
+          <td>{{ game_stats.fg_percent }}%</td>
+          <td>{{ game_stats.threep_percent }}%</td>
+          <td>{{ game_stats.ft_percent }}%</td>
+          <td>{{ game_stats.plus_minus }}</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Team Profile</title>
+
+    <!-- External CSS (optional icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
+
+    <!-- Your custom stylesheet -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+
+    <!-- Internal styles -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 75px;
+        background: #4caf50;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      nav .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        max-width: 90%;
+        margin: auto;
+      }
+
+      nav .navbar .logo a {
+        color: #fff;
+        font-size: 27px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      nav .navbar .menu {
+        display: flex;
+      }
+
+      .navbar .menu li {
+        list-style: none;
+        margin: 0 15px;
+      }
+
+      .navbar .menu li a {
+        color: #fff;
+        font-size: 17px;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .navbar .menu li a.active {
+        background-color: #388e3c;
+      }
+
+      .navbar .menu li a:hover {
+        background-color: #45a049;
+      }
+
+      .container {
+        margin-top: 100px;
+        padding: 20px;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .team-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .team-header img {
+        height: 100px;
+      }
+
+      .team-info,
+      .roster,
+      .recent-games,
+      .advanced-stats {
+        background-color: #fff;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .team-info h1,
+      .roster h2,
+      .recent-games h2,
+      .advanced-stats h2 {
+        text-align: center;
+      }
+
+      .team-info ul,
+      .advanced-stats ul {
+        list-style-type: none;
+        padding: 0;
+        text-align: center;
+      }
+
+      .team-info li,
+      .advanced-stats li {
+        margin-bottom: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .roster td a {
+        color: #4caf50;
+        text-decoration: none;
+      }
+
+      .roster td a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 600px) {
+        .navbar .menu li {
+          margin: 0 10px;
+        }
+
+        .navbar .menu li a {
+          font-size: 15px;
+        }
+
+        .container {
+          margin-top: 120px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav>
+      <div class="navbar">
+        <div class="logo">
+          <a href="{{ url_for('landing') }}">Fresh Finder</a>
+        </div>
+        <ul class="menu">
+          <li>
+            <a href="{{ url_for('team_search') }}" class="{% if request.endpoint == 'team_search' %}active{% endif %}">Team Search</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="team-header">
+        <img src="{{ team_info.logo }}" alt="{{ team_info.name }} logo" />
+      </div>
+
+      <div class="team-info">
+        <h1>{{ team_info.name }}</h1>
+        <ul>
+          <li><strong>City:</strong> {{ team_info.city }}</li>
+          <li><strong>State:</strong> {{ team_info.state }}</li>
+          <li><strong>Abbreviation:</strong> {{ team_info.abbreviation }}</li>
+        </ul>
+      </div>
+
+      <div class="roster">
+        <h2>Roster</h2>
+        <table>
+          <tr>
+            <th>Player Name</th>
+            <th>Position</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Jersey Number</th>
+          </tr>
+          {% for player in roster %}
+          <tr>
+            <td><a href="/player_profile/{{ player.player_name }}">{{ player.player_name }}</a></td>
+            <td>{{ player.position }}</td>
+            <td>{{ player.height }}</td>
+            <td>{{ player.weight }}</td>
+            <td>{{ player.jersey_number }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="recent-games">
+        <h2>Recent Games</h2>
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Matchup</th>
+            <th>Result</th>
+            <th>Score</th>
+            <th>Points</th>
+            <th>Rebounds</th>
+            <th>Assists</th>
+            <th>FG %</th>
+            <th>3P %</th>
+            <th>FT %</th>
+          </tr>
+          {% for game in recent_games %}
+          <tr>
+            <td>{{ game.date }}</td>
+            <td>{{ game.matchup }}</td>
+            <td>{{ game.result }}</td>
+            <td>{{ game.score }}</td>
+            <td>{{ game.points }}</td>
+            <td>{{ game.rebounds }}</td>
+            <td>{{ game.assists }}</td>
+            <td>{{ game.fg_percent }}%</td>
+            <td>{{ game.threep_percent }}%</td>
+            <td>{{ game.ft_percent }}%</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="advanced-stats">
+        <h2>Advanced Team Stats</h2>
+        <ul>
+          <li>Offensive Rating: {{ advanced_stats.off_rating }}</li>
+          <li>Defensive Rating: {{ advanced_stats.def_rating }}</li>
+          <li>Net Rating: {{ advanced_stats.net_rating }}</li>
+          <li>Rebound Percentage: {{ advanced_stats.reb_percent }}</li>
+          <li>Assist Percentage: {{ advanced_stats.ast_percent }}</li>
+          <li>True Shooting Percentage: {{ advanced_stats.ts_percent }}</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
