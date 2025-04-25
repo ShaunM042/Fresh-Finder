@@ -1,43 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <title>Game Box Score</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
+
+      .box-score-container {
+        max-width: 800px;
+        margin: auto;
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .player-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 15px;
+      }
+
+      .player-header img {
+        height: 60px;
+        width: auto;
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ccc;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      @media (max-width: 600px) {
+        th, td {
+          font-size: 14px;
+          padding: 8px;
+        }
+
+        .player-header img {
+          height: 40px;
+        }
+      }
+    </style>
   </head>
   <body>
     <h1>Game Box Score</h1>
+
     <div class="box-score-container">
+      <div class="player-header">
+        <img src="{{ url_for('static', filename='player_images/' + game_stats.player_name.replace(' ', '-') + '.jpg') }}" alt="{{ game_stats.player_name }} headshot">
+        <strong>{{ game_stats.player_name }}</strong>
+        <img src="{{ url_for('static', filename='team_logos/' + game_stats.team_for + '.png') }}" alt="{{ game_stats.team_for }} logo">
+        <span>vs</span>
+        <img src="{{ url_for('static', filename='team_logos/' + game_stats.team_against + '.png') }}" alt="{{ game_stats.team_against }} logo">
+      </div>
+
       <table>
-        <tr>
-          <th>Game Date</th>
-          <th>Matchup</th>
-          <th>Result</th>
-          <th>Minutes</th>
-          <th>Points</th>
-          <th>Rebounds</th>
-          <th>Assists</th>
-          <th>FG %</th>
-          <th>3P %</th>
-          <th>FT %</th>
-          <th>+/-</th>
-        </tr>
-        <tr>
-          <td>{{ game_stats.game_date }}</td>
-          <td>{{ game_stats.matchup }}</td>
-          <td>{{ game_stats.wl }}</td>
-          <td>{{ game_stats.minutes }}</td>
-          <td>{{ game_stats.points }}</td>
-          <td>{{ game_stats.rebounds }}</td>
-          <td>{{ game_stats.assists }}</td>
-          <td>{{ game_stats.fg_percent }}%</td>
-          <td>{{ game_stats.threep_percent }}%</td>
-          <td>{{ game_stats.ft_percent }}%</td>
-          <td>{{ game_stats.plus_minus }}</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>Game Date</th>
+            <th>Matchup</th>
+            <th>Result</th>
+            <th>Minutes</th>
+            <th>Points</th>
+            <th>Rebounds</th>
+            <th>Assists</th>
+            <th>FG %</th>
+            <th>3P %</th>
+            <th>FT %</th>
+            <th>+/-</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ game_stats.game_date }}</td>
+            <td>{{ game_stats.matchup }}</td>
+            <td>{{ game_stats.wl }}</td>
+            <td>{{ game_stats.minutes }}</td>
+            <td>{{ game_stats.points }}</td>
+            <td>{{ game_stats.rebounds }}</td>
+            <td>{{ game_stats.assists }}</td>
+            <td>{{ game_stats.fg_percent }}%</td>
+            <td>{{ game_stats.threep_percent }}%</td>
+            <td>{{ game_stats.ft_percent }}%</td>
+            <td>{{ game_stats.plus_minus }}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </body>

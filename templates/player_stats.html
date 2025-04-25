@@ -2,35 +2,106 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Fresh Finder</title>
+    <title>Fresh Finder - Player Stats</title>
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+
+      h1, h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      img.team-logo {
+        height: 30px;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+
+      .no-data {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 18px;
+        color: #888;
+      }
+    </style>
   </head>
   <body>
     <h1>Fresh Finder</h1>
     <h2>Player Stats</h2>
 
     {% if stats %}
-      {% for stat in stats %}
-        <ul>
-          <li>Name: {{ stat.name }}</li>
-          <li>Team For: {{ stat.team_for }}</li>
-          <li>Team Against: {{ stat.team_against }}</li>
-          <li>Points: {{ stat.points }}</li>
-          <li>Rebounds: {{ stat.rebounds }}</li>
-          <li>Assists: {{ stat.assists }}</li>
-          <li>FG %: {{ stat.fg_percent }}</li>
-          <li>TS %: {{ stat.ts_percent }}</li>
-          <li>+/-: {{ stat.plus_minus }}</li>
-          <li>PER: {{ stat.per }}</li>
-        </ul>
-        <hr>
-      {% endfor %}
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Team For</th>
+          <th>Team Against</th>
+          <th>Minutes</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG %</th>
+          <th>TS %</th>
+          <th>+/-</th>
+        </tr>
+        {% for stat in stats %}
+        <tr>
+          <td>
+            <a href="{{ url_for('game_box_score', game_id=stat.game_id) }}" target="_blank"></a>
+              {{ stat.game_date }}
+            </a>
+          </td>
+          <td>
+            <img src="{{ stat.team_logo }}" alt="{{ stat.team_for }}" class="team-logo" />
+            {{ stat.team_for }}
+          </td>
+          <td>
+            <img src="{{ stat.opposing_team_logo }}" alt="{{ stat.team_against }}" class="team-logo" />
+            {{ stat.team_against }}
+          </td>
+          <td>{{ stat.minutes }}</td>
+          <td>{{ stat.points }}</td>
+          <td>{{ stat.rebounds }}</td>
+          <td>{{ stat.assists }}</td>
+          <td>{{ stat.fg_percent }}%</td>
+          <td>{{ stat.ts_percent }}%</td>
+          <td>{{ stat.plus_minus }}</td>
+        </tr>
+        {% endfor %}
+      </table>
     {% else %}
-      <p>No game stats available for this player in the selected date range.</p>
+      <p class="no-data">No game stats available for this player in the selected date range.</p>
     {% endif %}
   </body>
 </html>

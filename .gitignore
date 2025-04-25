@@ -1,13 +1,21 @@
+# Byte-compiled / cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Environment files
 .env
-venv/
 .env.*
 
+# Virtual environment
+venv/
+
+# macOS metadata
 .DS_Store
 
+# VS Code settings
 .vscode/
 
+# Node.js packages
 node_modules/

@@ -1,7 +1,4 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Player Profile</title>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -20,138 +17,23 @@
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
-  </head>
-  <body>
-    <div class="profile-container">
-      <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" />
-      <h1>Player Profile</h1>
-      <div class="profile-info">
-        <ul>
-          <li><span>Name:</span> {{ profile.name }}</li>
-          <li><span>Position:</span> {{ profile.position }}</li>
-          <li><span>Height:</span> {{ profile.height }}</li>
-          <li><span>Weight:</span> {{ profile.weight }}</li>
-          <li>
-            <span>Team:</span>
-            <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" />
-            {{ profile.team }}
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="recent-games">
-      <h2>Recent Games</h2>
-      <table>
-        <tr>
-          <th>Date</th>
-          <th>Team For</th>
-          <th>Team Against</th>
-          <th>Minutes</th>
-          <th>Points</th>
-          <th>Rebounds</th>
-          <th>Assists</th>
-          <th>FG %</th>
-          <th>TS %</th>
-          <th>+/-</th>
-        </tr>
-        {% for game in recent_games %}
-        <tr>
-          <td>{{ game.date }}</td>
-          <td>
-            <img
-              src="{{ game.team_for_logo }}"
-              alt="{{ game.team_for }} logo"
-            />
-            {{ game.team_for }}
-          </td>
-          <td>
-            <img
-              src="{{ game.team_against_logo }}"
-              alt="{{ game.team_against }} logo"
-            />
-            {{ game.team_against }}
-          </td>
-          <td>{{ game.minutes }}</td>
-          <td>{{ game.points }}</td>
-          <td>{{ game.rebounds }}</td>
-          <td>{{ game.assists }}</td>
-          <td>{{ game.fg_percent }}%</td>
-          <td>{{ game.ts_percent }}%</td>
-          <td>{{ game.plus_minus }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </body>
-<head>
-    <title>Player Profile</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-    </style>
-</head>
-<body>
-    <div class="profile-container">
-        
-        <h1>Player Profile</h1>
-        <div class="profile-info">
-            <ul>
-                <li><img class="player-headshot" src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}" alt="{{ profile.name }} headshot"></li>
-                <li><span>Name:</span> {{ profile.name }}</li>
-                <li><span>Position:</span> {{ profile.position }}</li>
-                <li><span>Height:</span> {{ profile.height }}</li>
-                <li><span>Weight:</span> {{ profile.weight }}</li>
-                <li><span>Team:</span> <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo"> {{ profile.team }}</li>
-            </ul>
-        </div>
-    </div>
-    <div class="recent-games">
-        <h2>Recent Games</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Team For</th>
-                <th>Team Against</th>
-                <th>Minutes</th>
-                <th>Points</th>
-                <th>Rebounds</th>
-                <th>Assists</th>
-                <th>FG %</th>
-                <th>TS %</th>
-                <th>+/-</th>
-            </tr>
-            {% for game in recent_games %}
-            <tr>
-                <td>{{ game.date }}</td>
-                <td><img src="{{ game.team_for_logo }}" alt="{{ game.team_for }} logo"> {{ game.team_for }}</td>
-                <td><img src="{{ game.team_against_logo }}" alt="{{ game.team_against }} logo"> {{ game.team_against }}</td>
-                <td>{{ game.minutes }}</td>
-                <td>{{ game.points }}</td>
-                <td>{{ game.rebounds }}</td>
-                <td>{{ game.assists }}</td>
-                <td>{{ game.fg_percent }}%</td>
-                <td>{{ game.ts_percent }}%</td>
-                <td>{{ game.plus_minus }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-</body>
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+
+      h1, h2 {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
       }
 
       nav {
@@ -162,6 +44,7 @@
         height: 75px;
         background: #4caf50;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
       }
 
       nav .navbar {
@@ -200,7 +83,7 @@
       }
 
       .navbar .menu li a.active {
-        background-color: #388e3c; 
+        background-color: #388e3c;
       }
 
       .navbar .menu li a:hover {
@@ -208,22 +91,21 @@
       }
 
       .container {
-        width: 100%;
-        max-width: 100%;
-        padding: 0 10px;
-        margin: 0 auto;
-        margin-top: 100px; 
+        max-width: 1000px;
+        margin: 100px auto 20px;
+        padding: 0 15px;
       }
 
       .profile-container {
         display: flex;
-        justify-content: center;
-        margin-top: 20px;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 40px;
       }
 
       .profile-info ul {
         list-style-type: none;
-        text-align: left;
+        padding: 0;
       }
 
       .profile-info ul li {
@@ -233,16 +115,22 @@
       .team-logo-small {
         height: 20px;
         vertical-align: middle;
-        margin-right: 5px;
+        margin-left: 5px;
       }
 
-      .recent-games {
-        margin-top: 20px;
+      .player-headshot {
+        height: 150px;
+        width: auto;
+        border-radius: 8px;
+        object-fit: cover;
+        background: #fff;
+        box-shadow: 0 0 8px rgba(0,0,0,0.1);
       }
 
-      .recent-games table {
+      table {
         width: 100%;
         border-collapse: collapse;
+        background: white;
       }
 
       th, td {
@@ -260,22 +148,15 @@
         background-color: #f1f1f1;
       }
 
-      h1, h2 {
-        text-align: center;
-        margin-top: 20px;
+      img.team-logo-small {
+        height: 25px;
+        vertical-align: middle;
       }
 
-      @media (max-width: 600px) {
-        nav .navbar .menu li {
-          margin: 0 10px;
-        }
-
-        .navbar .menu li a {
-          font-size: 15px;
-        }
-
-        .container {
-          margin-top: 120px;
+      @media (max-width: 768px) {
+        .profile-container {
+          flex-direction: column;
+          text-align: center;
         }
       }
     </style>
@@ -296,7 +177,7 @@
 
     <div class="container">
       <h1>{{ player_name }} - Player Profile</h1>
-      
+
       <div class="profile-container">
         <img
           class="player-headshot"
@@ -305,17 +186,13 @@
         />
         <div class="profile-info">
           <ul>
-            <li><span>Name:</span> {{ profile.name }}</li>
-            <li><span>Position:</span> {{ profile.position }}</li>
-            <li><span>Height:</span> {{ profile.height }}</li>
-            <li><span>Weight:</span> {{ profile.weight }}</li>
+            <li><strong>Name:</strong> {{ profile.name }}</li>
+            <li><strong>Position:</strong> {{ profile.position }}</li>
+            <li><strong>Height:</strong> {{ profile.height }}</li>
+            <li><strong>Weight:</strong> {{ profile.weight }}</li>
             <li>
-              <span>Team:</span>
-              <img
-                src="{{ profile.team_logo }}"
-                alt="{{ profile.team }} logo"
-                class="team-logo-small"
-              />
+              <strong>Team:</strong>
+              <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" class="team-logo-small" />
               {{ profile.team }}
             </li>
           </ul>
