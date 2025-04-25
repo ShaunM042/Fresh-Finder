@@ -1,4 +1,1 @@
-flask
-nba_api
-pandas
-gunicorn
+python-dotenv==1.1.0

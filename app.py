@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails, leaguedashteamstats
