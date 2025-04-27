@@ -363,36 +363,6 @@ def get_player_stats_average():
 
     except Exception as e:
         return jsonify(error=str(e)), 500
-
-@app.route('/game_box_score/<game_id>')
-def game_box_score(game_id):
-    try:
-        game_log = playergamelog.PlayerGameLog(player_id=player_id)
-        data_frame = game_log.get_data_frames()[0]
-        game_details = data_frame[data_frame['Game_ID'] == game_id]
-
-        if game_details.empty:
-            return jsonify(message="Game details not found"), 404
-
-        game_stats = {
-            'game_date': game_details['GAME_DATE'].values[0],
-            'matchup': game_details['MATCHUP'].values[0],
-            'wl': game_details['WL'].values[0],
-            'minutes': game_details['MIN'].values[0],
-            'points': game_details['PTS'].values[0],
-            'rebounds': game_details['REB'].values[0],
-            'assists': game_details['AST'].values[0],
-            'fg_percent': round(game_details['FG_PCT'].values[0] * 100, 2),
-            'threep_percent': round(game_details['FG3_PCT'].values[0] * 100, 2),
-            'ft_percent': round(game_details['FT_PCT'].values[0] * 100, 2),
-            'plus_minus': game_details['PLUS_MINUS'].values[0]
-        }
-
-        return render_template('game_box_score.html', game_stats=game_stats)
-
-    except Exception as e:
-        return jsonify(error=str(e)), 500
-
 @app.route('/game_box_score/<game_id>/<player_name>')
 def game_box_score(game_id, player_name):
     player_info = players.find_players_by_full_name(player_name)
@@ -402,7 +372,8 @@ def game_box_score(game_id, player_name):
     player_id = player_info[0]['id']
 
     try:
-        game_log = playergamelog.PlayerGameLog(player_id=player_id)
+        # FIX: Fetch full season games
+        game_log = playergamelog.PlayerGameLog(player_id=player_id, season='2024-25')
         data_frame = game_log.get_data_frames()[0]
         game_details = data_frame[data_frame['Game_ID'] == game_id]
 

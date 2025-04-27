@@ -55,6 +55,21 @@
         font-size: 18px;
         color: #888;
       }
+      .game-link-button {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .game-link-button:hover {
+        background-color: #45a049;
+      }
     </style>
   </head>
   <body>
@@ -78,8 +93,11 @@
         {% for stat in stats %}
         <tr>
           <td>
-            <a href="{{ url_for('game_box_score', game_id=stat.game_id) }}" target="_blank"></a>
-              {{ stat.game_date }}
+            {{ stat.game_date }}
+            <br />
+            <a href="{{ url_for('game_box_score', game_id=stat.game_id, player_name=stat.name) }}" 
+               class="game-link-button" target="_blank">
+              View Game
             </a>
           </td>
           <td>
