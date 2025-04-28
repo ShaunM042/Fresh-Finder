@@ -27,20 +27,6 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
 
-      .player-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        gap: 15px;
-      }
-
-      .player-header img {
-        height: 60px;
-        width: auto;
-        border-radius: 8px;
-      }
-
       table {
         width: 100%;
         border-collapse: collapse;
@@ -60,31 +46,32 @@
       tr:hover {
         background-color: #f1f1f1;
       }
+      .game-link-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+      }
+
+      .game-link-button:hover {
+        background-color: #45a049;
+      }
 
       @media (max-width: 600px) {
         th, td {
           font-size: 14px;
           padding: 8px;
         }
-
-        .player-header img {
-          height: 40px;
-        }
       }
     </style>
   </head>
   <body>
     <h1>Game Box Score</h1>
-
     <div class="box-score-container">
-      <div class="player-header">
-        <img src="{{ url_for('static', filename='player_images/' + game_stats.player_name.replace(' ', '-') + '.jpg') }}" alt="{{ game_stats.player_name }} headshot">
-        <strong>{{ game_stats.player_name }}</strong>
-        <img src="{{ url_for('static', filename='team_logos/' + game_stats.team_for + '.png') }}" alt="{{ game_stats.team_for }} logo">
-        <span>vs</span>
-        <img src="{{ url_for('static', filename='team_logos/' + game_stats.team_against + '.png') }}" alt="{{ game_stats.team_against }} logo">
-      </div>
-
       <table>
         <thead>
           <tr>
@@ -117,6 +104,9 @@
           </tr>
         </tbody>
       </table>
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('landing') }}" class="game-link-button">Back to Search</a>
+      </div>
     </div>
   </body>
 </html>
