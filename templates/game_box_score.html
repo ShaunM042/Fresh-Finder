@@ -106,6 +106,9 @@
       </table>
       <div style="text-align: center; margin-top: 20px;">
         <a href="{{ url_for('landing') }}" class="game-link-button">Back to Search</a>
+        <a href="{{ url_for('get_player_profile', player_name=game_stats.player_name) }}" class="game-link-button" style="margin-left: 10px;">
+          Back to Player Profile
+        </a>
       </div>
     </div>
   </body>
