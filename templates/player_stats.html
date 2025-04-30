@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Fresh Finder - Player Stats</title>
+    <title>{{ player_name }} - Player Stats</title>
     <link
       rel="stylesheet"
       type="text/css"
@@ -70,11 +70,15 @@
         .game-link-button:hover {
         background-color: #45a049;
       }
+        tr:hover {
+        background-color: #e0f7e9;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <h1>Fresh Finder</h1>
-    <h2>Player Stats</h2>
+    <h2>Stats from {{ start_date or "N/A" }} to {{ end_date or "N/A" }}</h2>
 
     {% if stats %}
       <table>
