@@ -140,7 +140,7 @@
               Search Player Stats
             </button>
             <button type="button" id="clear-button" class="btn">Clear</button>
-            <a href="#" id="profile-button" class="btn">Go to Player Profile</a>
+            <button type="button" id="profile-button" class="btn">Go to Player Profile</button>
           </div>
         </form>
       </div>
@@ -244,6 +244,15 @@
         $("#team-clear-button").click(function () {
           $("#team-name").val("");
         });
+      });
+      $("#profile-button").click(function () {
+        const playerName = $("#player-name").val();
+        if (playerName) {
+          const profileUrl = `/player_profile/${encodeURIComponent(playerName)}`;
+          window.location.href = profileUrl;
+        } else {
+          alert("Please enter a player name to view the profile.");
+        }
       });
     </script>
   </body>

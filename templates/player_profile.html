@@ -4,19 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ player_name }} - Player Profile</title>
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
     <style>
       * {
         margin: 0;
@@ -182,6 +172,7 @@
         <img
           class="player-headshot"
           src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}"
+          onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';"
           alt="{{ profile.name }} headshot"
         />
         <div class="profile-info">
@@ -218,19 +209,11 @@
           <tr>
             <td>{{ game.date }}</td>
             <td>
-              <img
-                src="{{ game.team_for_logo }}"
-                alt="{{ game.team_for }} logo"
-                class="team-logo-small"
-              />
+              <img src="{{ game.team_for_logo }}" alt="{{ game.team_for }} logo" class="team-logo-small" />
               {{ game.team_for }}
             </td>
             <td>
-              <img
-                src="{{ game.team_against_logo }}"
-                alt="{{ game.team_against }} logo"
-                class="team-logo-small"
-              />
+              <img src="{{ game.team_against_logo }}" alt="{{ game.team_against }} logo" class="team-logo-small" />
               {{ game.team_against }}
             </td>
             <td>{{ game.minutes }}</td>
@@ -244,10 +227,43 @@
           {% endfor %}
         </table>
       </div>
+
+      <h2 style="text-align: center; margin-top: 40px;">Points Per Game (Last 10)</h2>
+      <canvas id="pointsChart" height="100"></canvas>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const labels = {{ recent_games | map(attribute='date') | list | tojson }};
+      const dataPoints = {{ recent_games | map(attribute='points') | list | tojson }};
+
+      const ctx = document.getElementById('pointsChart').getContext('2d');
+      const pointsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Points per Game',
+            data: dataPoints,
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.2
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    </script>
   </body>
 </html>
