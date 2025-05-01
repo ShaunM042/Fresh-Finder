@@ -143,6 +143,19 @@
         vertical-align: middle;
       }
 
+      #metric-selector {
+        display: block;
+        margin: 30px auto 10px;
+        padding: 8px;
+        font-size: 16px;
+      }
+
+      .averages {
+        text-align: center;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+
       @media (max-width: 768px) {
         .profile-container {
           flex-direction: column;
@@ -169,12 +182,7 @@
       <h1>{{ player_name }} - Player Profile</h1>
 
       <div class="profile-container">
-        <img
-          class="player-headshot"
-          src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}"
-          onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';"
-          alt="{{ profile.name }} headshot"
-        />
+        <img class="player-headshot" src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';" alt="{{ profile.name }} headshot" />
         <div class="profile-info">
           <ul>
             <li><strong>Name:</strong> {{ profile.name }}</li>
@@ -208,14 +216,8 @@
           {% for game in recent_games %}
           <tr>
             <td>{{ game.date }}</td>
-            <td>
-              <img src="{{ game.team_for_logo }}" alt="{{ game.team_for }} logo" class="team-logo-small" />
-              {{ game.team_for }}
-            </td>
-            <td>
-              <img src="{{ game.team_against_logo }}" alt="{{ game.team_against }} logo" class="team-logo-small" />
-              {{ game.team_against }}
-            </td>
+            <td><img src="{{ game.team_for_logo }}" alt="{{ game.team_for }} logo" class="team-logo-small" /> {{ game.team_for }}</td>
+            <td><img src="{{ game.team_against_logo }}" alt="{{ game.team_against }} logo" class="team-logo-small" /> {{ game.team_against }}</td>
             <td>{{ game.minutes }}</td>
             <td>{{ game.points }}</td>
             <td>{{ game.rebounds }}</td>
@@ -228,7 +230,17 @@
         </table>
       </div>
 
-      <h2 style="text-align: center; margin-top: 40px;">Points Per Game (Last 10)</h2>
+      <div class="averages">
+        Averages (Last 10 Games): {{ avg_points }} PTS | {{ avg_assists }} AST | {{ avg_rebounds }} REB
+      </div>
+
+      <select id="metric-selector">
+        <option value="points">Points</option>
+        <option value="assists">Assists</option>
+        <option value="rebounds">Rebounds</option>
+      </select>
+
+      <h2 style="text-align: center;">Metric Per Game (Last 10)</h2>
       <canvas id="pointsChart" height="100"></canvas>
     </div>
 
@@ -238,7 +250,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       const labels = {{ recent_games | map(attribute='date') | list | tojson }};
-      const dataPoints = {{ recent_games | map(attribute='points') | list | tojson }};
+      const metrics = {
+        points: {{ recent_games | map(attribute='points') | list | tojson }},
+        assists: {{ recent_games | map(attribute='assists') | list | tojson }},
+        rebounds: {{ recent_games | map(attribute='rebounds') | list | tojson }}
+      };
 
       const ctx = document.getElementById('pointsChart').getContext('2d');
       const pointsChart = new Chart(ctx, {
@@ -247,7 +263,7 @@
           labels: labels,
           datasets: [{
             label: 'Points per Game',
-            data: dataPoints,
+            data: metrics.points,
             backgroundColor: 'rgba(76, 175, 80, 0.2)',
             borderColor: 'rgba(76, 175, 80, 1)',
             borderWidth: 2,
@@ -263,6 +279,13 @@
             }
           }
         }
+      });
+
+      document.getElementById('metric-selector').addEventListener('change', function () {
+        const selectedMetric = this.value;
+        pointsChart.data.datasets[0].data = metrics[selectedMetric];
+        pointsChart.data.datasets[0].label = `${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} per Game`;
+        pointsChart.update();
       });
     </script>
   </body>
