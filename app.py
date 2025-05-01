@@ -372,7 +372,6 @@ def game_box_score(game_id, player_name):
     player_id = player_info[0]['id']
 
     try:
-        # FIX: Fetch full season games
         game_log = playergamelog.PlayerGameLog(player_id=player_id, season='2024-25')
         data_frame = game_log.get_data_frames()[0]
         game_details = data_frame[data_frame['Game_ID'] == game_id]
@@ -401,6 +400,35 @@ def game_box_score(game_id, player_name):
         }
 
         return render_template('game_box_score.html', game_stats=game_stats)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+@app.route('/team_stats')
+def team_stats():
+    try:
+        league_stats = leaguedashteamstats.LeagueDashTeamStats(season='2023-24')
+        stats_df = league_stats.get_data_frames()[0]
+
+        team_stats = []
+        for _, row in stats_df.iterrows():
+            team_stats.append({
+                'team': row['TEAM_NAME'],
+                'abbreviation': row['TEAM_ABBREVIATION'],
+                'wins': row['W'],
+                'losses': row['L'],
+                'win_pct': round(row['W_PCT'] * 100, 1),
+                'ppg': row['PTS'],
+                'rpg': row['REB'],
+                'apg': row['AST'],
+                'fg_pct': round(row['FG_PCT'] * 100, 1),
+                'tp_pct': round(row['FG3_PCT'] * 100, 1),
+                'ft_pct': round(row['FT_PCT'] * 100, 1),
+                'off_rating': row['OFF_RATING'],
+                'def_rating': row['DEF_RATING'],
+                'net_rating': row['NET_RATING']
+            })
+
+        return render_template('team_stats.html', stats=team_stats)
 
     except Exception as e:
         return jsonify(error=str(e)), 500

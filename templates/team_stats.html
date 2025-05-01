@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Team Stats - Fresh Finder</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+      }
+
+      h1, h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .no-data {
+        text-align: center;
+        font-size: 18px;
+        color: #888;
+        margin-top: 40px;
+      }
+
+      .team-logo {
+        height: 30px;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fresh Finder</h1>
+    <h2>Team Stats</h2>
+
+    {% if stats %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Team</th>
+            <th>Opponent</th>
+            <th>Points</th>
+            <th>Rebounds</th>
+            <th>Assists</th>
+            <th>FG%</th>
+            <th>3P%</th>
+            <th>FT%</th>
+            <th>+/-</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in stats %}
+          <tr>
+            <td>{{ game.game_date }}</td>
+            <td>
+              <img src="{{ game.team_logo }}" alt="{{ game.team }} logo" class="team-logo" />
+              {{ game.team }}
+            </td>
+            <td>
+              <img src="{{ game.opponent_logo }}" alt="{{ game.opponent }} logo" class="team-logo" />
+              {{ game.opponent }}
+            </td>
+            <td>{{ game.points }}</td>
+            <td>{{ game.rebounds }}</td>
+            <td>{{ game.assists }}</td>
+            <td>{{ game.fg_percent }}%</td>
+            <td>{{ game.threep_percent }}%</td>
+            <td>{{ game.ft_percent }}%</td>
+            <td>{{ game.plus_minus }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="no-data">No team stats found for this date range.</p>
+    {% endif %}
+  </body>
+</html>
