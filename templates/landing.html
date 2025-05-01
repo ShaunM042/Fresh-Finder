@@ -102,8 +102,7 @@
 
   <div class="btn-group">
     <button class="btn" onclick="toggleSection('player')">Search Player</button>
-    <button class="btn" onclick="toggleSection('team')">Search Team</button>
-    <a href="{{ url_for('team_stats') }}" class="btn">View All Team Stats</a>
+    <button class="btn" onclick="toggleSection('team')">Team Stats</button>
   </div>
 
   <div id="player-section" class="form-section">
@@ -132,8 +131,8 @@
   <script>
     function toggleSection(type) {
       $("#player-section, #team-section").hide();
-      if (type === 'player') $("#player-section").slideDown();
-      if (type === 'team') $("#team-section").slideDown();
+      if (type === 'player') { $("#player-section").slideDown(); }
+      if (type === 'team') { $("#team-section").slideDown(); }
     }
 
     $(document).ready(function () {
@@ -171,8 +170,12 @@
 
       $("#team-search-form").submit(function (e) {
         e.preventDefault();
-        const name = $("#team-name").val();
-        window.location.href = `/team_profile/${encodeURIComponent(name)}`;
+        const name = $("#team-name").val().trim();
+        if (name === "") {
+          window.location.href = "/team_stats";
+        } else {
+          window.location.href = `/team_profile/${encodeURIComponent(name)}`;
+        }
       });
     });
   </script>
