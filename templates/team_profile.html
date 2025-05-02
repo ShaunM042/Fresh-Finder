@@ -3,20 +3,17 @@
   <head>
     <title>Team Profile</title>
 
-    <!-- External CSS (optional icons) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
     />
 
-    <!-- Your custom stylesheet -->
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
 
-    <!-- Internal styles -->
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -252,18 +249,6 @@
           </tr>
           {% endfor %}
         </table>
-      </div>
-
-      <div class="advanced-stats">
-        <h2>Advanced Team Stats</h2>
-        <ul>
-          <li>Offensive Rating: {{ advanced_stats.off_rating }}</li>
-          <li>Defensive Rating: {{ advanced_stats.def_rating }}</li>
-          <li>Net Rating: {{ advanced_stats.net_rating }}</li>
-          <li>Rebound Percentage: {{ advanced_stats.reb_percent }}</li>
-          <li>Assist Percentage: {{ advanced_stats.ast_percent }}</li>
-          <li>True Shooting Percentage: {{ advanced_stats.ts_percent }}</li>
-        </ul>
       </div>
     </div>
   </body>

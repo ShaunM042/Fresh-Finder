@@ -199,44 +199,6 @@ def get_player_profile(player_name):
             }
             recent_games.append(game_stats)
 
-        player_info = players.find_players_by_full_name(player_name)
-        if not player_info:
-            return render_template('player_profile.html', error="Player not found.")
-        player_id = player_info[0]['id']
-        if not player_id:
-            return render_template('player_profile.html', error="Player not found.")
-
-        recent_games_log = playergamelog.PlayerGameLog(player_id=player_id, season='2023-24')
-        recent_games_data = recent_games_log.get_data_frames()[0].head(10)
-
-        games = []
-        for index, row in recent_games_data.iterrows():
-            ts_percent = (row['PTS'] / (2 * (row['FGA'] + 0.44 * row['FTA']))) * 100 if (row['FGA'] + 0.44 * row['FTA']) != 0 else 0
-            game_stats = {
-                'date': row['GAME_DATE'],
-                'team_for': row['TEAM_ABBREVIATION'],
-                'team_for_logo': TEAM_LOGOS.get(row['TEAM_ABBREVIATION'], ''),
-                'team_against': row['MATCHUP'].split(' ')[-1],
-                'team_against_logo': TEAM_LOGOS.get(row['MATCHUP'].split(' ')[-1], ''),
-                'minutes': row['MIN'],
-                'points': row['PTS'],
-                'rebounds': row['REB'],
-                'assists': row['AST'],
-                'fg_percent': round(row['FG_PCT'] * 100, 2),
-                'ts_percent': round(ts_percent, 2),
-                'plus_minus': row.get('PLUS_MINUS', 'N/A')
-            }
-            games.append(game_stats)
-        if not games:
-            return render_template('player_profile.html', player_name=player_name, error="No recent game data available. This player may be retired.")
-
-        profile_data = get_player_profile(player_id)
-        return render_template('player_profile.html', profile=profile_data, games=games)
-
-    except Exception as e:
-        return render_template('player_profile.html', error=str(e))
-    
-    except Exception as e:
         return render_template('player_profile.html', profile=profile, recent_games=recent_games)
 
     except Exception as e:

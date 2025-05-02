@@ -16,6 +16,23 @@
         color: #333;
       }
 
+      .back-button {
+        display: block;
+        margin: 20px auto 10px;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        text-align: center;
+        width: fit-content;
+      }
+
+      .back-button:hover {
+        background-color: #45a049;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
@@ -36,7 +53,8 @@
       }
 
       tr:hover {
-        background-color: #f1f1f1;
+        background-color: #e8f5e9;
+        cursor: pointer;
       }
 
       .no-data {
@@ -51,11 +69,23 @@
         vertical-align: middle;
         margin-right: 5px;
       }
+
+      .logo-link {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+      }
+
+      .logo-link:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <h1>Fresh Finder</h1>
     <h2>Team Stats</h2>
+
+    <a href="{{ url_for('landing') }}" class="back-button">← Back to Search</a>
 
     {% if stats %}
       <table>
@@ -78,12 +108,16 @@
           <tr>
             <td>{{ game.game_date }}</td>
             <td>
-              <img src="{{ game.team_logo }}" alt="{{ game.team }} logo" class="team-logo" />
-              {{ game.team }}
+              <a href="{{ url_for('get_team_profile', team_name=game.team) }}" class="logo-link">
+                <img src="{{ game.team_logo }}" alt="{{ game.team }} logo" class="team-logo" />
+                {{ game.team }}
+              </a>
             </td>
             <td>
-              <img src="{{ game.opponent_logo }}" alt="{{ game.opponent }} logo" class="team-logo" />
-              {{ game.opponent }}
+              <a href="{{ url_for('get_team_profile', team_name=game.opponent) }}" class="logo-link">
+                <img src="{{ game.opponent_logo }}" alt="{{ game.opponent }} logo" class="team-logo" />
+                {{ game.opponent }}
+              </a>
             </td>
             <td>{{ game.points }}</td>
             <td>{{ game.rebounds }}</td>
