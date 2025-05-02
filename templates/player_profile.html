@@ -179,6 +179,25 @@
     </nav>
 
     <div class="container">
+      {% if error %}
+      <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="card shadow p-5" style="max-width: 600px; width: 100%; border-radius: 12px;">
+          <div class="text-center">
+            <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+            <h2 class="text-dark">{{ player_name }} - Player Profile</h2>
+            <p class="mt-3 text-muted" style="font-size: 1.1rem;">
+              {{ error }}
+            </p>
+            <p class="text-secondary">
+              This player may be retired, or recent stats are not available through the NBA API.
+            </p>
+            <a href="{{ url_for('landing') }}" class="btn btn-success mt-4 px-4 py-2">
+              ← Back to Search
+            </a>
+          </div>
+        </div>
+      </div>
+{% else %}
       <h1>{{ player_name }} - Player Profile</h1>
 
       <div class="profile-container">
@@ -288,5 +307,6 @@
         pointsChart.update();
       });
     </script>
+    {% endif %}
   </body>
 </html>
