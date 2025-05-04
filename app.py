@@ -7,6 +7,7 @@ import datetime
 import os
 import requests
 from nba_api.stats.library.http import NBAStatsHTTP
+import pandas as pd
 
 NBAStatsHTTP._session = requests.Session()
 NBAStatsHTTP._session.headers.update({
@@ -405,33 +406,62 @@ def game_box_score(game_id, player_name):
         return jsonify(error=str(e)), 500
 @app.route('/team_stats')
 def team_stats():
-    try:
-        league_stats = leaguedashteamstats.LeagueDashTeamStats(season='2023-24')
-        stats_df = league_stats.get_data_frames()[0]
+    team_name = request.args.get("team_name")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
 
-        team_stats = []
-        for _, row in stats_df.iterrows():
-            team_stats.append({
-                'team': row['TEAM_NAME'],
-                'abbreviation': row['TEAM_ABBREVIATION'],
-                'wins': row['W'],
-                'losses': row['L'],
-                'win_pct': round(row['W_PCT'] * 100, 1),
-                'ppg': row['PTS'],
-                'rpg': row['REB'],
-                'apg': row['AST'],
-                'fg_pct': round(row['FG_PCT'] * 100, 1),
-                'tp_pct': round(row['FG3_PCT'] * 100, 1),
-                'ft_pct': round(row['FT_PCT'] * 100, 1),
-                'off_rating': row['OFF_RATING'],
-                'def_rating': row['DEF_RATING'],
-                'net_rating': row['NET_RATING']
+    if not team_name:
+        return render_template("team_stats.html", stats=[])
+
+    nba_teams = teams.get_teams()
+    team = next((t for t in nba_teams if t['abbreviation'].lower() == team_name.lower() or t['full_name'].lower() == team_name.lower()), None)
+
+    if not team:
+        return render_template("team_stats.html", stats=[])
+
+    team_id = team['id']
+    team_abbreviation = team['abbreviation']
+
+    try:
+        game_log = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24', season_type_all_star='Regular Season')
+        games_df = game_log.get_data_frames()[0]
+        games_df['GAME_DATE'] = pd.to_datetime(games_df['GAME_DATE'])
+
+        if start_date and end_date:
+            start = pd.to_datetime(start_date)
+            end = pd.to_datetime(end_date)
+            games_df = games_df[(games_df['GAME_DATE'] >= start) & (games_df['GAME_DATE'] <= end)]
+
+        if games_df.empty:
+            return render_template("team_stats.html", stats=[])
+
+        if 'TEAM_ABBREVIATION' not in games_df.columns:
+            games_df['TEAM_ABBREVIATION'] = games_df['MATCHUP'].apply(lambda x: x.split(' ')[0])
+
+        team_games = []
+        for _, row in games_df.iterrows():
+            team_games.append({
+                "game_date": row["GAME_DATE"].strftime("%b %d, %Y"),
+                "team": team_abbreviation,
+                "team_logo": TEAM_LOGOS.get(team_abbreviation, ""),
+                "opponent": row["MATCHUP"].split(" ")[-1],
+                "opponent_logo": TEAM_LOGOS.get(row["MATCHUP"].split(" ")[-1], ""),
+                "points": row["PTS"],
+                "rebounds": row["REB"],
+                "assists": row["AST"],
+                "fg_percent": round(row["FG_PCT"] * 100, 1),
+                "threep_percent": round(row["FG3_PCT"] * 100, 1),
+                "ft_percent": round(row["FT_PCT"] * 100, 1),
+                "plus_minus": row["PLUS_MINUS"],
             })
 
-        return render_template('team_stats.html', stats=team_stats)
+        return render_template("team_stats.html", stats=team_games)
 
     except Exception as e:
         return jsonify(error=str(e)), 500
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
 
 if __name__ == '__main__':
     print("App started, current directory:", os.getcwd())
