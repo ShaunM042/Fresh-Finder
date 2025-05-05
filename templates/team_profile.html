@@ -212,7 +212,7 @@
           </tr>
           {% for player in roster %}
           <tr>
-            <td><a href="/player_profile/{{ player.player_name }}">{{ player.player_name }}</a></td>
+            <td><a href="/player_profile/{{ player.player_name }}" title="View {{ player.player_name }}'s profile">{{ player.player_name }}</a></td>
             <td>{{ player.position }}</td>
             <td>{{ player.height }}</td>
             <td>{{ player.weight }}</td>
