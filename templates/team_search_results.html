@@ -15,16 +15,25 @@
         <th>Team Name</th>
         <th>Abbreviation</th>
       </tr>
-      {% for team in teams %}
+
+      {% if teams|length == 0 %}
       <tr>
-        <td>
-          <a href="/team_profile/{{ team.abbreviation }}"
-            >{{ team.full_name }}</a
-          >
+        <td colspan="2" style="color: #888; text-align: center; padding: 20px;">
+          <i class="fas fa-search"></i> No matching teams found.
         </td>
-        <td>{{ team.abbreviation }}</td>
       </tr>
-      {% endfor %}
+      {% else %}
+        {% for team in teams %}
+        <tr>
+          <td>
+            <a href="/team_profile/{{ team.abbreviation }}">
+              {{ team.full_name }}
+            </a>
+          </td>
+          <td>{{ team.abbreviation }}</td>
+        </tr>
+        {% endfor %}
+      {% endif %}
     </table>
   </body>
 </html>
