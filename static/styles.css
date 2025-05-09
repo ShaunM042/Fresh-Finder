@@ -116,14 +116,16 @@ td a {
     text-decoration: none;
 }
 
-td a:hover {
-    text-decoration: underline;
-}
-
 .error {
     color: red;
     text-align: center;
     margin-top: 20px;
+}
+
+tr:hover {
+    background-color: #f0fff0;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
 
 .team-logo {
@@ -217,5 +219,9 @@ td a:hover {
         table {
             width: 100%;
         }
+    }
+
+    html {
+        scroll-behavior: smooth;
     }
 }
