@@ -128,100 +128,110 @@ tr:hover {
     transition: background-color 0.2s ease-in-out;
 }
 
-.team-logo {
+button:hover {
+    background-color: #218838;
+    transform: scale(1.03);
+    transition: all 0.2s ease-in-out;
+}
+
+/* For small table logos */
+.team-logo-small {
     height: 20px;
     vertical-align: middle;
     margin-left: 10px;
+}
 
-    .profile-info ul {
-        list-style-type: none;
-        padding: 0;
+.profile-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.profile-info li {
+    margin: 10px 0;
+}
+
+.profile-info span {
+    font-weight: bold;
+}
+
+.recent-games {
+    margin: 20px auto;
+    width: 80%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.recent-games table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-games th,
+.recent-games td {
+    padding: 20px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 20px;
+}
+
+.recent-games th {
+    background-color: #4caf50;
+    color: white;
+    font-size: 22px;
+}
+
+.recent-games img {
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.player-headshot {
+    width: 50px;
+    height: 250px;
+    display: block;
+    margin-left: 20px;
+}
+
+/* For large profile logos */
+.team-logo-large {
+    height: 200px;
+    width: auto;
+}
+
+@media (max-width: 600px) {
+    .profile-container {
+        flex-direction: column;
+        width: 90%;
     }
 
-    .profile-info li {
-        margin: 10px 0;
-    }
-
-    .profile-info span {
-        font-weight: bold;
-    }
-
-    .recent-games {
-        margin: 20px auto;
-        width: 80%;
-        background-color: #fff;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-    }
-
-    .recent-games table {
+    table {
         width: 100%;
-        border-collapse: collapse;
     }
+}
 
-    .recent-games th,
-    .recent-games td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
+html {
+    scroll-behavior: smooth;
+}
 
-    .recent-games th {
-        background-color: #4caf50;
-        color: white;
-    }
+#scrollTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
 
-    .recent-games img {
-        height: 30px;
-        vertical-align: middle;
-        margin-right: 5px;
-    }
-
-    .player-headshot {
-        width: 50px;
-        height: 250px;
-        display: block;
-        margin-left: 20px;
-    }
-
-    .recent-games th,
-    .recent-games td {
-        padding: 20px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        font-size: 20px;
-    }
-
-    .recent-games th {
-        background-color: #4caf50;
-        color: white;
-        font-size: 22px;
-    }
-
-    .recent-games img {
-        height: 40px;
-        vertical-align: middle;
-        margin-right: 10px;
-    }
-
-    .team-logo {
-        height: 200px;
-        width: auto;
-    }
-
-    @media (max-width: 600px) {
-        .profile-container {
-            flex-direction: column;
-            width: 90%;
-        }
-
-        table {
-            width: 100%;
-        }
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
+#scrollTopBtn:hover {
+    background-color: #388e3c;
 }
