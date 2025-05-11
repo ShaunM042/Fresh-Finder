@@ -3,7 +3,7 @@ load_dotenv()
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails, leaguedashteamstats
-import datetime
+from datetime import datetime
 import os
 import requests
 from nba_api.stats.library.http import NBAStatsHTTP
@@ -312,13 +312,12 @@ def team_search():
             matched_teams = [team for team in teams.get_teams() if search_term in team['full_name'].lower()]
             if matched_teams:
                 matched_team = matched_teams[0]  
-                
+
         if matched_team:
             return redirect(url_for('get_team_profile', team_search_term=matched_team['abbreviation']))
         else:
             return jsonify(error="Team not found"), 404
-
-    return redirect(url_for('landing'))
+    return render_template('team_search.html')
 
 @app.route('/player_stats_average', methods=['GET'])
 def get_player_stats_average():
@@ -456,6 +455,98 @@ def team_stats():
             })
 
         return render_template("team_stats.html", stats=team_games)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+@app.route('/search_team_stats', methods=['POST'])
+def search_team_stats():
+    team_abbreviation = request.form['team_name'].upper()
+    start_date = pd.to_datetime(request.form['start_date'])
+    end_date = pd.to_datetime(request.form['end_date'])
+
+    try:
+        gamelog = teamgamelog.TeamGameLog(season='2023-24')
+        df = gamelog.get_data_frames()[0]
+        df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
+
+        team_df = df[(df['TEAM_ABBREVIATION'] == team_abbreviation) & 
+                     (df['GAME_DATE'] >= start_date) & 
+                     (df['GAME_DATE'] <= end_date)]
+
+        if team_df.empty:
+            return render_template('team_stats.html', stats=[])
+
+        stats = []
+        for _, row in team_df.iterrows():
+            stats.append({
+                'game_date': row['GAME_DATE'].strftime('%B %d, %Y'),
+                'team': row['TEAM_ABBREVIATION'],
+                'team_logo': TEAM_LOGOS.get(row['TEAM_ABBREVIATION'], ''),
+                'opponent': row['MATCHUP'].split(' ')[-1],
+                'opponent_logo': TEAM_LOGOS.get(row['MATCHUP'].split(' ')[-1], ''),
+                'points': row['PTS'],
+                'rebounds': row['REB'],
+                'assists': row['AST'],
+                'fg_percent': round(row['FG_PCT'] * 100, 1),
+                'threep_percent': round(row['FG3_PCT'] * 100, 1),
+                'ft_percent': round(row['FT_PCT'] * 100, 1),
+                'plus_minus': row.get('PLUS_MINUS', 'N/A')
+            })
+
+        return render_template('team_stats.html', stats=stats)
+
+    except Exception as e:
+        return jsonify(error=str(e))
+@app.route('/team_stats_stretch', methods=['GET'])
+def team_stats_stretch():
+    try:
+        team_abbreviation = request.args.get('team')
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        if not (team_abbreviation and start_date and end_date):
+            return render_template('team_stats.html', stats=[])
+
+        # Get all NBA teams
+        all_teams = teams.get_teams()
+        selected_team = next((team for team in all_teams if team['abbreviation'].lower() == team_abbreviation.lower()), None)
+
+        if not selected_team:
+            return render_template('team_stats.html', stats=[])
+
+        team_id = selected_team['id']
+
+        # Fetch the game logs for the team
+        gamelog = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24')
+        df = gamelog.get_data_frames()[0]
+
+        # Convert date and filter
+        df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
+        start_dt = pd.to_datetime(start_date)
+        end_dt = pd.to_datetime(end_date)
+        filtered = df[(df['GAME_DATE'] >= start_dt) & (df['GAME_DATE'] <= end_dt)]
+
+        if filtered.empty:
+            return render_template('team_stats.html', stats=[])
+
+        stats = []
+        for _, row in filtered.iterrows():
+            stats.append({
+                'game_date': row['GAME_DATE'].strftime('%B %d, %Y'),
+                'team': selected_team['full_name'],
+                'opponent': row['MATCHUP'].split(' ')[-1],
+                'points': row.get('PTS', 0),
+                'rebounds': row.get('REB', 0),
+                'assists': row.get('AST', 0),
+                'fg_percent': round(row.get('FG_PCT', 0) * 100, 1),
+                'threep_percent': round(row.get('FG3_PCT', 0) * 100, 1),
+                'ft_percent': round(row.get('FT_PCT', 0) * 100, 1),
+                'plus_minus': row.get('PLUS_MINUS', 0),
+                'team_logo': f"https://cdn.nba.com/logos/nba/{team_id}/global/L/logo.svg",
+                'opponent_logo': '',  
+            })
+
+        return render_template('team_stats.html', stats=stats)
 
     except Exception as e:
         return jsonify(error=str(e)), 500

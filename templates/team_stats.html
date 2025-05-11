@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Team Stats - Fresh Finder</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
     <style>
       body {
@@ -84,6 +85,15 @@
   <body>
     <h1>Fresh Finder</h1>
     <h2>Team Stats</h2>
+    <h2>Search Team Stats by Date Range</h2>
+      <form method="get" action="{{ url_for('team_stats_stretch') }}" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" name="team" placeholder="Team Abbreviation (e.g., GSW)" required style="margin: 0 10px; padding: 8px; width: 200px;" />
+        <input type="date" name="start_date" required style="margin: 0 10px; padding: 8px;" />
+        <input type="date" name="end_date" required style="margin: 0 10px; padding: 8px;" />
+        <button type="submit" style="padding: 10px 20px; background-color: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          Search Stats
+        </button>
+      </form>
 
     <a href="{{ url_for('landing') }}" class="back-button">← Back to Search</a>
 
