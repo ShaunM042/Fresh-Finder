@@ -3,7 +3,7 @@ load_dotenv()
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import playergamelog, commonplayerinfo, playercareerstats, teamgamelog, commonteamroster, teamdetails, leaguedashteamstats
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import requests
 from nba_api.stats.library.http import NBAStatsHTTP
@@ -504,6 +504,11 @@ def team_stats_stretch():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
 
+        if not start_date or not end_date:
+            today = datetime.today()
+            end_date = today.strftime('%Y-%m-%d')
+            start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+
         if not (team_abbreviation and start_date and end_date):
             return render_template('team_stats.html', stats=[])
 
@@ -553,6 +558,10 @@ def team_stats_stretch():
 @app.route('/favicon.ico')
 def favicon():
     return '', 204
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     print("App started, current directory:", os.getcwd())
