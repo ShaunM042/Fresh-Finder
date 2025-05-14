@@ -5,6 +5,7 @@
     <title>Team Stats - Fresh Finder</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -141,7 +142,10 @@
         </tbody>
       </table>
     {% else %}
-      <p class="no-data">No team stats found for this date range.</p>
+      <div class="no-data">
+        <i class="fas fa-frown" style="font-size: 48px; color: #ccc;"></i>
+        <p style="font-size: 18px; color: #666;">No stats found for the selected date range. Try adjusting your search.</p>
+      </div>
     {% endif %}
   </body>
 </html>
