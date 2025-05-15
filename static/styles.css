@@ -55,6 +55,13 @@ input[type="text"] {
     width: 200px;
 }
 
+input[type="text"]:focus,
+input[type="date"]:focus {
+  outline: 2px solid #4caf50;
+  outline-offset: 2px;
+  background-color: #e8f5e9;
+}
+
 input[type="submit"] {
     padding: 10px 20px;
     font-size: 16px;
@@ -147,6 +154,12 @@ button:hover {
     background-color: #218838;
     transform: scale(1.03);
     transition: all 0.2s ease-in-out;
+}
+
+button:focus, input[type="submit"]:focus {
+  outline: 2px solid #1e7e34;
+  outline-offset: 2px;
+  transition: outline 0.2s ease-in-out;
 }
 
 /* For small table logos */
@@ -275,6 +288,10 @@ html {
     font-weight: 600;
 }
 
+a {
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
 @media (max-width: 768px) {
     h1 {
         font-size: 28px;
@@ -294,4 +311,13 @@ html {
     .container {
         max-width: 960px;
     }
+}
+
+body {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
