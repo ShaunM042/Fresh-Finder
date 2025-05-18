@@ -1,14 +1,16 @@
+html {
+    font-size: 16px;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;
     margin: 0;
     padding: 20px;
     line-height: 1.6;
-}
-
-html {
-    font-size: 16px;
-    box-sizing: border-box;
+    animation: fadeIn 0.4s ease-in;
 }
 
 *,
@@ -45,12 +47,15 @@ form {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 input[type="date"],
 input[type="text"] {
-    padding: 10px;
-    font-size: 16px;
+    padding: 20px;
+    margin-right: 20px;
+    font-size: 24px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     width: 200px;
@@ -64,9 +69,9 @@ input[type="date"]:focus {
 }
 
 input[type="submit"] {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #28a745;
+    padding: 20px 40px;
+    font-size: 24px;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -78,42 +83,32 @@ input[type="submit"]:hover {
     background-color: #218838;
 }
 
+input[type="submit"]:focus,
+button:focus {
+    outline: 2px solid #1e7e34;
+    outline-offset: 2px;
+    transition: outline 0.2s ease-in-out;
+}
+
+input[type="submit"]:active,
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) inset;
+}
+
 .table-container {
     background: white;
-    padding: 20px;
+    padding: 40px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     margin: 0;
-    padding: 40px;
 }
 
 h1 {
-    text-align: center;
-    color: #333;
     font-size: 36px;
-}
-
-form {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-input[type="date"],
-input[type="text"] {
-    padding: 20px;
-    margin-right: 20px;
-    font-size: 24px;
-}
-
-input[type="submit"] {
-    padding: 20px 40px;
-    font-size: 24px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    cursor: pointer;
+    color: #333;
 }
 
 table {
@@ -154,19 +149,6 @@ button:hover {
     background-color: #218838;
     transform: scale(1.03);
     transition: all 0.2s ease-in-out;
-}
-
-button:focus,
-input[type="submit"]:focus {
-    outline: 2px solid #1e7e34;
-    outline-offset: 2px;
-    transition: outline 0.2s ease-in-out;
-}
-
-button:active,
-input[type="submit"]:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) inset;
 }
 
 /* For small table logos */
@@ -249,25 +231,25 @@ input[type="submit"]:active {
     transition: transform 0.2s ease-in-out;
 }
 
-/* For large profile logos */
 .team-logo-large {
     height: 200px;
     width: auto;
 }
 
-@media (max-width: 600px) {
-    .profile-container {
-        flex-direction: column;
-        width: 90%;
-    }
-
-    table {
-        width: 100%;
-    }
+.menu li a,
+.highlighted-link {
+    font-weight: 600;
 }
 
-html {
-    scroll-behavior: smooth;
+a {
+    cursor: pointer;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+a:focus {
+    outline: 2px dashed #4caf50;
+    outline-offset: 4px;
+    background-color: #e8f5e9;
 }
 
 #scrollTopBtn {
@@ -290,23 +272,15 @@ html {
     background-color: #388e3c;
 }
 
-.menu li a,
-.highlighted-link {
-    font-weight: 600;
-}
+@media (max-width: 600px) {
+    .profile-container {
+        flex-direction: column;
+        width: 90%;
+    }
 
-a {
-    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-}
-
-a {
-    cursor: pointer;
-}
-
-a:focus {
-    outline: 2px dashed #4caf50;
-    outline-offset: 4px;
-    background-color: #e8f5e9;
+    table {
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
@@ -328,10 +302,6 @@ a:focus {
     .container {
         max-width: 960px;
     }
-}
-
-body {
-    animation: fadeIn 0.4s ease-in;
 }
 
 @keyframes fadeIn {
