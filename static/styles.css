@@ -205,6 +205,12 @@ button:hover {
     margin-right: 10px;
 }
 
+input[type="submit"]:hover,
+button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
 .player-headshot {
     width: 50px;
     height: 250px;
