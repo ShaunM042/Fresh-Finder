@@ -91,10 +91,22 @@ button:focus {
     transition: outline 0.2s ease-in-out;
 }
 
+input[type="submit"]:focus-visible,
+button:focus-visible {
+    outline: 3px solid #4caf50;
+    outline-offset: 2px;
+}
+
 input[type="submit"]:active,
 button:active {
     transform: scale(0.98);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) inset;
+}
+
+input[type="submit"]:focus-visible,
+button:focus-visible {
+    outline: 3px solid #4caf50;
+    outline-offset: 2px;
 }
 
 .table-container {
@@ -258,6 +270,7 @@ a:focus {
     outline-offset: 4px;
     background-color: #e8f5e9;
 }
+
 
 #scrollTopBtn {
     position: fixed;
