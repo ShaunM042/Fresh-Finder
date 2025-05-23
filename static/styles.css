@@ -348,3 +348,11 @@ caption {
     margin-bottom: 10px;
     text-align: left;
 }
+
+small {
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
