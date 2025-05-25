@@ -84,16 +84,16 @@
     {% if stats %}
       <table>
         <tr>
-          <th>Date</th>
-          <th>Team For</th>
-          <th>Team Against</th>
-          <th>Minutes</th>
-          <th>Points</th>
-          <th>Rebounds</th>
-          <th>Assists</th>
-          <th>FG %</th>
-          <th>TS %</th>
-          <th>+/-</th>
+          <th title="Date of the game">Date</th>
+          <th title="Player's team">Team For</th>
+          <th title="Opposing team">Team Against</th>
+          <th title="Minutes played">Minutes</th>
+          <th title="Total points scored">Points</th>
+          <th title="Total rebounds (offensive and defensive)">Rebounds</th>
+          <th title="Total assists">Assists</th>
+          <th title="Field Goal Percentage — made shots divided by attempted shots">FG%</th>
+          <th title="True Shooting Percentage — accounts for field goals, 3-pointers, and free throws">TS%</th>
+          <th title="Plus/Minus — point differential while player was on the court">+/-</th>
         </tr>
         {% for stat in stats %}
         <tr>
