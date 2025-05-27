@@ -102,7 +102,9 @@
         {% for stat in stats %}
         <tr>
           <td>
-            {{ stat.game_date }}
+            <span {% if stat.game_date == current_date %}style="font-weight:bold; color:#e53935"{% endif %}>
+              {{ stat.game_date }}
+            </span>
             <br />
             <a href="{{ url_for('game_box_score', game_id=stat.game_id, player_name=stat.name) }}" 
                class="game-link-button" target="_blank">
