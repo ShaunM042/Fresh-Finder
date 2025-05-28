@@ -148,6 +148,13 @@ th {
     color: white;
 }
 
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #4caf50;
+  z-index: 1;
+}
+
 td a:hover {
     text-decoration: underline;
 }
