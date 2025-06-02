@@ -81,7 +81,7 @@
       }
     </style>
   </head>
-  <body>
+  <body id="top">
     <h1>Fresh Finder</h1>
     <h2>Stats from {{ start_date or "N/A" }} to {{ end_date or "N/A" }}</h2>
 
@@ -132,5 +132,6 @@
     {% else %}
       <p class="no-data">No game stats available for this player in the selected date range.</p>
     {% endif %}
+    <a href="#top" class="back-to-top">↑ Back to Top</a>
   </body>
 </html>

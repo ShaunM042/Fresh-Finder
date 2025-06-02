@@ -399,3 +399,20 @@ small {
 tr {
   animation: fadeInRow 0.3s ease-in-out;
 }
+
+
+/* Back to Top link styles */
+.back-to-top {
+  display: block;
+  text-align: center;
+  margin: 40px 0;
+  font-size: 16px;
+  color: #4caf50;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.back-to-top:hover {
+  color: #388e3c;
+  text-decoration: underline;
+}
