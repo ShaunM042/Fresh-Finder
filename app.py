@@ -123,7 +123,8 @@ def get_player_stats():
             }
             games.append(game_stats)
 
-        return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date)
+        current_date = datetime.today().strftime('%Y-%m-%d')
+        return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date, current_date=current_date)
 
     except Exception as e:
         return jsonify(error=str(e)), 500

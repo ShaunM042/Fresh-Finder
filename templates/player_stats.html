@@ -84,6 +84,9 @@
   <body id="top">
     <div id="spinner" class="spinner"></div>
     <h1>Fresh Finder</h1>
+    <p style="text-align: center; color: #555; font-size: 14px;">
+      Today’s date: {{ current_date }}
+    </p>
     <h2>Stats from {{ start_date or "N/A" }} to {{ end_date or "N/A" }}</h2>
 
     {% if stats %}
