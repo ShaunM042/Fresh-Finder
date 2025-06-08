@@ -88,6 +88,9 @@
       Today’s date: {{ current_date }}
     </p>
     <h2>Stats from {{ start_date or "N/A" }} to {{ end_date or "N/A" }}</h2>
+    <p style="text-align: center; font-size: 14px; color: #555;">
+      Total games displayed: {{ stats|length }}
+    </p>
 
     {% if stats %}
       <table>
