@@ -168,8 +168,10 @@ td a:hover {
 hr {
     border: none;
     height: 1px;
-    background-color: #ccc;
     margin: 30px 0;
+    background-image: linear-gradient(to right, #4caf50, #81c784, #4caf50);
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
 }
 
 tr:hover {
@@ -208,10 +210,20 @@ input[type="submit"]:active {
 }
 
 /* For small table logos */
+
 .team-logo-small {
     height: 20px;
     vertical-align: middle;
     margin-left: 10px;
+}
+
+/* Team logo hover zoom effect */
+.team-logo {
+  transition: transform 0.2s ease-in-out;
+}
+
+.team-logo:hover {
+  transform: scale(1.1);
 }
 
 .profile-info ul {
