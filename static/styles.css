@@ -518,3 +518,15 @@ body.dark-mode .highlighted-link {
 body.dark-mode .highlighted-link:hover {
     background-color: #1b5e20;
 }
+
+body.dark-mode .player-headshot,
+body.dark-mode img {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+body.dark-mode img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
