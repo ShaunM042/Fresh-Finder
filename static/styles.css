@@ -535,3 +535,7 @@ body.dark-mode img:hover {
 body.dark-mode .error {
     color: #ff6b6b;
 }
+
+body.dark-mode input::placeholder {
+    color: #bbb;
+}
