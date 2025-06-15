@@ -539,3 +539,9 @@ body.dark-mode .error {
 body.dark-mode input::placeholder {
     color: #bbb;
 }
+
+/* Add extra space between table rows for readability */
+table tr:not(:last-child) {
+    margin-bottom: 10px;
+    display: block;
+}
