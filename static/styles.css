@@ -545,3 +545,12 @@ table tr:not(:last-child) {
     margin-bottom: 10px;
     display: block;
 }
+
+/* Zebra striping for tables */
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+body.dark-mode table tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
