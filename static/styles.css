@@ -577,3 +577,8 @@ table tr:not(:last-child) {
 .hint:hover::after {
     opacity: 1;
 }
+
+.table-container a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
