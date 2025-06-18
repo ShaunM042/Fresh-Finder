@@ -289,6 +289,16 @@
       }
     </script>
 
+    <script>
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          const searchBox = document.getElementById('player-name');
+          if (searchBox) searchBox.focus();
+        }
+      });
+    </script>
+
     <style>
       body {
         font-family: Arial, sans-serif;
