@@ -605,3 +605,8 @@ table tr:not(:last-child) {
     text-align: center;
     border-radius: 6px;
 }
+# Soft green glow effect for focused input fields
+input[type="text"]:focus,
+input[type="date"]:focus {
+  box-shadow: 0 0 8px #4caf50;
+}
