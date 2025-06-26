@@ -180,10 +180,11 @@ hr {
 tr:hover {
     background-color: #f0fff0;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, filter 0.2s ease-in-out;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     /* Soft zoom-in animation */
     transform: scale(1.01);
+    filter: brightness(0.97);
 }
 
 
