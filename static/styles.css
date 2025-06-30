@@ -651,7 +651,7 @@ body.dark-mode hr {
     display: block;
     opacity: 1;
 }
-# Disabled button styles for clear indication
+
 button:disabled,
 input[type="submit"]:disabled {
   background-color: #ccc;
@@ -659,4 +659,19 @@ input[type="submit"]:disabled {
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+}
+@keyframes slideFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1,
+h2 {
+  animation: slideFadeDown 0.5s ease-in-out;
 }
