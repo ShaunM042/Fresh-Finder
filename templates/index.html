@@ -300,6 +300,14 @@
       });
     </script>
 
+    <script>
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          const input = document.getElementById('player-name');
+          if (input) input.value = '';
+        }
+      });
+    </script>
     <style>
       body {
         font-family: Arial, sans-serif;
