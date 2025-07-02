@@ -36,6 +36,7 @@
           <label for="end-date">End date:</label>
           <input type="date" id="end-date" name="end-date" />
           <input type="submit" value="Fetch Data" />
+          <button type="button" id="reset-player-form">Reset</button>
         </form>
       </div>
 
@@ -369,5 +370,11 @@
         }
       }
     </style>
-  </body>
+</body>
+<script>
+  document.getElementById('reset-player-form').addEventListener('click', function () {
+    document.getElementById('player-form').reset();
+    document.getElementById('player-name').focus();
+  });
+</script>
 </html>
