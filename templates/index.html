@@ -37,6 +37,9 @@
           <input type="date" id="end-date" name="end-date" />
           <input type="submit" value="Fetch Data" />
           <button type="button" id="reset-player-form">Reset</button>
+          <p id="loading-message" style="display: none; text-align: center; color: #4caf50;">
+            Loading player stats...
+          </p>
         </form>
       </div>
 
@@ -156,6 +159,7 @@
 
       document.querySelector("#player-form").onsubmit = async function (event) {
         event.preventDefault();
+        document.getElementById("loading-message").style.display = "block";
         const playerName = document.querySelector("#player-name").value;
         const startDate = document.querySelector("#start-date").value;
         const endDate = document.querySelector("#end-date").value;
@@ -170,11 +174,13 @@
             document.querySelector("#error-message").style.display = "block";
             document.querySelector("#no-matches").style.display = "none";
             document.querySelector("#stats-table").style.display = "none";
+            document.getElementById("loading-message").style.display = "none";
             return;
           }
           const stats = await response.json();
           displayStats(stats);
           document.querySelector("#error-message").style.display = "none";
+          document.getElementById("loading-message").style.display = "none";
         } catch (error) {
           console.error("Fetch error:", error);
           document.querySelector("#error-message").textContent =
@@ -182,6 +188,7 @@
           document.querySelector("#error-message").style.display = "block";
           document.querySelector("#no-matches").style.display = "none";
           document.querySelector("#stats-table").style.display = "none";
+          document.getElementById("loading-message").style.display = "none";
         }
       };
 
