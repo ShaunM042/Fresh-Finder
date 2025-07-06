@@ -162,10 +162,15 @@
 
       document.querySelector("#player-form").onsubmit = async function (event) {
         event.preventDefault();
+        let startDate = document.querySelector("#start-date").value;
+        let endDate = document.querySelector("#end-date").value;
+        if (!startDate || !endDate) {
+          alert("Please select both start and end dates before submitting.");
+          document.getElementById("loading-message").style.display = "none";
+          return;
+        }
         document.getElementById("loading-message").style.display = "block";
         const playerName = document.querySelector("#player-name").value;
-        const startDate = document.querySelector("#start-date").value;
-        const endDate = document.querySelector("#end-date").value;
         try {
           const response = await fetch(
             `/player_stats?player_name=${playerName}&start_date=${startDate}&end_date=${endDate}`
