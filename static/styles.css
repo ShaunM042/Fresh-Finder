@@ -675,3 +675,9 @@ h1,
 h2 {
   animation: slideFadeDown 0.5s ease-in-out;
 }
+
+/* Make all buttons use uppercase text for consistency */
+button,
+input[type="submit"] {
+    text-transform: uppercase;
+}
