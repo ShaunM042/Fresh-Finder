@@ -331,9 +331,14 @@ button:hover {
     font-weight: 600;
 }
 
-a {
+ a {
     cursor: pointer;
     transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+a:focus-visible {
+    outline: 2px dashed #4caf50;
+    outline-offset: 4px;
 }
 
 a:focus {
