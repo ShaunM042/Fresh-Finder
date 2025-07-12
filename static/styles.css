@@ -242,6 +242,10 @@ input[type="submit"]:active {
 
 .profile-info li {
     margin: 10px 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
 }
 
 .profile-info span {
