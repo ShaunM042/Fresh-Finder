@@ -686,3 +686,14 @@ button,
 input[type="submit"] {
     text-transform: uppercase;
 }
+/* Smooth zoom effect on all links */
+a {
+    transition: all 0.2s ease-in-out;
+}
+
+a:hover {
+    transform: scale(1.05);
+    color: #2e7d32;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
