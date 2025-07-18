@@ -71,6 +71,7 @@
             required
           />
           <input type="submit" value="Fetch Average Stats" />
+          <button type="button" id="reset-average-form">Reset</button>
         </form>
       </div>
 
@@ -406,5 +407,11 @@
       document.getElementById('player-name').focus();
     });
   </script>
+  <script>
+  document.getElementById('reset-average-form').addEventListener('click', function () {
+    document.getElementById('player-average-form').reset();
+    document.getElementById('player-average-name').focus();
+  });
+</script>
 </body>
 </html>
