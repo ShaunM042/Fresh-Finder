@@ -250,6 +250,12 @@ input[type="submit"]:active {
     background-color: #f9f9f9;
 }
 
+.profile-info li:hover {
+    background-color: #eef7ee;
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+}
+
 .profile-info span {
     font-weight: bold;
 }
