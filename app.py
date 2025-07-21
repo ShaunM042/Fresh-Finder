@@ -160,11 +160,11 @@ def get_player_stats():
 
     try:
         if start_date and end_date:
-            start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d')
-            end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
         else:
-            end_date_obj = datetime.datetime.today()
-            start_date_obj = end_date_obj - datetime.timedelta(days=7)
+            end_date_obj = datetime.now()
+            start_date_obj = end_date_obj - timedelta(days=7)
 
         game_log = playergamelog.PlayerGameLog(
             player_id=player_id,
@@ -205,7 +205,7 @@ def get_player_stats():
             }
             games.append(game_stats)
 
-        current_date = datetime.today().strftime('%Y-%m-%d')
+        current_date = datetime.now().strftime('%Y-%m-%d')
         return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date, current_date=current_date)
 
     except Exception as e:
@@ -398,8 +398,8 @@ def get_player_stats_average():
 
     try:
         if start_date and end_date:
-            start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d')
-            end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
         else:
             return jsonify(error="Start date and end date are required"), 400
 
@@ -564,7 +564,7 @@ def team_stats_stretch():
         end_date = request.args.get('end_date')
 
         if not start_date or not end_date:
-            today = datetime.today()
+            today = datetime.now()
             end_date = today.strftime('%Y-%m-%d')
             start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
 
