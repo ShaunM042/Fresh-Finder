@@ -17,6 +17,88 @@ from nba_api.stats.library.http import NBAStatsHTTP
 # Application-Specific Modules
 from team_logos import TEAM_LOGOS
 
+def get_current_nba_season():
+    """Get the current NBA season based on the date"""
+    current_date = datetime.now()
+    current_year = current_date.year
+    
+    # NBA season starts in October, so if we're before October, use previous year
+    if current_date.month < 10:
+        start_year = current_year - 1
+    else:
+        start_year = current_year
+    
+    return f"{start_year}-{str(start_year + 1)[2:]}"
+
+def get_available_seasons():
+    """Get list of available NBA seasons (last 5 years)"""
+    current_date = datetime.now()
+    current_year = current_date.year
+    
+    # NBA season starts in October, so if we're before October, use previous year
+    if current_date.month < 10:
+        start_year = current_year - 1
+    else:
+        start_year = current_year
+    
+    seasons = []
+    for i in range(5):  # Last 5 seasons
+        year = start_year - i
+        seasons.append(f"{year}-{str(year + 1)[2:]}")
+    
+    return seasons
+
+def get_player_data_with_fallback(player_id, data_func, **kwargs):
+    """Try to get player data, falling back to previous seasons if current season has no data"""
+    seasons = get_available_seasons()
+    
+    for season in seasons:
+        try:
+            kwargs['season'] = season
+            data = data_func(player_id=player_id, **kwargs)
+            df = data.get_data_frames()[0]
+            if not df.empty:
+                return df, season
+        except Exception:
+            continue
+    
+    # If no data found in any season, return empty dataframe
+    return pd.DataFrame(), seasons[0]
+
+def get_team_data_with_fallback(team_id, data_func, **kwargs):
+    """Try to get team data, falling back to previous seasons if current season has no data"""
+    seasons = get_available_seasons()
+    
+    for season in seasons:
+        try:
+            kwargs['season'] = season
+            data = data_func(team_id=team_id, **kwargs)
+            df = data.get_data_frames()[0]
+            if not df.empty:
+                return df, season
+        except Exception:
+            continue
+    
+    # If no data found in any season, return empty dataframe
+    return pd.DataFrame(), seasons[0]
+
+def get_league_data_with_fallback(data_func, **kwargs):
+    """Try to get league data, falling back to previous seasons if current season has no data"""
+    seasons = get_available_seasons()
+    
+    for season in seasons:
+        try:
+            kwargs['season'] = season
+            data = data_func(**kwargs)
+            df = data.get_data_frames()[0]
+            if not df.empty:
+                return df, season
+        except Exception:
+            continue
+    
+    # If no data found in any season, return empty dataframe
+    return pd.DataFrame(), seasons[0]
+
 def configure_nba_api():
     NBAStatsHTTP._session = requests.Session()
     NBAStatsHTTP._session.headers.update({
@@ -154,8 +236,7 @@ def get_player_profile(player_name):
             'team_logo': TEAM_LOGOS.get(common_data['TEAM_ABBREVIATION'].values[0], '') if 'TEAM_ABBREVIATION' in common_data.columns else ''
         }
 
-        recent_games_log = playergamelog.PlayerGameLog(player_id=player_id, season='2023-24')
-        recent_games_data = recent_games_log.get_data_frames()[0]
+        recent_games_data, used_season = get_player_data_with_fallback(player_id, playergamelog.PlayerGameLog)
         
         if 'TEAM_ABBREVIATION' not in recent_games_data.columns:
             recent_games_data['TEAM_ABBREVIATION'] = recent_games_data['MATCHUP'].apply(lambda x: x.split(' ')[0])
@@ -213,10 +294,10 @@ def fetch_team_data(team_abbreviation):
     team_details = teamdetails.TeamDetails(team_id=team_id)
     team_data = team_details.get_data_frames()[0]
     roster_data = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
-    game_log = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24')
-    game_log_data = game_log.get_data_frames()[0].head(10)
+    game_log_data, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog)
+    game_log_data = game_log_data.head(10)
 
-    league_stats = leaguedashteamstats.LeagueDashTeamStats(season='2023-24')
+    league_stats = leaguedashteamstats.LeagueDashTeamStats(season=used_season)
     advanced_stats = league_stats.get_data_frames()[0]
     team_advanced_stats = advanced_stats[advanced_stats['TEAM_ID'] == team_id]
 
@@ -353,8 +434,7 @@ def game_box_score(game_id, player_name):
     player_id = player_info[0]['id']
 
     try:
-        game_log = playergamelog.PlayerGameLog(player_id=player_id, season='2024-25')
-        data_frame = game_log.get_data_frames()[0]
+        data_frame, used_season = get_player_data_with_fallback(player_id, playergamelog.PlayerGameLog)
         game_details = data_frame[data_frame['Game_ID'] == game_id]
 
         if game_details.empty:
@@ -403,8 +483,7 @@ def team_stats():
     team_abbreviation = team['abbreviation']
 
     try:
-        game_log = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24', season_type_all_star='Regular Season')
-        games_df = game_log.get_data_frames()[0]
+        games_df, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog, season_type_all_star='Regular Season')
         games_df['GAME_DATE'] = pd.to_datetime(games_df['GAME_DATE'])
 
         if start_date and end_date:
@@ -446,8 +525,7 @@ def search_team_stats():
     end_date = pd.to_datetime(request.form['end_date'])
 
     try:
-        gamelog = teamgamelog.TeamGameLog(season='2023-24')
-        df = gamelog.get_data_frames()[0]
+        df, used_season = get_league_data_with_fallback(teamgamelog.TeamGameLog)
         df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
 
         team_df = df[(df['TEAM_ABBREVIATION'] == team_abbreviation) & 
@@ -503,8 +581,7 @@ def team_stats_stretch():
         team_id = selected_team['id']
 
         # Fetch the game logs for the team
-        gamelog = teamgamelog.TeamGameLog(team_id=team_id, season='2023-24')
-        df = gamelog.get_data_frames()[0]
+        df, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog)
 
         # Convert date and filter
         df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])

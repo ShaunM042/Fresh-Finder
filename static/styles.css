@@ -28,6 +28,7 @@ h2 {
     margin-top: 20px;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
 }
 
 .container {
