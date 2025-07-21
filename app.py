@@ -55,10 +55,17 @@ def get_player_data_with_fallback(player_id, data_func, **kwargs):
     for season in seasons:
         try:
             kwargs['season'] = season
+            # Add timeout parameter if it's a game log request
+            if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
+                kwargs['timeout'] = 60
+            
             data = data_func(player_id=player_id, **kwargs)
             df = data.get_data_frames()[0]
             if not df.empty:
                 return df, season
+        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
+            # Skip timeout errors and try next season
+            continue
         except Exception:
             continue
     
@@ -72,10 +79,17 @@ def get_team_data_with_fallback(team_id, data_func, **kwargs):
     for season in seasons:
         try:
             kwargs['season'] = season
+            # Add timeout parameter if it's a game log request
+            if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
+                kwargs['timeout'] = 60
+                
             data = data_func(team_id=team_id, **kwargs)
             df = data.get_data_frames()[0]
             if not df.empty:
                 return df, season
+        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
+            # Skip timeout errors and try next season
+            continue
         except Exception:
             continue
     
@@ -89,10 +103,17 @@ def get_league_data_with_fallback(data_func, **kwargs):
     for season in seasons:
         try:
             kwargs['season'] = season
+            # Add timeout parameter if it's a game log request
+            if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
+                kwargs['timeout'] = 60
+                
             data = data_func(**kwargs)
             df = data.get_data_frames()[0]
             if not df.empty:
                 return df, season
+        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
+            # Skip timeout errors and try next season
+            continue
         except Exception:
             continue
     
@@ -104,6 +125,16 @@ def configure_nba_api():
     NBAStatsHTTP._session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'
     })
+    # Increase timeout to 60 seconds
+    adapter = requests.adapters.HTTPAdapter(
+        max_retries=requests.adapters.Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504]
+        )
+    )
+    NBAStatsHTTP._session.mount('https://', adapter)
+    NBAStatsHTTP._session.mount('http://', adapter)
 
 load_dotenv()
 configure_nba_api()
@@ -208,6 +239,8 @@ def get_player_stats():
         current_date = datetime.now().strftime('%Y-%m-%d')
         return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date, current_date=current_date)
 
+    except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
+        return jsonify(error="NBA API request timed out. Please try again later."), 408
     except Exception as e:
         return jsonify(error=str(e)), 500
 
