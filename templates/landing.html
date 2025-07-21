@@ -384,6 +384,18 @@
     }
 
     $(document).ready(function () {
+      // Auto-fill dates with last 7 days
+      const today = new Date();
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+      
+      const formatDate = (date) => date.toISOString().split('T')[0];
+      
+      $("#start-date").val(formatDate(sevenDaysAgo));
+      $("#end-date").val(formatDate(today));
+      $("#team-start-date").val(formatDate(sevenDaysAgo));
+      $("#team-end-date").val(formatDate(today));
+
       $("#player-name").autocomplete({
         source: function (req, res) {
           $.get("/autocomplete", { term: req.term }, res);
