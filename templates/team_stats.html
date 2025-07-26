@@ -258,6 +258,30 @@
           const submitBtn = this.querySelector('button[type="submit"]');
           submitBtn.disabled = true;
         });
+
+      // Auto-fill default date ranges (last 7 days)
+      window.addEventListener("DOMContentLoaded", function () {
+        const today = new Date();
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        const formatDate = (date) => date.toISOString().split("T")[0];
+
+        // Set default dates for team stats search
+        const startDateInput = document.querySelector(
+          'input[name="start_date"]'
+        );
+        const endDateInput = document.querySelector('input[name="end_date"]');
+
+        if (startDateInput && !startDateInput.value) {
+          startDateInput.value = formatDate(sevenDaysAgo);
+        }
+        if (endDateInput && !endDateInput.value) {
+          endDateInput.value = formatDate(today);
+        }
+
+        console.log("Team stats: Default date ranges set to last 7 days");
+      });
     </script>
   </body>
 </html>

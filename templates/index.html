@@ -491,6 +491,32 @@
           input.style.border = input.value === today ? "2px solid #4caf50" : "";
         });
       });
+
+      // Auto-fill default date ranges (last 7 days)
+      window.addEventListener("DOMContentLoaded", function () {
+        const today = new Date();
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        const formatDate = (date) => date.toISOString().split("T")[0];
+
+        // Set default dates for player stats
+        const startDate = document.getElementById("start-date");
+        const endDate = document.getElementById("end-date");
+        if (startDate && !startDate.value)
+          startDate.value = formatDate(sevenDaysAgo);
+        if (endDate && !endDate.value) endDate.value = formatDate(today);
+
+        // Set default dates for average stats
+        const avgStartDate = document.getElementById("average-start-date");
+        const avgEndDate = document.getElementById("average-end-date");
+        if (avgStartDate && !avgStartDate.value)
+          avgStartDate.value = formatDate(sevenDaysAgo);
+        if (avgEndDate && !avgEndDate.value)
+          avgEndDate.value = formatDate(today);
+
+        console.log("Default date ranges set: Last 7 days");
+      });
     </script>
     <script>
       document
