@@ -2,10 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Team Stats - Fresh Finder</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -13,7 +25,8 @@
         padding: 20px;
       }
 
-      h1, h2 {
+      h1,
+      h2 {
         text-align: center;
         color: #333;
       }
@@ -43,7 +56,8 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
       }
 
-      th, td {
+      th,
+      td {
         padding: 12px;
         text-align: center;
         border-bottom: 1px solid #ddd;
@@ -87,65 +101,111 @@
     <h1>Fresh Finder</h1>
     <h2>Team Stats</h2>
     <h2>Search Team Stats by Date Range</h2>
-      <form method="get" action="{{ url_for('team_stats_stretch') }}" style="text-align: center; margin-bottom: 20px;">
-        <input type="text" name="team" placeholder="Team Abbreviation (e.g., GSW)" required style="margin: 0 10px; padding: 8px; width: 200px;" />
-        <input type="date" name="start_date" required style="margin: 0 10px; padding: 8px;" />
-        <input type="date" name="end_date" required style="margin: 0 10px; padding: 8px;" />
-        <button type="submit" style="padding: 10px 20px; background-color: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">
-          Search Stats
-        </button>
-      </form>
+    <form
+      method="get"
+      action="{{ url_for('team_stats_stretch') }}"
+      style="text-align: center; margin-bottom: 20px"
+    >
+      <input
+        type="text"
+        name="team"
+        placeholder="Team Abbreviation (e.g., GSW)"
+        required
+        style="margin: 0 10px; padding: 8px; width: 200px"
+      />
+      <input
+        type="date"
+        name="start_date"
+        required
+        style="margin: 0 10px; padding: 8px"
+      />
+      <input
+        type="date"
+        name="end_date"
+        required
+        style="margin: 0 10px; padding: 8px"
+      />
+      <button
+        type="submit"
+        style="
+          padding: 10px 20px;
+          background-color: #4caf50;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        "
+      >
+        Search Stats
+      </button>
+    </form>
 
     <a href="{{ url_for('landing') }}" class="back-button">← Back to Search</a>
 
     {% if stats %}
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Team</th>
-            <th>Opponent</th>
-            <th>Points</th>
-            <th>Rebounds</th>
-            <th>Assists</th>
-            <th>FG%</th>
-            <th>3P%</th>
-            <th>FT%</th>
-            <th>+/-</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for game in stats %}
-          <tr>
-            <td>{{ game.game_date }}</td>
-            <td>
-              <a href="{{ url_for('get_team_profile', team_name=game.team) }}" class="logo-link">
-                <img src="{{ game.team_logo }}" alt="{{ game.team }} logo" class="team-logo" />
-                {{ game.team }}
-              </a>
-            </td>
-            <td>
-              <a href="{{ url_for('get_team_profile', team_name=game.opponent) }}" class="logo-link">
-                <img src="{{ game.opponent_logo }}" alt="{{ game.opponent }} logo" class="team-logo" />
-                {{ game.opponent }}
-              </a>
-            </td>
-            <td>{{ game.points }}</td>
-            <td>{{ game.rebounds }}</td>
-            <td>{{ game.assists }}</td>
-            <td>{{ game.fg_percent }}%</td>
-            <td>{{ game.threep_percent }}%</td>
-            <td>{{ game.ft_percent }}%</td>
-            <td>{{ game.plus_minus }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Team</th>
+          <th>Opponent</th>
+          <th>Points</th>
+          <th>Rebounds</th>
+          <th>Assists</th>
+          <th>FG%</th>
+          <th>3P%</th>
+          <th>FT%</th>
+          <th>+/-</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for game in stats %}
+        <tr>
+          <td>{{ game.game_date }}</td>
+          <td>
+            <a
+              href="{{ url_for('get_team_profile', team_name=game.team) }}"
+              class="logo-link"
+            >
+              <img
+                src="{{ game.team_logo }}"
+                alt="{{ game.team }} logo"
+                class="team-logo"
+              />
+              {{ game.team }}
+            </a>
+          </td>
+          <td>
+            <a
+              href="{{ url_for('get_team_profile', team_name=game.opponent) }}"
+              class="logo-link"
+            >
+              <img
+                src="{{ game.opponent_logo }}"
+                alt="{{ game.opponent }} logo"
+                class="team-logo"
+              />
+              {{ game.opponent }}
+            </a>
+          </td>
+          <td>{{ game.points }}</td>
+          <td>{{ game.rebounds }}</td>
+          <td>{{ game.assists }}</td>
+          <td>{{ game.fg_percent }}%</td>
+          <td>{{ game.threep_percent }}%</td>
+          <td>{{ game.ft_percent }}%</td>
+          <td>{{ game.plus_minus }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
     {% else %}
-      <div class="no-data">
-        <i class="fas fa-frown" style="font-size: 48px; color: #ccc;"></i>
-        <p style="font-size: 18px; color: #666;">No stats found for the selected date range. Try adjusting your search.</p>
-      </div>
+    <div class="no-data">
+      <i class="fas fa-frown" style="font-size: 48px; color: #ccc"></i>
+      <p style="font-size: 18px; color: #666">
+        No stats found for the selected date range. Try adjusting your search.
+      </p>
+    </div>
     {% endif %}
   </body>
 </html>

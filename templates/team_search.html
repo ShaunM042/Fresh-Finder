@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Team Search</title>
     <link
       rel="stylesheet"
@@ -12,7 +14,13 @@
     <h1>Search for a Team</h1>
     <form method="post" action="/team_search">
       <label for="search_term">Enter Team Name:</label>
-      <input type="text" id="search_term" name="search_term" required aria-label="Search for team name" />
+      <input
+        type="text"
+        id="search_term"
+        name="search_term"
+        required
+        aria-label="Search for team name"
+      />
       <input type="submit" value="Search" aria-label="Submit team search" />
     </form>
   </body>
