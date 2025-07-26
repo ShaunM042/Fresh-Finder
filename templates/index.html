@@ -14,6 +14,10 @@
       type="text/css"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link
@@ -133,10 +137,33 @@
             <th>+/-</th>
           </tr>
         </table>
-        <div id="no-matches" class="error" style="display: none">
-          No matches played on this date
+        <div id="no-matches" class="no-results-state" style="display: none">
+          <div class="no-results-icon">
+            <i class="fas fa-calendar-times"></i>
+          </div>
+          <h3>No Games Found</h3>
+          <p>No matches were played during the selected date range.</p>
+          <div class="suggestions">
+            <p>Try:</p>
+            <ul>
+              <li>Expanding your date range</li>
+              <li>Checking if the player was active during this period</li>
+              <li>Verifying the player name spelling</li>
+            </ul>
+          </div>
         </div>
-        <div id="error-message" class="error" style="display: none"></div>
+        <div id="error-message" class="error-state" style="display: none">
+          <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3>Something went wrong</h3>
+          <p id="error-text">An error occurred while fetching data.</p>
+          <div class="error-actions">
+            <button onclick="location.reload()" class="retry-btn">
+              <i class="fas fa-redo"></i> Try Again
+            </button>
+          </div>
+        </div>
       </div>
 
       <div
@@ -205,7 +232,7 @@
           );
           if (!response.ok) {
             const errorData = await response.json();
-            document.querySelector("#error-message").textContent =
+            document.querySelector("#error-text").textContent =
               errorData.message || errorData.error;
             document.querySelector("#error-message").style.display = "block";
             document.querySelector("#no-matches").style.display = "none";
@@ -219,8 +246,8 @@
           document.getElementById("loading-indicator").style.display = "none";
         } catch (error) {
           console.error("Fetch error:", error);
-          document.querySelector("#error-message").textContent =
-            "Failed to fetch data. Please check the console for more information.";
+          document.querySelector("#error-text").textContent =
+            "Failed to fetch data. Please check your connection and try again.";
           document.querySelector("#error-message").style.display = "block";
           document.querySelector("#no-matches").style.display = "none";
           document.querySelector("#stats-table").style.display = "none";
@@ -470,6 +497,81 @@
         100% {
           transform: rotate(360deg);
         }
+      }
+
+      /* New Styles for No Results and Error States */
+      .no-results-state,
+      .error-state {
+        text-align: center;
+        padding: 40px 20px;
+        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .no-results-icon,
+      .error-icon {
+        font-size: 60px;
+        color: #4caf50;
+        margin-bottom: 15px;
+      }
+
+      .no-results-state h3,
+      .error-state h3 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .no-results-state p,
+      .error-state p {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .suggestions {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #eee;
+      }
+
+      .suggestions p {
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      .suggestions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .suggestions li {
+        color: #4caf50;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+      }
+
+      .retry-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .retry-btn:hover {
+        background-color: #388e3c;
+      }
+
+      .retry-btn i {
+        margin-right: 8px;
       }
     </style>
 
