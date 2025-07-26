@@ -223,6 +223,94 @@
         text-decoration: none;
         color: white;
       }
+
+      /* Team Stats Visualizations */
+      .stats-visualizations {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .stats-visualizations h2 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .chart-controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .chart-controls label {
+        font-size: 1.1rem;
+        color: #555;
+        margin-right: 10px;
+      }
+
+      .chart-controls select {
+        padding: 8px 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+        justify-items: center;
+      }
+
+      .chart-container {
+        width: 100%;
+        max-width: 400px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .chart-container canvas {
+        width: 100%;
+        height: 200px; /* Fixed height for charts */
+      }
+
+      .stats-summary {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f0f7f0;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .summary-card {
+        text-align: center;
+        padding: 15px 25px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .summary-card h4 {
+        color: #4caf50;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #4caf50;
+      }
     </style>
   </head>
   <body>
@@ -336,6 +424,74 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <!-- Team Stats Visualizations -->
+    <div class="stats-visualizations">
+      <h2><i class="fas fa-chart-line"></i> Statistical Analysis</h2>
+
+      <div class="chart-controls">
+        <label for="stats-chart-type">Select Chart:</label>
+        <select id="stats-chart-type">
+          <option value="trends">Performance Trends</option>
+          <option value="shooting">Shooting Analysis</option>
+          <option value="summary">Game Summary</option>
+        </select>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Performance Trends Chart -->
+        <div id="trends-chart-container" class="chart-container">
+          <canvas id="trendsChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Shooting Analysis Chart -->
+        <div
+          id="shooting-chart-container"
+          class="chart-container"
+          style="display: none"
+        >
+          <canvas id="shootingAnalysisChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Game Summary Chart -->
+        <div
+          id="summary-chart-container"
+          class="chart-container"
+          style="display: none"
+        >
+          <canvas id="summaryChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Statistics Summary Cards -->
+      <div class="stats-summary">
+        <div class="summary-card">
+          <h4>Total Games</h4>
+          <span class="stat-number">{{ stats|length }}</span>
+        </div>
+        <div class="summary-card">
+          <h4>Average Points</h4>
+          <span class="stat-number"
+            >{{ "%.1f"|format(stats|map(attribute='points')|sum / stats|length)
+            if stats|length > 0 else '0' }}</span
+          >
+        </div>
+        <div class="summary-card">
+          <h4>Average Rebounds</h4>
+          <span class="stat-number"
+            >{{ "%.1f"|format(stats|map(attribute='rebounds')|sum /
+            stats|length) if stats|length > 0 else '0' }}</span
+          >
+        </div>
+        <div class="summary-card">
+          <h4>Average FG%</h4>
+          <span class="stat-number"
+            >{{ "%.1f"|format(stats|map(attribute='fg_percent')|sum /
+            stats|length) if stats|length > 0 else '0' }}%</span
+          >
+        </div>
+      </div>
+    </div>
     {% else %}
     <div class="no-results-state">
       <div class="no-results-icon">
@@ -363,27 +519,24 @@
     </div>
     {% endif %}
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      document
-        .getElementById("team-stats-form")
-        .addEventListener("submit", function (e) {
-          document.getElementById("team-stats-loading").style.display = "block";
-          const submitBtn = this.querySelector('button[type="submit"]');
-          submitBtn.disabled = true;
-        });
+      document.getElementById('team-stats-form').addEventListener('submit', function(e) {
+        document.getElementById('team-stats-loading').style.display = 'block';
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+      });
 
       // Auto-fill default date ranges (last 7 days)
-      window.addEventListener("DOMContentLoaded", function () {
+      window.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         const sevenDaysAgo = new Date(today);
         sevenDaysAgo.setDate(today.getDate() - 7);
 
-        const formatDate = (date) => date.toISOString().split("T")[0];
+        const formatDate = (date) => date.toISOString().split('T')[0];
 
         // Set default dates for team stats search
-        const startDateInput = document.querySelector(
-          'input[name="start_date"]'
-        );
+        const startDateInput = document.querySelector('input[name="start_date"]');
         const endDateInput = document.querySelector('input[name="end_date"]');
 
         if (startDateInput && !startDateInput.value) {
@@ -393,8 +546,207 @@
           endDateInput.value = formatDate(today);
         }
 
-        console.log("Team stats: Default date ranges set to last 7 days");
+        console.log('Team stats: Default date ranges set to last 7 days');
       });
+
+      {% if stats %}
+      // Team stats data for visualizations
+      const statsData = {
+        dates: {{ stats | map(attribute='game_date') | list | tojson }},
+        points: {{ stats | map(attribute='points') | list | tojson }},
+        rebounds: {{ stats | map(attribute='rebounds') | list | tojson }},
+        assists: {{ stats | map(attribute='assists') | list | tojson }},
+        fg_percent: {{ stats | map(attribute='fg_percent') | list | tojson }},
+        threep_percent: {{ stats | map(attribute='threep_percent') | list | tojson }},
+        ft_percent: {{ stats | map(attribute='ft_percent') | list | tojson }},
+        plus_minus: {{ stats | map(attribute='plus_minus') | list | tojson }}
+      };
+
+      let trendsChart, shootingAnalysisChart, summaryChart;
+
+      // Initialize Performance Trends Chart
+      function initTrendsChart() {
+        const ctx = document.getElementById('trendsChart').getContext('2d');
+        trendsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: statsData.dates,
+            datasets: [
+              {
+                label: 'Points',
+                data: statsData.points,
+                borderColor: '#4caf50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3
+              },
+              {
+                label: 'Rebounds',
+                data: statsData.rebounds,
+                borderColor: '#2196f3',
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.3
+              },
+              {
+                label: 'Assists',
+                data: statsData.assists,
+                borderColor: '#ff9800',
+                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Team Performance Over Time'
+              },
+              legend: {
+                position: 'top'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Initialize Shooting Analysis Chart
+      function initShootingAnalysisChart() {
+        const ctx = document.getElementById('shootingAnalysisChart').getContext('2d');
+        shootingAnalysisChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: statsData.dates,
+            datasets: [
+              {
+                label: 'Field Goal %',
+                data: statsData.fg_percent,
+                backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                borderColor: '#4caf50',
+                borderWidth: 1
+              },
+              {
+                label: '3-Point %',
+                data: statsData.threep_percent,
+                backgroundColor: 'rgba(33, 150, 243, 0.8)',
+                borderColor: '#2196f3',
+                borderWidth: 1
+              },
+              {
+                label: 'Free Throw %',
+                data: statsData.ft_percent,
+                backgroundColor: 'rgba(255, 152, 0, 0.8)',
+                borderColor: '#ff9800',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Shooting Percentages Breakdown'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Initialize Summary Chart
+      function initSummaryChart() {
+        const ctx = document.getElementById('summaryChart').getContext('2d');
+        const avgPoints = statsData.points.reduce((a, b) => a + b, 0) / statsData.points.length;
+        const avgRebounds = statsData.rebounds.reduce((a, b) => a + b, 0) / statsData.rebounds.length;
+        const avgAssists = statsData.assists.reduce((a, b) => a + b, 0) / statsData.assists.length;
+        const avgFGPercent = statsData.fg_percent.reduce((a, b) => a + b, 0) / statsData.fg_percent.length;
+
+        summaryChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Points', 'Rebounds', 'Assists', 'FG%'],
+            datasets: [{
+              data: [avgPoints, avgRebounds, avgAssists, avgFGPercent],
+              backgroundColor: [
+                '#4caf50',
+                '#2196f3',
+                '#ff9800',
+                '#9c27b0'
+              ],
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Average Performance Distribution'
+              },
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+
+      // Chart switching functionality
+      document.getElementById('stats-chart-type').addEventListener('change', function() {
+        const chartType = this.value;
+
+        // Hide all chart containers
+        document.querySelectorAll('.chart-container').forEach(container => {
+          container.style.display = 'none';
+        });
+
+        // Show selected chart container
+        document.getElementById(chartType + '-chart-container').style.display = 'block';
+
+        // Initialize chart if not already done
+        switch(chartType) {
+          case 'trends':
+            if (!trendsChart) initTrendsChart();
+            break;
+          case 'shooting':
+            if (!shootingAnalysisChart) initShootingAnalysisChart();
+            break;
+          case 'summary':
+            if (!summaryChart) initSummaryChart();
+            break;
+        }
+      });
+
+      // Initialize default chart on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('trendsChart')) {
+          initTrendsChart();
+        }
+      });
+      {% endif %}
     </script>
   </body>
 </html>

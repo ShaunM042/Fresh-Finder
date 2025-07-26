@@ -360,6 +360,73 @@
           padding: 20px;
         }
       }
+
+      /* Advanced Team Visualizations Styles */
+      .team-visualizations {
+        background-color: #fff;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .team-visualizations h2 {
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .chart-controls {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .chart-selector {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+      }
+
+      .chart-selector label {
+        font-weight: 600;
+        color: #555;
+        margin-right: 10px;
+      }
+
+      .charts-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .chart-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .chart-section h3 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .chart-section canvas {
+        width: 100%;
+        height: 200px; /* Default height for charts */
+      }
+
+      @media (max-width: 768px) {
+        .charts-container {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
 
@@ -506,10 +573,318 @@
           {% endfor %}
         </table>
       </div>
+
+      <!-- Advanced Team Visualizations -->
+      <div class="team-visualizations">
+        <h2><i class="fas fa-chart-bar"></i> Team Performance Analytics</h2>
+        
+        <div class="chart-controls">
+          <div class="chart-selector">
+            <label for="chart-type">Select Visualization:</label>
+            <select id="chart-type">
+              <option value="performance">Performance Trends</option>
+              <option value="shooting">Shooting Percentages</option>
+              <option value="winloss">Win/Loss Pattern</option>
+              <option value="comparison">Advanced Metrics</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="charts-container">
+          <!-- Performance Trends Chart -->
+          <div id="performance-chart-container" class="chart-section">
+            <h3>Performance Trends (Last 10 Games)</h3>
+            <canvas id="performanceChart" width="400" height="200"></canvas>
+          </div>
+
+          <!-- Shooting Percentages Chart -->
+          <div id="shooting-chart-container" class="chart-section" style="display: none;">
+            <h3>Shooting Percentages Over Time</h3>
+            <canvas id="shootingChart" width="400" height="200"></canvas>
+          </div>
+
+          <!-- Win/Loss Pattern Chart -->
+          <div id="winloss-chart-container" class="chart-section" style="display: none;">
+            <h3>Recent Win/Loss Pattern</h3>
+            <canvas id="winlossChart" width="400" height="200"></canvas>
+          </div>
+
+          <!-- Advanced Metrics Chart -->
+          <div id="comparison-chart-container" class="chart-section" style="display: none;">
+            <h3>Advanced Team Metrics</h3>
+            <canvas id="comparisonChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      // Auto-fill default date ranges (last 7 days)
+      // Team data for visualizations
+      const gameData = {
+        dates: {{ recent_games | map(attribute='date') | list | tojson }},
+        points: {{ recent_games | map(attribute='points') | list | tojson }},
+        rebounds: {{ recent_games | map(attribute='rebounds') | list | tojson }},
+        assists: {{ recent_games | map(attribute='assists') | list | tojson }},
+        fg_percent: {{ recent_games | map(attribute='fg_percent') | list | tojson }},
+        threep_percent: {{ recent_games | map(attribute='threep_percent') | list | tojson }},
+        ft_percent: {{ recent_games | map(attribute='ft_percent') | list | tojson }},
+        results: {{ recent_games | map(attribute='result') | list | tojson }}
+      };
+
+      // Chart instances
+      let performanceChart, shootingChart, winlossChart, comparisonChart;
+
+      // Initialize Performance Trends Chart
+      function initPerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        performanceChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: gameData.dates,
+            datasets: [
+              {
+                label: 'Points',
+                data: gameData.points,
+                borderColor: '#4caf50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 8
+              },
+              {
+                label: 'Rebounds',
+                data: gameData.rebounds,
+                borderColor: '#2196f3',
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 8
+              },
+              {
+                label: 'Assists',
+                data: gameData.assists,
+                borderColor: '#ff9800',
+                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { usePointStyle: true }
+              },
+              title: {
+                display: true,
+                text: 'Team Performance Metrics'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+              },
+              x: {
+                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+              }
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            }
+          }
+        });
+      }
+
+      // Initialize Shooting Percentages Chart
+      function initShootingChart() {
+        const ctx = document.getElementById('shootingChart').getContext('2d');
+        shootingChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: gameData.dates,
+            datasets: [
+              {
+                label: 'Field Goal %',
+                data: gameData.fg_percent,
+                backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                borderColor: '#4caf50',
+                borderWidth: 1
+              },
+              {
+                label: '3-Point %',
+                data: gameData.threep_percent,
+                backgroundColor: 'rgba(33, 150, 243, 0.8)',
+                borderColor: '#2196f3',
+                borderWidth: 1
+              },
+              {
+                label: 'Free Throw %',
+                data: gameData.ft_percent,
+                backgroundColor: 'rgba(255, 152, 0, 0.8)',
+                borderColor: '#ff9800',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: {
+                display: true,
+                text: 'Shooting Efficiency Trends'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Initialize Win/Loss Pattern Chart
+      function initWinLossChart() {
+        const ctx = document.getElementById('winlossChart').getContext('2d');
+        const winLossData = gameData.results.map(result => result === 'W' ? 1 : 0);
+        const colors = gameData.results.map(result => result === 'W' ? '#4caf50' : '#f44336');
+        
+        winlossChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: gameData.dates,
+            datasets: [{
+              label: 'Game Results',
+              data: winLossData,
+              backgroundColor: colors,
+              borderColor: colors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: {
+                display: true,
+                text: 'Win/Loss Streak Analysis'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 1,
+                ticks: {
+                  stepSize: 1,
+                  callback: function(value) {
+                    return value === 1 ? 'Win' : 'Loss';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Initialize Advanced Metrics Chart
+      function initComparisonChart() {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        const advancedStats = {
+          'Off Rating': {{ advanced_stats.off_rating if advanced_stats.off_rating != 'N/A' else 0 }},
+          'Def Rating': {{ advanced_stats.def_rating if advanced_stats.def_rating != 'N/A' else 0 }},
+          'Net Rating': {{ advanced_stats.net_rating if advanced_stats.net_rating != 'N/A' else 0 }},
+          'TS%': {{ (advanced_stats.ts_percent * 100) if advanced_stats.ts_percent != 'N/A' else 0 }},
+          'Reb%': {{ advanced_stats.reb_percent if advanced_stats.reb_percent != 'N/A' else 0 }},
+          'Ast%': {{ advanced_stats.ast_percent if advanced_stats.ast_percent != 'N/A' else 0 }}
+        };
+
+        comparisonChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: Object.keys(advancedStats),
+            datasets: [{
+              label: '{{ team_info.name }}',
+              data: Object.values(advancedStats),
+              borderColor: '#4caf50',
+              backgroundColor: 'rgba(76, 175, 80, 0.2)',
+              borderWidth: 2,
+              pointBackgroundColor: '#4caf50',
+              pointBorderColor: '#fff',
+              pointRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Team Advanced Analytics'
+              }
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                ticks: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      // Chart switching functionality
+      document.getElementById('chart-type').addEventListener('change', function() {
+        const chartType = this.value;
+        
+        // Hide all chart containers
+        document.querySelectorAll('.chart-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        
+        // Show selected chart container
+        document.getElementById(chartType + '-chart-container').style.display = 'block';
+        
+        // Initialize chart if not already done
+        switch(chartType) {
+          case 'performance':
+            if (!performanceChart) initPerformanceChart();
+            break;
+          case 'shooting':
+            if (!shootingChart) initShootingChart();
+            break;
+          case 'winloss':
+            if (!winlossChart) initWinLossChart();
+            break;
+          case 'comparison':
+            if (!comparisonChart) initComparisonChart();
+            break;
+        }
+      });
+
+      // Initialize default chart on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        initPerformanceChart();
+      });
+
+      // Auto-fill default date ranges (last 7 days) for search form
       document.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         const sevenDaysAgo = new Date(today);
