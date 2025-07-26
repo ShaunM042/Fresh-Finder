@@ -168,6 +168,198 @@
           margin-top: 120px;
         }
       }
+
+      /* Team Search Section Styles */
+      .team-search-section {
+        background-color: #fff;
+        padding: 30px;
+        margin: 20px 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #4caf50;
+      }
+
+      .team-search-section h2 {
+        color: #333;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-description {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 1.1rem;
+      }
+
+      .search-forms {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      .search-form-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+      }
+
+      .search-form-container h3 {
+        color: #4caf50;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .date-inputs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        flex: 1;
+      }
+
+      .input-group label {
+        display: block;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+      }
+
+      .search-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      .search-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .quick-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .stat-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .stat-value.positive {
+        color: #4caf50;
+      }
+
+      .stat-value.negative {
+        color: #f44336;
+      }
+
+      .loading-indicator {
+        text-align: center;
+        margin-top: 15px;
+        color: #4caf50;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #4caf50;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loading-indicator p {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      /* Responsive design for search section */
+      @media (max-width: 768px) {
+        .search-forms {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .date-inputs {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .quick-stats {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .team-search-section {
+          padding: 20px;
+        }
+      }
     </style>
   </head>
 
@@ -225,6 +417,64 @@
         </table>
       </div>
 
+      <!-- Enhanced Team Stats Search Section -->
+      <div class="team-search-section">
+        <h2><i class="fas fa-search"></i> Team Statistics Search</h2>
+        <p class="search-description">Search for detailed team statistics by date range</p>
+        
+        <div class="search-forms">
+          <div class="search-form-container">
+            <h3>Game-by-Game Stats</h3>
+            <form id="team-game-stats-form" class="team-search-form">
+              <input type="hidden" id="team-abbrev" value="{{ team_info.abbreviation }}">
+              
+              <div class="date-inputs">
+                <div class="input-group">
+                  <label for="game-start-date"><i class="fas fa-calendar-alt"></i> Start Date</label>
+                  <input type="date" id="game-start-date" name="start_date" required>
+                </div>
+                <div class="input-group">
+                  <label for="game-end-date"><i class="fas fa-calendar-alt"></i> End Date</label>
+                  <input type="date" id="game-end-date" name="end_date" required>
+                </div>
+              </div>
+              
+              <button type="submit" class="search-btn">
+                <i class="fas fa-chart-line"></i> Get Game Stats
+              </button>
+              <div class="loading-indicator" id="game-stats-loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading game statistics...</p>
+              </div>
+            </form>
+          </div>
+
+          <div class="search-form-container">
+            <h3>Advanced Team Metrics</h3>
+            <div class="quick-stats">
+              <div class="stat-item">
+                <span class="stat-label">Offensive Rating</span>
+                <span class="stat-value">{{ advanced_stats.off_rating|round(1) if advanced_stats.off_rating != 'N/A' else 'N/A' }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Defensive Rating</span>
+                <span class="stat-value">{{ advanced_stats.def_rating|round(1) if advanced_stats.def_rating != 'N/A' else 'N/A' }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Net Rating</span>
+                <span class="stat-value {{ 'positive' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating < 0 else '' }}">
+                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating > 0 else advanced_stats.net_rating|round(1) if advanced_stats.net_rating != 'N/A' else 'N/A' }}
+                </span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">True Shooting %</span>
+                <span class="stat-value">{{ (advanced_stats.ts_percent * 100)|round(1) if advanced_stats.ts_percent != 'N/A' else 'N/A' }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="recent-games">
         <h2>Recent Games</h2>
         <table>
@@ -257,5 +507,40 @@
         </table>
       </div>
     </div>
+
+    <script>
+      // Auto-fill default date ranges (last 7 days)
+      document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        const formatDate = (date) => date.toISOString().split('T')[0];
+
+        const gameStartDate = document.getElementById('game-start-date');
+        const gameEndDate = document.getElementById('game-end-date');
+        
+        if (gameStartDate) gameStartDate.value = formatDate(sevenDaysAgo);
+        if (gameEndDate) gameEndDate.value = formatDate(today);
+      });
+
+      // Handle team game stats form submission
+      document.getElementById('team-game-stats-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const teamAbbrev = document.getElementById('team-abbrev').value;
+        const startDate = document.getElementById('game-start-date').value;
+        const endDate = document.getElementById('game-end-date').value;
+        
+        // Show loading indicator
+        document.getElementById('game-stats-loading').style.display = 'block';
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        
+        // Redirect to team stats page with parameters
+        const url = `/team_stats?team_name=${encodeURIComponent(teamAbbrev)}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
+        window.location.href = url;
+      });
+    </script>
   </body>
 </html>
