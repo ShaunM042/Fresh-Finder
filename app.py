@@ -1,5 +1,8 @@
 # Standard Library
 import os
+import json
+import hashlib
+import time
 from datetime import datetime, timedelta
 
 # Third-Party Libraries
@@ -16,6 +19,126 @@ from nba_api.stats.library.http import NBAStatsHTTP
 
 # Application-Specific Modules
 from team_logos import TEAM_LOGOS
+
+# Cache Configuration
+CACHE_DIR = 'cache'
+CACHE_DURATION = 3600  # 1 hour in seconds
+
+def ensure_cache_directory():
+    """Ensure cache directory exists"""
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+
+def generate_cache_key(*args, **kwargs):
+    """Generate a unique cache key based on function arguments"""
+    key_data = str(args) + str(sorted(kwargs.items()))
+    return hashlib.md5(key_data.encode()).hexdigest()
+
+def get_cache_file_path(cache_key):
+    """Get the full path for a cache file"""
+    return os.path.join(CACHE_DIR, f"{cache_key}.json")
+
+def is_cache_valid(cache_file_path):
+    """Check if cache file exists and is still valid"""
+    if not os.path.exists(cache_file_path):
+        return False
+    
+    # Check if cache is expired
+    file_age = time.time() - os.path.getmtime(cache_file_path)
+    return file_age < CACHE_DURATION
+
+def save_to_cache(cache_key, data):
+    """Save data to cache file"""
+    try:
+        ensure_cache_directory()
+        cache_file_path = get_cache_file_path(cache_key)
+        
+        cache_data = {
+            'timestamp': time.time(),
+            'data': data
+        }
+        
+        with open(cache_file_path, 'w') as f:
+            json.dump(cache_data, f, default=str)
+        
+        print(f"Data cached with key: {cache_key}")
+    except Exception as e:
+        print(f"Failed to save cache: {e}")
+
+def load_from_cache(cache_key):
+    """Load data from cache file"""
+    try:
+        cache_file_path = get_cache_file_path(cache_key)
+        
+        if not is_cache_valid(cache_file_path):
+            return None
+        
+        with open(cache_file_path, 'r') as f:
+            cache_data = json.load(f)
+        
+        print(f"Data loaded from cache: {cache_key}")
+        return cache_data['data']
+    except Exception as e:
+        print(f"Failed to load cache: {e}")
+        return None
+
+def cached_api_call(func, *args, **kwargs):
+    """Wrapper function to cache API calls"""
+    # Generate cache key
+    cache_key = generate_cache_key(func.__name__, *args, **kwargs)
+    
+    # Try to load from cache first
+    cached_data = load_from_cache(cache_key)
+    if cached_data is not None:
+        # Convert back to DataFrame if it was a DataFrame
+        if isinstance(cached_data, dict) and 'dataframe_data' in cached_data:
+            return pd.DataFrame(cached_data['dataframe_data'])
+        return cached_data
+    
+    # Make API call if not in cache
+    try:
+        result = func(*args, **kwargs)
+        
+        # Prepare data for caching
+        if hasattr(result, 'get_data_frames'):
+            # NBA API endpoint result
+            data_frames = result.get_data_frames()
+            if data_frames and len(data_frames) > 0:
+                df = data_frames[0]
+                cache_data = {'dataframe_data': df.to_dict('records')}
+                save_to_cache(cache_key, cache_data)
+                return df
+        elif isinstance(result, pd.DataFrame):
+            # Direct DataFrame result
+            cache_data = {'dataframe_data': result.to_dict('records')}
+            save_to_cache(cache_key, cache_data)
+            return result
+        else:
+            # Other data types
+            save_to_cache(cache_key, result)
+            return result
+            
+    except Exception as e:
+        print(f"API call failed: {e}")
+        raise e
+
+def clear_expired_cache():
+    """Clear expired cache files"""
+    try:
+        if not os.path.exists(CACHE_DIR):
+            return
+        
+        current_time = time.time()
+        for filename in os.listdir(CACHE_DIR):
+            if filename.endswith('.json'):
+                file_path = os.path.join(CACHE_DIR, filename)
+                file_age = current_time - os.path.getmtime(file_path)
+                
+                if file_age > CACHE_DURATION:
+                    os.remove(file_path)
+                    print(f"Removed expired cache file: {filename}")
+    except Exception as e:
+        print(f"Failed to clear expired cache: {e}")
 
 def get_current_nba_season():
     """Get the current NBA season based on the date"""
@@ -59,9 +182,11 @@ def get_player_data_with_fallback(player_id, data_func, **kwargs):
             if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
                 kwargs['timeout'] = 60
             
-            data = data_func(player_id=player_id, **kwargs)
-            df = data.get_data_frames()[0]
-            if not df.empty:
+            # Use cached API call
+            df = cached_api_call(data_func, player_id=player_id, **kwargs)
+            if hasattr(df, 'empty') and not df.empty:
+                return df, season
+            elif df is not None:
                 return df, season
         except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
             # Skip timeout errors and try next season
@@ -83,9 +208,11 @@ def get_team_data_with_fallback(team_id, data_func, **kwargs):
             if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
                 kwargs['timeout'] = 60
                 
-            data = data_func(team_id=team_id, **kwargs)
-            df = data.get_data_frames()[0]
-            if not df.empty:
+            # Use cached API call
+            df = cached_api_call(data_func, team_id=team_id, **kwargs)
+            if hasattr(df, 'empty') and not df.empty:
+                return df, season
+            elif df is not None:
                 return df, season
         except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
             # Skip timeout errors and try next season
@@ -107,9 +234,11 @@ def get_league_data_with_fallback(data_func, **kwargs):
             if hasattr(data_func, '__name__') and 'gamelog' in str(data_func).lower():
                 kwargs['timeout'] = 60
                 
-            data = data_func(**kwargs)
-            df = data.get_data_frames()[0]
-            if not df.empty:
+            # Use cached API call
+            df = cached_api_call(data_func, **kwargs)
+            if hasattr(df, 'empty') and not df.empty:
+                return df, season
+            elif df is not None:
                 return df, season
         except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
             # Skip timeout errors and try next season
@@ -140,6 +269,49 @@ load_dotenv()
 configure_nba_api()
 
 app = Flask(__name__, template_folder='templates')
+
+# Clear expired cache on app startup
+@app.before_request
+def startup():
+    """Initialize app and clear expired cache"""
+    if not hasattr(startup, 'called'):
+        clear_expired_cache()
+        print("Fresh Finder started with caching enabled")
+        startup.called = True
+
+# Add cache management route for admin purposes
+@app.route('/admin/clear-cache')
+def clear_cache():
+    """Clear all cache files (admin route)"""
+    try:
+        if os.path.exists(CACHE_DIR):
+            import shutil
+            shutil.rmtree(CACHE_DIR)
+            ensure_cache_directory()
+            return jsonify({"status": "success", "message": "Cache cleared successfully"})
+        else:
+            return jsonify({"status": "info", "message": "No cache directory found"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# Add cache statistics route
+@app.route('/admin/cache-stats')
+def cache_stats():
+    """Get cache statistics (admin route)"""
+    try:
+        if not os.path.exists(CACHE_DIR):
+            return jsonify({"cache_files": 0, "total_size": 0})
+        
+        cache_files = [f for f in os.listdir(CACHE_DIR) if f.endswith('.json')]
+        total_size = sum(os.path.getsize(os.path.join(CACHE_DIR, f)) for f in cache_files)
+        
+        return jsonify({
+            "cache_files": len(cache_files),
+            "total_size": f"{total_size / 1024:.2f} KB",
+            "cache_duration": f"{CACHE_DURATION / 3600:.1f} hours"
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/')
@@ -253,10 +425,9 @@ def get_player_profile(player_name):
     player_id = player_info[0]['id']
 
     try:
-        player_career = playercareerstats.PlayerCareerStats(player_id=player_id)
-        career_data = player_career.get_data_frames()[0]
-        common_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
-        common_data = common_info.get_data_frames()[0]
+        # Use cached API calls for better performance
+        career_data = cached_api_call(playercareerstats.PlayerCareerStats, player_id=player_id)
+        common_data = cached_api_call(commonplayerinfo.CommonPlayerInfo, player_id=player_id)
 
         position = common_data['POSITION'].values[0] if 'POSITION' in common_data.columns and not common_data.empty else 'N/A'
 
@@ -324,21 +495,21 @@ def fetch_team_data(team_abbreviation):
 
     team_id = team_info['id']
 
-    team_details = teamdetails.TeamDetails(team_id=team_id)
-    team_data = team_details.get_data_frames()[0]
-    roster_data = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+    # Use cached API calls for better performance
+    team_details_data = cached_api_call(teamdetails.TeamDetails, team_id=team_id)
+    roster_data = cached_api_call(commonteamroster.CommonTeamRoster, team_id=team_id)
     game_log_data, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog)
     game_log_data = game_log_data.head(10)
 
-    league_stats = leaguedashteamstats.LeagueDashTeamStats(season=used_season)
-    advanced_stats = league_stats.get_data_frames()[0]
-    team_advanced_stats = advanced_stats[advanced_stats['TEAM_ID'] == team_id]
+    # Cache league stats call
+    league_stats_data = cached_api_call(leaguedashteamstats.LeagueDashTeamStats, season=used_season)
+    team_advanced_stats = league_stats_data[league_stats_data['TEAM_ID'] == team_id]
 
     team_info_dict = {
-        'name': team_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_data.columns else team_info.get('full_name', 'N/A'),
-        'city': team_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_data.columns else team_info.get('city', 'N/A'),
-        'state': team_data['TEAM_STATE'].values[0] if 'TEAM_STATE' in team_data.columns else team_info.get('state', 'N/A'),
-        'abbreviation': team_data['TEAM_ABBREVIATION'].values[0] if 'TEAM_ABBREVIATION' in team_data.columns else team_info.get('abbreviation', 'N/A'),
+        'name': team_details_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_details_data.columns else team_info.get('full_name', 'N/A'),
+        'city': team_details_data['TEAM_CITY'].values[0] if 'TEAM_CITY' in team_details_data.columns else team_info.get('city', 'N/A'),
+        'state': team_details_data['TEAM_STATE'].values[0] if 'TEAM_STATE' in team_details_data.columns else team_info.get('state', 'N/A'),
+        'abbreviation': team_details_data['TEAM_ABBREVIATION'].values[0] if 'TEAM_ABBREVIATION' in team_details_data.columns else team_info.get('abbreviation', 'N/A'),
         'logo': TEAM_LOGOS.get(team_abbreviation, '')
     }
 
