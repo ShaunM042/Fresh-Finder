@@ -4,16 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ player_name }} - Player Profile</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
       }
 
       body {
@@ -21,7 +35,8 @@
         padding: 20px;
       }
 
-      h1, h2 {
+      h1,
+      h2 {
         text-align: center;
         margin-top: 20px;
         color: #333;
@@ -66,7 +81,7 @@
       .navbar .menu li a {
         color: #fff;
         font-size: 17px;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
         padding: 8px 12px;
         border-radius: 4px;
@@ -115,7 +130,7 @@
         border-radius: 8px;
         object-fit: cover;
         background: #fff;
-        box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
       }
 
       table {
@@ -124,7 +139,8 @@
         background: white;
       }
 
-      th, td {
+      th,
+      td {
         padding: 10px;
         text-align: center;
         border-bottom: 1px solid #ddd;
@@ -173,8 +189,20 @@
           <a href="{{ url_for('landing') }}">Fresh Finder</a>
         </div>
         <ul class="menu">
-          <li><a href="{{ url_for('get_player_profile', player_name=player_name) }}" class="{% if request.endpoint == 'get_player_profile' %}active{% endif %}">Player Profile</a></li>
-          <li><a href="{{ url_for('team_search') }}" class="{% if request.endpoint == 'team_search' %}active{% endif %}">Team Search</a></li>
+          <li>
+            <a
+              href="{{ url_for('get_player_profile', player_name=player_name) }}"
+              class="{% if request.endpoint == 'get_player_profile' %}active{% endif %}"
+              >Player Profile</a
+            >
+          </li>
+          <li>
+            <a
+              href="{{ url_for('team_search') }}"
+              class="{% if request.endpoint == 'team_search' %}active{% endif %}"
+              >Team Search</a
+            >
+          </li>
         </ul>
       </div>
     </nav>
@@ -183,7 +211,12 @@
       <h1>{{ player_name }} - Player Profile</h1>
 
       <div class="profile-container">
-        <img class="player-headshot" src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';" alt="{{ profile.name }} headshot" />
+        <img
+          class="player-headshot"
+          src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}"
+          onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';"
+          alt="{{ profile.name }} headshot"
+        />
         <div class="profile-info">
           <ul>
             <li><strong>Name:</strong> {{ profile.name }}</li>
@@ -192,7 +225,11 @@
             <li><strong>Weight:</strong> {{ profile.weight }}</li>
             <li>
               <strong>Team:</strong>
-              <img src="{{ profile.team_logo }}" alt="{{ profile.team }} logo" class="team-logo-small" />
+              <img
+                src="{{ profile.team_logo }}"
+                alt="{{ profile.team }} logo"
+                class="team-logo-small"
+              />
               {{ profile.team }}
             </li>
           </ul>
@@ -217,8 +254,22 @@
           {% for game in recent_games %}
           <tr>
             <td>{{ game.date }}</td>
-            <td><img src="{{ game.team_for_logo }}" alt="{{ game.team_for }} logo" class="team-logo-small" /> {{ game.team_for }}</td>
-            <td><img src="{{ game.team_against_logo }}" alt="{{ game.team_against }} logo" class="team-logo-small" /> {{ game.team_against }}</td>
+            <td>
+              <img
+                src="{{ game.team_for_logo }}"
+                alt="{{ game.team_for }} logo"
+                class="team-logo-small"
+              />
+              {{ game.team_for }}
+            </td>
+            <td>
+              <img
+                src="{{ game.team_against_logo }}"
+                alt="{{ game.team_against }} logo"
+                class="team-logo-small"
+              />
+              {{ game.team_against }}
+            </td>
             <td>{{ game.minutes }}</td>
             <td>{{ game.points }}</td>
             <td>{{ game.rebounds }}</td>
@@ -232,7 +283,8 @@
       </div>
 
       <div class="averages">
-        Averages (Last 10 Games): {{ avg_points }} PTS | {{ avg_assists }} AST | {{ avg_rebounds }} REB
+        Averages (Last 10 Games): {{ avg_points }} PTS | {{ avg_assists }} AST |
+        {{ avg_rebounds }} REB
       </div>
 
       <select id="metric-selector">
@@ -241,7 +293,7 @@
         <option value="rebounds">Rebounds</option>
       </select>
 
-      <h2 style="text-align: center;">Metric Per Game (Last 10)</h2>
+      <h2 style="text-align: center">Metric Per Game (Last 10)</h2>
       <canvas id="pointsChart" height="100"></canvas>
     </div>
 
