@@ -2,29 +2,182 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ game_stats.player_name }} - Game Box Score</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <style>
       body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f4f4f4;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         margin: 0;
         padding: 20px;
+        min-height: 100vh;
       }
 
-      h1 {
+      .page-header {
         text-align: center;
-        margin-bottom: 30px;
-        color: #333;
+        margin-bottom: 40px;
+        color: white;
+      }
+
+      .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .page-header .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
       }
 
       .box-score-container {
-        max-width: 800px;
-        margin: auto;
-        background-color: #fff;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .container-header {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+        position: relative;
+      }
+
+      .container-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>')
+          repeat;
+        opacity: 0.3;
+      }
+
+      .game-matchup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .team-info {
+        text-align: center;
+      }
+
+      .team-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .vs-divider {
+        font-size: 2rem;
+        font-weight: bold;
+        opacity: 0.8;
+      }
+
+      .game-result {
+        font-size: 1.2rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+      }
+
+      .win {
+        color: #a5d6a7;
+      }
+
+      .loss {
+        color: #ef9a9a;
+      }
+
+      .stats-content {
+        padding: 40px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #4caf50;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .stat-unit {
+        font-size: 0.8rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .detailed-table {
+        margin-top: 30px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .table-header {
+        background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.1rem;
       }
 
       table {
@@ -32,103 +185,260 @@
         border-collapse: collapse;
       }
 
-      th, td {
-        padding: 12px;
+      th,
+      td {
+        padding: 15px 12px;
         text-align: center;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 0.95rem;
       }
 
       th {
-        background-color: #4caf50;
+        background-color: #6c757d;
         color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
       }
 
-      tr:hover {
-        background-color: #f1f1f1;
-      }
-      .game-link-button {
-        display: inline-block;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #4caf50;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: background-color 0.3s;
+      td {
+        background-color: white;
+        font-weight: 500;
       }
 
-      .game-link-button:hover {
-        background-color: #45a049;
+      tr:hover td {
+        background-color: #f1f3f5;
       }
-      .player-header {
+
+      .action-buttons {
         display: flex;
-        align-items: center;
         justify-content: center;
-        gap: 20px;
-        margin-bottom: 30px;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
       }
 
-      .player-header img {
-        height: 60px;
-        width: auto;
-        border-radius: 8px;
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: none;
+        cursor: pointer;
       }
 
-      .player-header .player-name {
-        font-size: 24px;
-        font-weight: bold;
-        color: #333;
+      .btn-primary {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
       }
 
-      @media (max-width: 600px) {
-        th, td {
-          font-size: 14px;
-          padding: 8px;
+      .btn-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .page-header h1 {
+          font-size: 2rem;
         }
+
+        .box-score-container {
+          margin: 0 10px;
+        }
+
+        .stats-content {
+          padding: 20px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+          gap: 15px;
+        }
+
+        .game-matchup {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .vs-divider {
+          transform: rotate(90deg);
+          font-size: 1.5rem;
+        }
+
+        th,
+        td {
+          padding: 10px 8px;
+          font-size: 0.85rem;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 300px;
+        }
+      }
+
+      /* Loading animation */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .box-score-container {
+        animation: slideIn 0.6s ease-out;
       }
     </style>
   </head>
   <body>
-    <h1>Game Box Score</h1>
+    <div class="page-header">
+      <h1><i class="fas fa-chart-line"></i> Game Box Score</h1>
+      <p class="subtitle">Detailed performance analysis</p>
+    </div>
+
     <div class="box-score-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Game Date</th>
-            <th>Matchup</th>
-            <th>Result</th>
-            <th>Minutes</th>
-            <th>Points</th>
-            <th>Rebounds</th>
-            <th>Assists</th>
-            <th>FG %</th>
-            <th>3P %</th>
-            <th>FT %</th>
-            <th>+/-</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{{ game_stats.game_date }}</td>
-            <td>{{ game_stats.matchup }}</td>
-            <td>{{ game_stats.wl }}</td>
-            <td>{{ game_stats.minutes }}</td>
-            <td>{{ game_stats.points }}</td>
-            <td>{{ game_stats.rebounds }}</td>
-            <td>{{ game_stats.assists }}</td>
-            <td>{{ game_stats.fg_percent }}%</td>
-            <td>{{ game_stats.threep_percent }}%</td>
-            <td>{{ game_stats.ft_percent }}%</td>
-            <td>{{ game_stats.plus_minus }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="text-align: center; margin-top: 20px;">
-        <a href="{{ url_for('landing') }}" class="game-link-button">Back to Search</a>
-        <a href="{{ url_for('get_player_profile', player_name=game_stats.player_name) }}" class="game-link-button" style="margin-left: 10px;">
-          Back to Player Profile
-        </a>
-      </div>  
+      <div class="container-header">
+        <div class="game-matchup">
+          <div class="team-info">
+            <div class="team-name">{{ game_stats.team_for }}</div>
+          </div>
+          <div class="vs-divider">VS</div>
+          <div class="team-info">
+            <div class="team-name">{{ game_stats.team_against }}</div>
+          </div>
+        </div>
+        <div
+          class="game-result {{ 'win' if game_stats.wl == 'W' else 'loss' }}"
+        >
+          {{ 'Victory' if game_stats.wl == 'W' else 'Loss' }} • {{
+          game_stats.game_date }}
+        </div>
+      </div>
+
+      <div class="stats-content">
+        <!-- Key Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Points</div>
+            <div class="stat-value">{{ game_stats.points }}</div>
+            <div class="stat-unit">PTS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Rebounds</div>
+            <div class="stat-value">{{ game_stats.rebounds }}</div>
+            <div class="stat-unit">REB</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Assists</div>
+            <div class="stat-value">{{ game_stats.assists }}</div>
+            <div class="stat-unit">AST</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Minutes</div>
+            <div class="stat-value">{{ game_stats.minutes }}</div>
+            <div class="stat-unit">MIN</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Plus/Minus</div>
+            <div
+              class="stat-value"
+              style="color: {{ 'green' if game_stats.plus_minus > 0 else 'red' if game_stats.plus_minus < 0 else '#666' }}"
+            >
+              {{ '+' + game_stats.plus_minus|string if game_stats.plus_minus > 0
+              else game_stats.plus_minus }}
+            </div>
+            <div class="stat-unit">+/-</div>
+          </div>
+        </div>
+
+        <!-- Detailed Stats Table -->
+        <div class="detailed-table">
+          <div class="table-header">
+            <i class="fas fa-table"></i> Complete Statistics
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Matchup</th>
+                <th>Result</th>
+                <th>MIN</th>
+                <th>PTS</th>
+                <th>REB</th>
+                <th>AST</th>
+                <th>FG%</th>
+                <th>3P%</th>
+                <th>FT%</th>
+                <th>+/-</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ game_stats.game_date }}</td>
+                <td>{{ game_stats.matchup }}</td>
+                <td>
+                  <span class="{{ 'win' if game_stats.wl == 'W' else 'loss' }}"
+                    >{{ game_stats.wl }}</span
+                  >
+                </td>
+                <td>{{ game_stats.minutes }}</td>
+                <td>{{ game_stats.points }}</td>
+                <td>{{ game_stats.rebounds }}</td>
+                <td>{{ game_stats.assists }}</td>
+                <td>{{ game_stats.fg_percent }}%</td>
+                <td>{{ game_stats.threep_percent }}%</td>
+                <td>{{ game_stats.ft_percent }}%</td>
+                <td
+                  style="color: {{ 'green' if game_stats.plus_minus > 0 else 'red' if game_stats.plus_minus < 0 else '#666' }}"
+                >
+                  {{ '+' + game_stats.plus_minus|string if game_stats.plus_minus
+                  > 0 else game_stats.plus_minus }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="action-buttons">
+          <a href="{{ url_for('landing') }}" class="btn btn-primary">
+            <i class="fas fa-search"></i>
+            Back to Search
+          </a>
+          <a
+            href="{{ url_for('get_player_profile', player_name=game_stats.player_name) }}"
+            class="btn btn-secondary"
+          >
+            <i class="fas fa-user"></i>
+            Player Profile
+          </a>
+        </div>
+      </div>
     </div>
   </body>
 </html>
