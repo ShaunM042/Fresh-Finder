@@ -173,6 +173,105 @@
         margin: 20px 0;
       }
 
+      /* Advanced Metrics Styles */
+      .advanced-metrics {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .advanced-metrics h2 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: left;
+        padding-left: 10px;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 0 10px;
+      }
+
+      .metric-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        text-align: center;
+      }
+
+      .metric-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        color: #4caf50;
+      }
+
+      .metric-header i {
+        font-size: 24px;
+        margin-right: 8px;
+      }
+
+      .metric-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .metric-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #4caf50;
+        margin-bottom: 5px;
+      }
+
+      .metric-description {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .performance-rating {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+      }
+
+      .performance-rating h3 {
+        color: #333;
+        margin-bottom: 10px;
+        text-align: left;
+        padding-left: 10px;
+      }
+
+      .rating-bar {
+        background-color: #e0e0e0;
+        height: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .rating-fill {
+        height: 100%;
+        background-color: #4caf50;
+        border-radius: 5px;
+        transition: width 0.3s ease-in-out;
+      }
+
+      .rating-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+      }
+
       @media (max-width: 768px) {
         .profile-container {
           flex-direction: column;
@@ -235,6 +334,96 @@
           </ul>
         </div>
       </div>
+
+      <!-- Advanced Metrics Section -->
+      {% if advanced_stats %}
+      <div class="advanced-metrics">
+        <h2><i class="fas fa-calculator"></i> Advanced Analytics</h2>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-star"></i>
+              <span class="metric-title">Player Efficiency Rating</span>
+            </div>
+            <div class="metric-value per-value">
+              {{ advanced_stats.per if advanced_stats.per else 'N/A' }}
+            </div>
+            <div class="metric-description">Overall efficiency per minute</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-target"></i>
+              <span class="metric-title">True Shooting %</span>
+            </div>
+            <div class="metric-value">{{ advanced_stats.ts_percent }}%</div>
+            <div class="metric-description">
+              Shooting efficiency including 3s and FTs
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-bullseye"></i>
+              <span class="metric-title">Effective FG %</span>
+            </div>
+            <div class="metric-value">{{ advanced_stats.efg_percent }}%</div>
+            <div class="metric-description">
+              Field goals adjusted for 3-point value
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-clock"></i>
+              <span class="metric-title">Minutes per Game</span>
+            </div>
+            <div class="metric-value">
+              {{ advanced_stats.minutes_per_game }}
+            </div>
+            <div class="metric-description">Average playing time</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-gamepad"></i>
+              <span class="metric-title">Games Played</span>
+            </div>
+            <div class="metric-value">{{ advanced_stats.games_played }}</div>
+            <div class="metric-description">Total games this season</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <i class="fas fa-chart-pie"></i>
+              <span class="metric-title">Usage Rate</span>
+            </div>
+            <div class="metric-value">{{ advanced_stats.usage_rate }}%</div>
+            <div class="metric-description">
+              Team possessions used when on court
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Rating -->
+        <div class="performance-rating">
+          <h3>Performance Rating</h3>
+          <div class="rating-bar">
+            {% set per_rating = (advanced_stats.per / 30 * 100) | round | int %}
+            <div
+              class="rating-fill"
+              style="width: {{ per_rating if per_rating <= 100 else 100 }}%"
+            ></div>
+            <span class="rating-text">
+              {% if advanced_stats.per >= 25 %}Elite {% elif advanced_stats.per
+              >= 20 %}All-Star {% elif advanced_stats.per >= 15 %}Above Average
+              {% elif advanced_stats.per >= 10 %}Average {% else %}Below Average
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <div class="recent-games">
         <h2>Recent Games</h2>

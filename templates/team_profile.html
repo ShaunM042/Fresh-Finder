@@ -427,6 +427,111 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* Comprehensive Advanced Analytics Section */
+      .advanced-analytics {
+        background-color: #fff;
+        padding: 30px;
+        margin: 20px 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #4caf50;
+      }
+
+      .advanced-analytics h2 {
+        color: #333;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* Three columns for three sections */
+        gap: 20px;
+      }
+
+      .analytics-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .analytics-section h3 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .metrics-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .metric-row:last-child {
+        border-bottom: none;
+      }
+
+      .metric-name {
+        font-size: 0.9rem;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .metric-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .metric-value.offensive {
+        color: #4caf50;
+      }
+
+      .metric-value.defensive {
+        color: #f44336;
+      }
+
+      .metric-value.positive {
+        color: #4caf50;
+      }
+
+      .metric-value.negative {
+        color: #f44336;
+      }
+
+      .metric-value.turnover {
+        color: #f44336;
+      }
+
+      @media (max-width: 992px) {
+        .analytics-grid {
+          grid-template-columns: 1fr 1fr; /* Two columns for two sections */
+        }
+      }
+
+      @media (max-width: 768px) {
+        .analytics-grid {
+          grid-template-columns: 1fr; /* One column for one section */
+        }
+        .advanced-analytics {
+          padding: 20px;
+        }
+      }
     </style>
   </head>
 
@@ -535,7 +640,111 @@
               </div>
               <div class="stat-item">
                 <span class="stat-label">True Shooting %</span>
-                <span class="stat-value">{{ (advanced_stats.ts_percent * 100)|round(1) if advanced_stats.ts_percent != 'N/A' else 'N/A' }}%</span>
+                <span class="stat-value">{{ advanced_stats.ts_percent|round(1) if advanced_stats.ts_percent != 'N/A' else 'N/A' }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Effective FG %</span>
+                <span class="stat-value">{{ advanced_stats.effective_fg_pct|round(1) if advanced_stats.effective_fg_pct else 'N/A' }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Pace</span>
+                <span class="stat-value">{{ advanced_stats.pace|round(1) if advanced_stats.pace else 'N/A' }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Turnover %</span>
+                <span class="stat-value">{{ advanced_stats.turnover_pct|round(1) if advanced_stats.turnover_pct else 'N/A' }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win %</span>
+                <span class="stat-value">{{ advanced_stats.win_percentage|round(1) if advanced_stats.win_percentage else 'N/A' }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Advanced Analytics Section -->
+      <div class="advanced-analytics">
+        <h2><i class="fas fa-chart-bar"></i> Comprehensive Team Analytics</h2>
+        
+        <div class="analytics-grid">
+          <!-- Offensive Metrics -->
+          <div class="analytics-section">
+            <h3><i class="fas fa-arrow-up"></i> Offensive Metrics</h3>
+            <div class="metrics-list">
+              <div class="metric-row">
+                <span class="metric-name">Offensive Rating</span>
+                <span class="metric-value offensive">{{ advanced_stats.off_rating|round(1) if advanced_stats.off_rating else 'N/A' }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">True Shooting %</span>
+                <span class="metric-value">{{ advanced_stats.ts_percent|round(1) if advanced_stats.ts_percent else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Effective FG %</span>
+                <span class="metric-value">{{ advanced_stats.effective_fg_pct|round(1) if advanced_stats.effective_fg_pct else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Assist %</span>
+                <span class="metric-value">{{ advanced_stats.ast_percent|round(1) if advanced_stats.ast_percent else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Turnover %</span>
+                <span class="metric-value turnover">{{ advanced_stats.turnover_pct|round(1) if advanced_stats.turnover_pct else 'N/A' }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Defensive Metrics -->
+          <div class="analytics-section">
+            <h3><i class="fas fa-shield-alt"></i> Defensive Metrics</h3>
+            <div class="metrics-list">
+              <div class="metric-row">
+                <span class="metric-name">Defensive Rating</span>
+                <span class="metric-value defensive">{{ advanced_stats.def_rating|round(1) if advanced_stats.def_rating else 'N/A' }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Steal %</span>
+                <span class="metric-value">{{ advanced_stats.steal_pct|round(1) if advanced_stats.steal_pct else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Block %</span>
+                <span class="metric-value">{{ advanced_stats.block_pct|round(1) if advanced_stats.block_pct else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Rebounding %</span>
+                <span class="metric-value">{{ advanced_stats.reb_percent|round(1) if advanced_stats.reb_percent else 'N/A' }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overall Performance -->
+          <div class="analytics-section">
+            <h3><i class="fas fa-trophy"></i> Overall Performance</h3>
+            <div class="metrics-list">
+              <div class="metric-row">
+                <span class="metric-name">Net Rating</span>
+                <span class="metric-value {{ 'positive' if advanced_stats.net_rating and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating and advanced_stats.net_rating < 0 else '' }}">
+                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if advanced_stats.net_rating and advanced_stats.net_rating > 0 else advanced_stats.net_rating|round(1) if advanced_stats.net_rating else 'N/A' }}
+                </span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Win Percentage</span>
+                <span class="metric-value">{{ advanced_stats.win_percentage|round(1) if advanced_stats.win_percentage else 'N/A' }}%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Wins - Losses</span>
+                <span class="metric-value">{{ advanced_stats.wins if advanced_stats.wins else '0' }} - {{ advanced_stats.losses if advanced_stats.losses else '0' }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Pace</span>
+                <span class="metric-value">{{ advanced_stats.pace|round(1) if advanced_stats.pace else 'N/A' }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Plus/Minus</span>
+                <span class="metric-value {{ 'positive' if advanced_stats.plus_minus and advanced_stats.plus_minus > 0 else 'negative' if advanced_stats.plus_minus and advanced_stats.plus_minus < 0 else '' }}">
+                  {{ ('+' + advanced_stats.plus_minus|round(1)|string) if advanced_stats.plus_minus and advanced_stats.plus_minus > 0 else advanced_stats.plus_minus|round(1) if advanced_stats.plus_minus else 'N/A' }}
+                </span>
               </div>
             </div>
           </div>

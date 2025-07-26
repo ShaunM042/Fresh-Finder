@@ -466,7 +466,13 @@ def get_player_profile(player_name):
             }
             recent_games.append(game_stats)
 
-        return render_template('player_profile.html', profile=profile, recent_games=recent_games)
+        # Get advanced statistics
+        advanced_stats = get_advanced_player_stats(player_id, used_season)
+
+        return render_template('player_profile.html', 
+                             profile=profile, 
+                             recent_games=recent_games,
+                             advanced_stats=advanced_stats)
 
     except Exception as e:
         return jsonify(error=str(e)), 500
@@ -501,9 +507,8 @@ def fetch_team_data(team_abbreviation):
     game_log_data, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog)
     game_log_data = game_log_data.head(10)
 
-    # Cache league stats call
-    league_stats_data = cached_api_call(leaguedashteamstats.LeagueDashTeamStats, season=used_season)
-    team_advanced_stats = league_stats_data[league_stats_data['TEAM_ID'] == team_id]
+    # Get comprehensive advanced statistics
+    advanced_stats_dict = get_advanced_team_stats(team_id, used_season)
 
     team_info_dict = {
         'name': team_details_data['TEAM_NAME'].values[0] if 'TEAM_NAME' in team_details_data.columns else team_info.get('full_name', 'N/A'),
@@ -540,16 +545,149 @@ def fetch_team_data(team_abbreviation):
         }
         recent_games.append(game_info)
 
-    advanced_stats_dict = {
-        'off_rating': team_advanced_stats['OFF_RATING'].values[0] if 'OFF_RATING' in team_advanced_stats.columns else 'N/A',
-        'def_rating': team_advanced_stats['DEF_RATING'].values[0] if 'DEF_RATING' in team_advanced_stats.columns else 'N/A',
-        'net_rating': team_advanced_stats['NET_RATING'].values[0] if 'NET_RATING' in team_advanced_stats.columns else 'N/A',
-        'reb_percent': team_advanced_stats['REB_PCT'].values[0] if 'REB_PCT' in team_advanced_stats.columns else 'N/A',
-        'ast_percent': team_advanced_stats['AST_PCT'].values[0] if 'AST_PCT' in team_advanced_stats.columns else 'N/A',
-        'ts_percent': team_advanced_stats['TS_PCT'].values[0] if 'TS_PCT' in team_advanced_stats.columns else 'N/A'
-    }
-
     return team_info_dict, roster, recent_games, advanced_stats_dict
+
+def calculate_per(stats_row):
+    """
+    Calculate Player Efficiency Rating (PER)
+    Simplified version of PER calculation
+    """
+    try:
+        # Extract necessary stats
+        min_played = stats_row.get('MIN', 0)
+        if min_played == 0:
+            return 0
+        
+        pts = stats_row.get('PTS', 0)
+        fgm = stats_row.get('FGM', 0)
+        fga = stats_row.get('FGA', 0)
+        ftm = stats_row.get('FTM', 0)
+        fta = stats_row.get('FTA', 0)
+        fg3m = stats_row.get('FG3M', 0)
+        reb = stats_row.get('REB', 0)
+        ast = stats_row.get('AST', 0)
+        stl = stats_row.get('STL', 0)
+        blk = stats_row.get('BLK', 0)
+        tov = stats_row.get('TO', 0)
+        pf = stats_row.get('PF', 0)
+        
+        # Simplified PER calculation (not the full Hollinger formula)
+        per = ((pts + reb + ast + stl + blk) - ((fga - fgm) + (fta - ftm) + tov + pf)) / min_played * 48
+        return max(0, per)  # Ensure PER is not negative
+        
+    except Exception:
+        return 0
+
+def calculate_true_shooting_percentage(pts, fga, fta):
+    """Calculate True Shooting Percentage"""
+    try:
+        if (fga + 0.44 * fta) == 0:
+            return 0
+        return (pts / (2 * (fga + 0.44 * fta))) * 100
+    except Exception:
+        return 0
+
+def calculate_effective_field_goal_percentage(fgm, fg3m, fga):
+    """Calculate Effective Field Goal Percentage"""
+    try:
+        if fga == 0:
+            return 0
+        return ((fgm + 0.5 * fg3m) / fga) * 100
+    except Exception:
+        return 0
+
+def calculate_usage_rate(fga, fta, tov, min_played, team_min, team_fga, team_fta, team_tov):
+    """Calculate Usage Rate (approximate)"""
+    try:
+        if team_min == 0:
+            return 0
+        
+        player_possessions = fga + 0.44 * fta + tov
+        team_possessions = team_fga + 0.44 * team_fta + team_tov
+        
+        if team_possessions == 0:
+            return 0
+            
+        usage_rate = (player_possessions * (team_min / 5)) / (min_played * team_possessions) * 100
+        return min(100, max(0, usage_rate))  # Cap between 0-100%
+    except Exception:
+        return 0
+
+def get_advanced_player_stats(player_id, season=None):
+    """Get advanced statistics for a player"""
+    try:
+        if season is None:
+            season = get_current_nba_season()
+        
+        # Get detailed player stats
+        career_data = cached_api_call(playercareerstats.PlayerCareerStats, player_id=player_id)
+        
+        # Find season data
+        season_data = career_data[career_data['SEASON_ID'] == season]
+        if season_data.empty and not career_data.empty:
+            season_data = career_data.tail(1)  # Get most recent season
+            
+        if season_data.empty:
+            return {}
+            
+        row = season_data.iloc[0]
+        
+        # Calculate advanced metrics
+        per = calculate_per(row)
+        ts_pct = calculate_true_shooting_percentage(row.get('PTS', 0), row.get('FGA', 0), row.get('FTA', 0))
+        efg_pct = calculate_effective_field_goal_percentage(row.get('FGM', 0), row.get('FG3M', 0), row.get('FGA', 0))
+        
+        return {
+            'per': round(per, 2),
+            'ts_percent': round(ts_pct, 2),
+            'efg_percent': round(efg_pct, 2),
+            'games_played': row.get('GP', 0),
+            'minutes_per_game': round(row.get('MIN', 0) / max(1, row.get('GP', 1)), 1),
+            'usage_rate': 0  # Would need team data for accurate calculation
+        }
+        
+    except Exception as e:
+        print(f"Error calculating advanced player stats: {e}")
+        return {}
+
+def get_advanced_team_stats(team_id, season=None):
+    """Get comprehensive advanced statistics for a team"""
+    try:
+        if season is None:
+            season = get_current_nba_season()
+        
+        # Get team stats from league dashboard
+        league_stats = cached_api_call(leaguedashteamstats.LeagueDashTeamStats, season=season)
+        team_stats = league_stats[league_stats['TEAM_ID'] == team_id]
+        
+        if team_stats.empty:
+            return {}
+            
+        row = team_stats.iloc[0]
+        
+        # Extract advanced metrics
+        advanced_stats = {
+            'off_rating': round(row.get('OFF_RATING', 0), 1),
+            'def_rating': round(row.get('DEF_RATING', 0), 1),
+            'net_rating': round(row.get('NET_RATING', 0), 1),
+            'reb_percent': round(row.get('REB_PCT', 0), 1),
+            'ast_percent': round(row.get('AST_PCT', 0), 1),
+            'ts_percent': round(row.get('TS_PCT', 0) * 100, 1),
+            'effective_fg_pct': round(((row.get('FGM', 0) + 0.5 * row.get('FG3M', 0)) / max(1, row.get('FGA', 0))) * 100, 1),
+            'turnover_pct': round(row.get('TOV_PCT', 0), 1),
+            'steal_pct': round(row.get('STL_PCT', 0), 1),
+            'block_pct': round(row.get('BLK_PCT', 0), 1),
+            'wins': row.get('W', 0),
+            'losses': row.get('L', 0),
+            'win_percentage': round(row.get('W_PCT', 0) * 100, 1),
+            'plus_minus': round(row.get('PLUS_MINUS', 0), 1)
+        }
+        
+        return advanced_stats
+        
+    except Exception as e:
+        print(f"Error getting advanced team stats: {e}")
+        return {}
 
 @app.route('/team_autocomplete')
 def team_autocomplete():
