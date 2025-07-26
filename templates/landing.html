@@ -1,495 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fresh Finder</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #1d4289 0%, #29a645 100%);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background-color: rgba(0, 0, 0, 0.2);
-      padding: 1.2rem;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-    }
-    
-    .navbar .logo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin-right: 2rem;
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar .logo i {
-      margin-right: 0.8rem;
-      font-size: 2rem;
-    }
-    
-    .main-content {
-      width: 100%;
-      max-width: 1400px;
-      margin-top: 100px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    h1 {
-      font-size: 5.5rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(90deg, #ffffff, #f0f0f0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: fadeIn 1.8s ease-in forwards;
-      opacity: 0;
-      letter-spacing: 2px;
-      margin-top: 40px;
-    }
-  
-    .description {
-      font-size: 1.6rem;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 40px;
-      animation: fadeIn 1s ease-in forwards;
-      animation-delay: 1.8s;
-      opacity: 0;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  
-    .prompt {
-      font-size: 1.5rem;
-      color: rgba(255, 255, 255, 0.85);
-      margin-bottom: 30px;
-      animation: fadeInUp 1s ease-in forwards;
-      animation-delay: 1.8s;
-      opacity: 0;
-    }
-  
-    .btn-group {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 60px;
-      animation: fadeInUp 1s ease-in forwards;
-      animation-delay: 1.5s;
-      opacity: 0;
-      justify-content: center;
-    }
-  
-    .btn {
-      background-color: #ffffff;
-      border: none;
-      border-radius: 50px;
-      padding: 18px 40px;
-      font-size: 1.25rem;
-      color: #1d4289;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-      text-decoration: none;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .btn i {
-      margin-right: 12px;
-      font-size: 1.3rem;
-    }
-  
-    .btn:hover {
-      background-color: #f0f0f0;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-  
-    .form-section {
-      max-width: 700px;
-      width: 90%;
-      margin: 20px auto 50px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 35px;
-      border-radius: 15px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-      display: none;
-      animation: fadeInUp 0.3s ease forwards;
-      backdrop-filter: blur(10px);
-    }
-    
-    .form-section h2 {
-      margin-bottom: 30px;
-      color: white;
-      font-size: 2rem;
-    }
-  
-    input[type="text"], input[type="date"] {
-      width: 85%;
-      padding: 16px 20px;
-      font-size: 1.2rem;
-      margin-bottom: 25px;
-      border-radius: 50px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      transition: all 0.3s ease;
-    }
-    
-    input[type="text"]::placeholder {
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    input[type="text"]:focus, input[type="date"]:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-    }
-    
-    .featured-section {
-      display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      width: 100%;
-      max-width: 1200px;
-      margin-top: 20px;
-      animation: fadeInUp 1s ease-in forwards;
-      animation-delay: 2s;
-      opacity: 0;
-    }
-    
-    .stats-card {
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 30px;
-      width: 320px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-      text-align: left;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .stats-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-    
-    .stats-card h3 {
-      font-size: 1.4rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-    }
-    
-    .stats-card h3 i {
-      margin-right: 0.8rem;
-      font-size: 1.5rem;
-    }
-    
-    .stats-card p {
-      opacity: 0.8;
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
-      line-height: 1.6;
-    }
-    
-    .stats-value {
-      font-size: 3.5rem;
-      font-weight: bold;
-      margin-top: 1rem;
-      display: flex;
-      align-items: baseline;
-    }
-    
-    .stats-value span {
-      font-size: 1.2rem;
-      opacity: 0.7;
-      margin-left: 0.7rem;
-    }
-  
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    @media (max-width: 1200px) {
-      .featured-section {
-        flex-wrap: wrap;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fresh Finder</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1d4289 0%, #29a645 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
+        text-align: center;
+        padding: 0;
+        overflow-x: hidden;
       }
-      
-      h1 {
-        font-size: 4.5rem;
+
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 1.2rem;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 100;
       }
-    }
-    
-    @media (max-width: 768px) {
-      .featured-section {
+
+      .navbar .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-right: 2rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .navbar .logo i {
+        margin-right: 0.8rem;
+        font-size: 2rem;
+      }
+
+      .main-content {
+        width: 100%;
+        max-width: 1400px;
+        margin-top: 100px;
+        padding: 20px;
+        display: flex;
         flex-direction: column;
         align-items: center;
       }
-      
-      .stats-card {
-        width: 100%;
-        max-width: 400px;
-      }
-      
-      .btn-group {
-        flex-direction: column;
-      }
-      
+
       h1 {
-        font-size: 3.5rem;
+        font-size: 5.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #ffffff, #f0f0f0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeIn 1.8s ease-in forwards;
+        opacity: 0;
+        letter-spacing: 2px;
+        margin-top: 40px;
       }
-      
+
       .description {
+        font-size: 1.6rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 40px;
+        animation: fadeIn 1s ease-in forwards;
+        animation-delay: 1.8s;
+        opacity: 0;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .prompt {
+        font-size: 1.5rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 30px;
+        animation: fadeInUp 1s ease-in forwards;
+        animation-delay: 1.8s;
+        opacity: 0;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 60px;
+        animation: fadeInUp 1s ease-in forwards;
+        animation-delay: 1.5s;
+        opacity: 0;
+        justify-content: center;
+      }
+
+      .btn {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 50px;
+        padding: 18px 40px;
+        font-size: 1.25rem;
+        color: #1d4289;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn i {
+        margin-right: 12px;
         font-size: 1.3rem;
       }
-    }
-    
-    .ui-autocomplete {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 10px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-      padding: 10px 0;
-      font-size: 1.1rem;
-    }
-    
-    .ui-menu-item {
-      padding: 10px 15px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    }
-    
-    .ui-menu-item:last-child {
-      border-bottom: none;
-    }
-    
-    .ui-state-active, .ui-widget-content .ui-state-active {
-      background: #1d4289 !important;
-      border-color: #1d4289 !important;
-      color: white !important;
-    }
-  </style>
-</head>
-<body>
-  <div class="navbar">
-    <div class="logo">
-      <i class="fas fa-basketball-ball"></i> Fresh Finder
-    </div>
-  </div>
 
-  <div class="main-content">
-    <h1>Fresh Finder</h1>
-    <p class="description">Your go-to platform for real-time NBA player and team stats.</p>
-    <div class="prompt">What would you like to do?</div>
-  
-    <div class="btn-group">
-      <button class="btn" onclick="toggleSection('player')"><i class="fas fa-search"></i> Search Player</button>
-      <button class="btn" onclick="toggleSection('team')"><i class="fas fa-chart-bar"></i> Team Stats</button>
+      .btn:hover {
+        background-color: #f0f0f0;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .form-section {
+        max-width: 700px;
+        width: 90%;
+        margin: 20px auto 50px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        display: none;
+        animation: fadeInUp 0.3s ease forwards;
+        backdrop-filter: blur(10px);
+      }
+
+      .form-section h2 {
+        margin-bottom: 30px;
+        color: white;
+        font-size: 2rem;
+      }
+
+      input[type="text"],
+      input[type="date"] {
+        width: 85%;
+        padding: 16px 20px;
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      input[type="text"]:focus,
+      input[type="date"]:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+      }
+
+      .featured-section {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 20px;
+        animation: fadeInUp 1s ease-in forwards;
+        animation-delay: 2s;
+        opacity: 0;
+      }
+
+      .stats-card {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 30px;
+        width: 320px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        text-align: left;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Loading Indicators */
+      .loading-indicator {
+        text-align: center;
+        padding: 20px;
+        color: white;
+        margin-top: 15px;
+      }
+
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #ffffff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+        display: block;
+      }
+
+      .loading-indicator p {
+        font-size: 1rem;
+        margin: 0;
+        opacity: 0.9;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .featured-section {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        h1 {
+          font-size: 4.5rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .featured-section {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .stats-card {
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+        }
+
+        h1 {
+          font-size: 3.5rem;
+        }
+
+        .description {
+          font-size: 1.3rem;
+        }
+      }
+
+      .ui-autocomplete {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        padding: 10px 0;
+        font-size: 1.1rem;
+      }
+
+      .ui-menu-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      .ui-menu-item:last-child {
+        border-bottom: none;
+      }
+
+      .ui-state-active,
+      .ui-widget-content .ui-state-active {
+        background: #1d4289 !important;
+        border-color: #1d4289 !important;
+        color: white !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="logo">
+        <i class="fas fa-basketball-ball"></i> Fresh Finder
+      </div>
     </div>
-  
-    <div id="player-section" class="form-section">
-      <h2>Search Player Stats</h2>
-      <form id="player-search-form">
-        <input type="text" id="player-name" placeholder="Player Name" required />
-        <input type="text" id="start-date" placeholder="Start Date" />
-        <input type="text" id="end-date" placeholder="End Date" />
-        <div class="btn-group">
-          <button type="submit" class="btn"><i class="fas fa-basketball-ball"></i> Search Stats</button>
-          <button type="button" id="profile-button" class="btn"><i class="fas fa-user"></i> Player Profile</button>
+
+    <div class="main-content">
+      <h1>Fresh Finder</h1>
+      <p class="description">
+        Your go-to platform for real-time NBA player and team stats.
+      </p>
+      <div class="prompt">What would you like to do?</div>
+
+      <div class="btn-group">
+        <button class="btn" onclick="toggleSection('player')">
+          <i class="fas fa-search"></i> Search Player
+        </button>
+        <button class="btn" onclick="toggleSection('team')">
+          <i class="fas fa-chart-bar"></i> Team Stats
+        </button>
+      </div>
+
+      <div id="player-section" class="form-section">
+        <h2>Search Player Stats</h2>
+        <form id="player-search-form">
+          <input
+            type="text"
+            id="player-name"
+            placeholder="Player Name"
+            required
+          />
+          <input type="text" id="start-date" placeholder="Start Date" />
+          <input type="text" id="end-date" placeholder="End Date" />
+          <div class="btn-group">
+            <button type="submit" class="btn">
+              <i class="fas fa-basketball-ball"></i> Search Stats
+            </button>
+            <button type="button" id="profile-button" class="btn">
+              <i class="fas fa-user"></i> Player Profile
+            </button>
+          </div>
+          <div
+            id="player-loading"
+            class="loading-indicator"
+            style="display: none"
+          >
+            <div class="spinner"></div>
+            <p>Loading player stats...</p>
+          </div>
+        </form>
+      </div>
+
+      <div id="team-section" class="form-section">
+        <h2>Search Team Stats</h2>
+        <form id="team-search-form">
+          <input
+            type="text"
+            id="team-name"
+            placeholder="Team Name or Abbreviation"
+            required
+          />
+          <input type="text" id="team-start-date" placeholder="Start Date" />
+          <input type="text" id="team-end-date" placeholder="End Date" />
+          <div class="btn-group">
+            <button type="submit" id="team-stats-button" class="btn">
+              <i class="fas fa-chart-line"></i> Search Stats
+            </button>
+            <button type="button" id="team-profile-button" class="btn">
+              <i class="fas fa-shield-alt"></i> Team Profile
+            </button>
+          </div>
+          <div
+            id="team-loading"
+            class="loading-indicator"
+            style="display: none"
+          >
+            <div class="spinner"></div>
+            <p>Loading team data...</p>
+          </div>
+        </form>
+      </div>
+
+      <div class="featured-section">
+        <div class="stats-card">
+          <h3><i class="fas fa-fire"></i> Trending Player</h3>
+          <p>
+            Check out the current hottest player based on recent performances.
+          </p>
+          <div class="stats-value">29.7 <span>PPG</span></div>
         </div>
-      </form>
-    </div>
-  
-    <div id="team-section" class="form-section">
-      <h2>Search Team Stats</h2>
-      <form id="team-search-form">
-        <input type="text" id="team-name" placeholder="Team Name or Abbreviation" required />
-        <input type="text" id="team-start-date" placeholder="Start Date" />
-        <input type="text" id="team-end-date" placeholder="End Date" />
-        <div class="btn-group">
-          <button type="submit" id="team-stats-button" class="btn"><i class="fas fa-chart-line"></i> Search Stats</button>
-          <button type="button" id="team-profile-button" class="btn"><i class="fas fa-shield-alt"></i> Team Profile</button>
+
+        <div class="stats-card">
+          <h3><i class="fas fa-trophy"></i> Top Team</h3>
+          <p>
+            Current standings leader with the best win-loss record this season.
+          </p>
+          <div class="stats-value">42-9 <span>W-L</span></div>
         </div>
-      </form>
-    </div>
-  
-    <div class="featured-section">
-      <div class="stats-card">
-        <h3><i class="fas fa-fire"></i> Trending Player</h3>
-        <p>Check out the current hottest player based on recent performances.</p>
-        <div class="stats-value">29.7 <span>PPG</span></div>
-      </div>
-      
-      <div class="stats-card">
-        <h3><i class="fas fa-trophy"></i> Top Team</h3>
-        <p>Current standings leader with the best win-loss record this season.</p>
-        <div class="stats-value">42-9 <span>W-L</span></div>
-      </div>
-      
-      <div class="stats-card">
-        <h3><i class="fas fa-bolt"></i> Today's Games</h3>
-        <p>Stay updated with all the action happening across the league today.</p>
-        <div class="stats-value">7 <span>Games</span></div>
+
+        <div class="stats-card">
+          <h3><i class="fas fa-bolt"></i> Today's Games</h3>
+          <p>
+            Stay updated with all the action happening across the league today.
+          </p>
+          <div class="stats-value">7 <span>Games</span></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    function toggleSection(type) {
-      $("#player-section, #team-section").hide();
-      if (type === 'player') $("#player-section").slideDown();
-      if (type === 'team') $("#team-section").slideDown();
-    }
+    <script>
+      function toggleSection(type) {
+        $("#player-section, #team-section").hide();
+        if (type === "player") $("#player-section").slideDown();
+        if (type === "team") $("#team-section").slideDown();
+      }
 
-    $(document).ready(function () {
-      // Auto-fill dates with last 7 days
-      const today = new Date();
-      const sevenDaysAgo = new Date(today);
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      
-      const formatDate = (date) => date.toISOString().split('T')[0];
-      
-      $("#start-date").val(formatDate(sevenDaysAgo));
-      $("#end-date").val(formatDate(today));
-      $("#team-start-date").val(formatDate(sevenDaysAgo));
-      $("#team-end-date").val(formatDate(today));
+      $(document).ready(function () {
+        // Auto-fill dates with last 7 days
+        const today = new Date();
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
 
-      $("#player-name").autocomplete({
-        source: function (req, res) {
-          $.get("/autocomplete", { term: req.term }, res);
-        },
-        minLength: 2
-      });
+        const formatDate = (date) => date.toISOString().split("T")[0];
 
-      $("#team-name").autocomplete({
-        source: function (req, res) {
-          $.get("/team_autocomplete", { term: req.term }, res);
-        },
-        minLength: 2
-      });
+        $("#start-date").val(formatDate(sevenDaysAgo));
+        $("#end-date").val(formatDate(today));
+        $("#team-start-date").val(formatDate(sevenDaysAgo));
+        $("#team-end-date").val(formatDate(today));
 
-      $("#player-search-form").submit(function (e) {
-        e.preventDefault();
-        const name = $("#player-name").val();
-        const start = $("#start-date").val();
-        const end = $("#end-date").val();
-        const url = `/player_stats?player_name=${encodeURIComponent(name)}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
-        window.location.href = url;
-      });
+        $("#player-name").autocomplete({
+          source: function (req, res) {
+            $.get("/autocomplete", { term: req.term }, res);
+          },
+          minLength: 2,
+        });
 
-      $("#profile-button").click(function () {
-        const name = $("#player-name").val();
-        if (name) {
+        $("#team-name").autocomplete({
+          source: function (req, res) {
+            $.get("/team_autocomplete", { term: req.term }, res);
+          },
+          minLength: 2,
+        });
+
+        $("#player-search-form").submit(function (e) {
+          e.preventDefault();
+          const name = $("#player-name").val();
+          const start = $("#start-date").val();
+          const end = $("#end-date").val();
+
+          // Show loading indicator
+          $("#player-loading").show();
+          $("button[type='submit']", this).prop("disabled", true);
+
+          const url = `/player_stats?player_name=${encodeURIComponent(
+            name
+          )}&start_date=${encodeURIComponent(
+            start
+          )}&end_date=${encodeURIComponent(end)}`;
+          window.location.href = url;
+        });
+
+        $("#team-search-form").submit(function (e) {
+          e.preventDefault();
+          const name = $("#team-name").val();
+          const start = $("#team-start-date").val();
+          const end = $("#team-end-date").val();
+
+          // Show loading indicator
+          $("#team-loading").show();
+          $("button[type='submit']", this).prop("disabled", true);
+
+          const url = `/team_stats?team_name=${encodeURIComponent(
+            name
+          )}&start_date=${encodeURIComponent(
+            start
+          )}&end_date=${encodeURIComponent(end)}`;
+          window.location.href = url;
+        });
+
+        $("#profile-button").click(function () {
+          const name = $("#player-name").val();
+          if (!name) {
+            alert("Please enter a player name first!");
+            return;
+          }
+
+          // Show loading indicator
+          $("#player-loading").show();
+          $(this).prop("disabled", true);
+
           window.location.href = `/player_profile/${encodeURIComponent(name)}`;
-        } else {
-          alert("Enter a player name.");
-        }
-      });
+        });
 
-      $("#team-search-form").submit(function (e) {
-        e.preventDefault();
-        const name = $("#team-name").val();
-        const start = $("#team-start-date").val();
-        const end = $("#team-end-date").val();
-        const url = `/team_stats?team_name=${encodeURIComponent(name)}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
-        window.location.href = url;
-      });
-      
-      $("#team-profile-button").click(function () {
-        const name = $("#team-name").val();
-        if (name) {
+        $("#team-profile-button").click(function () {
+          const name = $("#team-name").val();
+          if (!name) {
+            alert("Please enter a team name first!");
+            return;
+          }
+
+          // Show loading indicator
+          $("#team-loading").show();
+          $(this).prop("disabled", true);
+
           window.location.href = `/team_profile/${encodeURIComponent(name)}`;
-        } else {
-          alert("Enter a team name.");
-        }
+        });
       });
-    });
-  </script>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-          flatpickr("#start-date", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
-          });
-
-          flatpickr("#end-date", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
-          });
-
-          flatpickr("#team-start-date", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
-          });
-
-          flatpickr("#team-end-date", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
+      flatpickr("#start-date", {
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        altInput: true,
+        altFormat: "F j, Y",
       });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-        flatpickr("#start-date, #end-date, #team-start-date, #team-end-date", {
-          dateFormat: "Y-m-d", // Backend format
-          altInput: true,       // Display nice UI format
-          altFormat: "F j, Y",  // e.g., April 30, 1998
-          allowInput: true,
-          maxDate: "today",     // Optional: prevents future selection
-          wrap: false,
-          yearRange: [1900, new Date().getFullYear()],
-          monthSelectorType: "dropdown",
-          shorthandCurrentMonth: true
+
+      flatpickr("#end-date", {
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        altInput: true,
+        altFormat: "F j, Y",
       });
-</script>
-</body>
+
+      flatpickr("#team-start-date", {
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        altInput: true,
+        altFormat: "F j, Y",
+      });
+
+      flatpickr("#team-end-date", {
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        altInput: true,
+        altFormat: "F j, Y",
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      flatpickr("#start-date, #end-date, #team-start-date, #team-end-date", {
+        dateFormat: "Y-m-d", // Backend format
+        altInput: true, // Display nice UI format
+        altFormat: "F j, Y", // e.g., April 30, 1998
+        allowInput: true,
+        maxDate: "today", // Optional: prevents future selection
+        wrap: false,
+        yearRange: [1900, new Date().getFullYear()],
+        monthSelectorType: "dropdown",
+        shorthandCurrentMonth: true,
+      });
+    </script>
+  </body>
 </html>
