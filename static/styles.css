@@ -710,3 +710,83 @@ a:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
 }
+
+/* Dark Mode Toggle Styles */
+.dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+    background: #2e7d32;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dark-mode-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Dark mode toggle icon rotation */
+.dark-mode-toggle i {
+    transition: transform 0.3s ease;
+}
+
+body.dark-mode .dark-mode-toggle {
+    background: #ffa726;
+    color: #1e1e1e;
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background: #ff9800;
+}
+
+/* Enhanced dark mode transition */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.form-container,
+.table-container,
+.recent-games {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode improvements for better contrast */
+body.dark-mode h1,
+body.dark-mode h2 {
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .profile-info li {
+    background-color: #2c2c2c;
+    border-color: #555;
+}
+
+body.dark-mode .profile-info li:hover {
+    background-color: #3a3a3a;
+}
+
+body.dark-mode tr:hover {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode caption {
+    color: #e0e0e0;
+}
