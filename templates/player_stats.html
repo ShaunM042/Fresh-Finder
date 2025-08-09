@@ -579,7 +579,9 @@
         </div>
       </div>
     {% endif %}
-    <a href="#top" class="back-to-top">↑ Back to Top</a>
+    <button id="backToTopBtn" class="back-to-top-btn" title="Back to Top">
+      <i class="fas fa-chevron-up"></i>
+    </button>
     <script>
       document.getElementById("spinner").style.display = "block";
       window.onload = function () {
@@ -798,6 +800,24 @@
 
       // Initialize theme when page loads
       document.addEventListener('DOMContentLoaded', loadTheme);
+
+      // Back to Top Button Functionality
+      const backToTopBtn = document.getElementById('backToTopBtn');
+      
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      });
+      
+      backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
     </script>
   </body>
 </html>

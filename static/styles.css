@@ -790,3 +790,77 @@ body.dark-mode tr:hover {
 body.dark-mode caption {
     color: #e0e0e0;
 }
+
+/* Back to Top Button Enhancement */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+}
+
+.back-to-top-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 15px rgba(76, 175, 80, 0.3);
+}
+
+body.dark-mode .back-to-top-btn {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    box-shadow: 0 4px 20px rgba(46, 125, 50, 0.4);
+}
+
+body.dark-mode .back-to-top-btn:hover {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+    box-shadow: 0 6px 25px rgba(76, 175, 80, 0.5);
+}
+
+/* Adjust dark mode toggle position to avoid conflict */
+.dark-mode-toggle {
+    top: 20px;
+    right: 90px; /* Move left to avoid conflict with back-to-top */
+}
+
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .dark-mode-toggle {
+        right: 75px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
