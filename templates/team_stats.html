@@ -389,7 +389,7 @@
           <td>{{ game.game_date }}</td>
           <td>
             <a
-              href="{{ url_for('get_team_profile', team_name=game.team) }}"
+              href="{{ url_for('get_team_profile', team_search_term=game.team) }}"
               class="logo-link"
             >
               <img
@@ -402,7 +402,7 @@
           </td>
           <td>
             <a
-              href="{{ url_for('get_team_profile', team_name=game.opponent) }}"
+              href="{{ url_for('get_team_profile', team_search_term=game.opponent) }}"
               class="logo-link"
             >
               <img
