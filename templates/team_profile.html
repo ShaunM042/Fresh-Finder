@@ -546,6 +546,9 @@
             <a href="{{ url_for('landing') }}" class="{% if request.endpoint == 'landing' %}active{% endif %}">Player Profile</a>
           </li>
           <li>
+            <a href="{{ url_for('team_search') }}" class="{% if request.endpoint == 'team_search' %}active{% endif %}">Team Search</a>
+          </li>
+          <li>
             <a href="{{ url_for('landing') }}" class="highlighted-link">Back to Search</a>
           </li>
         </ul>
