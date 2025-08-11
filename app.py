@@ -4,6 +4,7 @@ import json
 import hashlib
 import time
 from datetime import datetime, timedelta
+import traceback
 
 # Third-Party Libraries
 import requests
@@ -354,10 +355,25 @@ def get_player_stats():
 
     # Prepare default context for rendering fallback UI
     current_date = datetime.now().strftime('%Y-%m-%d')
+    def should_return_json():
+        try:
+            return request.args.get('debug') == '1' or 'application/json' in (request.headers.get('Accept') or '')
+        except Exception:
+            return False
+
     def render_fallback(message=None):
         if message:
             # Log the reason for the fallback for diagnosis
             app.logger.info(f"player_stats fallback: %s", message)
+        if should_return_json():
+            return jsonify({
+                'ok': False,
+                'route': '/player_stats',
+                'error': message or 'No stats found',
+                'player_name': player_name,
+                'start_date': start_date,
+                'end_date': end_date,
+            }), 200
         return render_template('player_stats.html', stats=[], player_name=player_name or '', start_date=start_date, end_date=end_date, current_date=current_date)
 
     if not player_name:
@@ -383,7 +399,7 @@ def get_player_stats():
             else:
                 end_date_obj = datetime.now()
                 start_date_obj = end_date_obj - timedelta(days=7)
-        except ValueError as ve:
+        except ValueError:
             app.logger.exception("player_stats: invalid date format")
             return render_fallback("Invalid date format")
 
@@ -396,10 +412,20 @@ def get_player_stats():
             )
             frames = getattr(game_log, 'get_data_frames', lambda: [])()
             data_frame = frames[0] if frames else pd.DataFrame()
+            # Attempt to log raw JSON response for debugging
+            try:
+                raw_json = getattr(game_log, 'get_json', lambda: '')()
+                if raw_json:
+                    snippet = raw_json[:1000]
+                    app.logger.debug("player_stats raw NBA API json (truncated): %s", snippet)
+            except Exception:
+                app.logger.debug("player_stats: unable to get raw json from nba_api endpoint")
         except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout) as te:
             app.logger.exception("player_stats: NBA API timeout")
             return render_fallback("NBA API timeout")
         except Exception:
+            # Print full traceback to stdout/stderr in Render logs
+            traceback.print_exc()
             app.logger.exception("player_stats: NBA API call failed")
             return render_fallback("NBA API error")
 
@@ -449,9 +475,17 @@ def get_player_stats():
             current_date=current_date,
         )
 
-    except Exception:
-        # Log the full stack trace and render a graceful page
+    except Exception as e:
+        # Full traceback to logs and JSON in debug mode
+        traceback.print_exc()
         app.logger.exception("player_stats: unexpected error")
+        if should_return_json():
+            return jsonify({
+                'ok': False,
+                'route': '/player_stats',
+                'error': str(e),
+                'traceback': traceback.format_exc(),
+            }), 500
         return render_fallback("Unexpected error")
 
 @app.route('/player_profile/<player_name>')
