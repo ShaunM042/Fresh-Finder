@@ -326,11 +326,15 @@
       <div class="container-header">
         <div class="game-matchup">
           <div class="team-info">
-            <div class="team-name">{{ game_stats.team_for }}</div>
+            <a href="{{ url_for('get_team_profile', team_search_term=game_stats.team_for) }}" class="team-name" title="Open team profile">
+              {{ game_stats.team_for }}
+            </a>
           </div>
           <div class="vs-divider">VS</div>
           <div class="team-info">
-            <div class="team-name">{{ game_stats.team_against }}</div>
+            <a href="{{ url_for('get_team_profile', team_search_term=game_stats.team_against) }}" class="team-name" title="Open team profile">
+              {{ game_stats.team_against }}
+            </a>
           </div>
         </div>
         <div
@@ -374,6 +378,21 @@
               else game_stats.plus_minus }}
             </div>
             <div class="stat-unit">+/-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Field Goal %</div>
+            <div class="stat-value">{{ game_stats.fg_percent }}%</div>
+            <div class="stat-unit">FG%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">3-Point %</div>
+            <div class="stat-value">{{ game_stats.threep_percent }}%</div>
+            <div class="stat-unit">3P%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Free Throw %</div>
+            <div class="stat-value">{{ game_stats.ft_percent }}%</div>
+            <div class="stat-unit">FT%</div>
           </div>
         </div>
 
