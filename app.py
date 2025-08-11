@@ -352,69 +352,107 @@ def get_player_stats():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
+    # Prepare default context for rendering fallback UI
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    def render_fallback(message=None):
+        if message:
+            # Log the reason for the fallback for diagnosis
+            app.logger.info(f"player_stats fallback: %s", message)
+        return render_template('player_stats.html', stats=[], player_name=player_name or '', start_date=start_date, end_date=end_date, current_date=current_date)
+
     if not player_name:
-        return jsonify(error="Player name is required"), 400
-
-    player_info = players.find_players_by_full_name(player_name)
-    if not player_info:
-        return jsonify(message="Player not found"), 404
-
-    player_id = player_info[0]['id']
+        app.logger.warning("player_stats: missing player_name param")
+        return render_fallback("Missing player name")
 
     try:
-        if start_date and end_date:
-            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
-        else:
-            end_date_obj = datetime.now()
-            start_date_obj = end_date_obj - timedelta(days=7)
+        player_info = players.find_players_by_full_name(player_name)
+        if not player_info:
+            app.logger.info("player_stats: player not found - %s", player_name)
+            return render_fallback("Player not found")
 
-        game_log = playergamelog.PlayerGameLog(
-            player_id=player_id,
-            date_from_nullable=start_date_obj.strftime('%m/%d/%Y'),
-            date_to_nullable=end_date_obj.strftime('%m/%d/%Y')
-        )
-        data_frame = game_log.get_data_frames()[0]
+        player_id = player_info[0].get('id')
+        if not player_id:
+            app.logger.error("player_stats: missing player id for %s", player_name)
+            return render_fallback("Missing player id")
 
-        if data_frame.empty:
-            return jsonify(message="No matches played on this date"), 404
+        # Parse dates or use last 7 days
+        try:
+            if start_date and end_date:
+                start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+            else:
+                end_date_obj = datetime.now()
+                start_date_obj = end_date_obj - timedelta(days=7)
+        except ValueError as ve:
+            app.logger.exception("player_stats: invalid date format")
+            return render_fallback("Invalid date format")
 
-        data_frame['TEAM_ABBREVIATION'] = data_frame['MATCHUP'].apply(lambda x: x.split(' ')[0])
-        data_frame['MATCHUP'] = data_frame['MATCHUP'].apply(lambda x: x.split(' ')[-1])
+        # Call NBA API with robust guards
+        try:
+            game_log = playergamelog.PlayerGameLog(
+                player_id=player_id,
+                date_from_nullable=start_date_obj.strftime('%m/%d/%Y'),
+                date_to_nullable=end_date_obj.strftime('%m/%d/%Y')
+            )
+            frames = getattr(game_log, 'get_data_frames', lambda: [])()
+            data_frame = frames[0] if frames else pd.DataFrame()
+        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout) as te:
+            app.logger.exception("player_stats: NBA API timeout")
+            return render_fallback("NBA API timeout")
+        except Exception:
+            app.logger.exception("player_stats: NBA API call failed")
+            return render_fallback("NBA API error")
+
+        if data_frame is None or data_frame.empty:
+            app.logger.info("player_stats: no stats found for %s in range %s - %s", player_name, start_date_obj, end_date_obj)
+            return render_fallback("No stats found in date range")
+
+        # Derive safe columns
+        if 'MATCHUP' in data_frame.columns:
+            data_frame['TEAM_ABBREVIATION'] = data_frame['MATCHUP'].apply(lambda x: str(x).split(' ')[0] if isinstance(x, str) else '')
+            data_frame['MATCHUP'] = data_frame['MATCHUP'].apply(lambda x: str(x).split(' ')[-1] if isinstance(x, str) else '')
 
         games = []
-        for index, row in data_frame.iterrows():
-            turnovers = row['TO'] if 'TO' in data_frame.columns else 'N/A'
+        for _, row in data_frame.iterrows():
+            fga = row.get('FGA', 0)
+            fta = row.get('FTA', 0)
+            pts = row.get('PTS', 0)
+            ts_percent = (pts / (2 * (fga + 0.44 * fta)) * 100) if (fga + 0.44 * fta) != 0 else 0
 
-            ts_percent = (row['PTS'] / (2 * (row['FGA'] + 0.44 * row['FTA']))) * 100 if (row['FGA'] + 0.44 * row['FTA']) != 0 else 0
             game_stats = {
-                'game_id': row['Game_ID'],
-                'game_date': row['GAME_DATE'],
+                'game_id': row.get('Game_ID') or row.get('GAME_ID'),
+                'game_date': row.get('GAME_DATE', ''),
                 'name': player_name,
-                'team_for': row['TEAM_ABBREVIATION'],
-                'team_logo': TEAM_LOGOS.get(row['TEAM_ABBREVIATION'], ''),
-                'team_against': row['MATCHUP'],
-                'opposing_team_logo': TEAM_LOGOS.get(row['MATCHUP'], ''),
+                'team_for': row.get('TEAM_ABBREVIATION', ''),
+                'team_logo': TEAM_LOGOS.get(row.get('TEAM_ABBREVIATION', ''), ''),
+                'team_against': row.get('MATCHUP', ''),
+                'opposing_team_logo': TEAM_LOGOS.get(row.get('MATCHUP', ''), ''),
                 'minutes': row.get('MIN', 'N/A'),
-                'points': row['PTS'],
-                'rebounds': row['REB'],
-                'assists': row['AST'],
-                'steals': row['STL'],
-                'blocks': row['BLK'],
-                'fg_percent': round(row['FG_PCT'] * 100, 2),
+                'points': pts,
+                'rebounds': row.get('REB', 0),
+                'assists': row.get('AST', 0),
+                'steals': row.get('STL', 0),
+                'blocks': row.get('BLK', 0),
+                'fg_percent': round((row.get('FG_PCT', 0) or 0) * 100, 2),
                 'ts_percent': round(ts_percent, 2),
                 'plus_minus': row.get('PLUS_MINUS', 'N/A'),
-                'turnovers': turnovers
+                'turnovers': row.get('TO', 'N/A'),
             }
             games.append(game_stats)
 
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        return render_template('player_stats.html', stats=games, player_name=player_name, start_date=start_date, end_date=end_date, current_date=current_date)
+        return render_template(
+            'player_stats.html',
+            stats=games,
+            player_name=player_name,
+            start_date=start_date,
+            end_date=end_date,
+            current_date=current_date,
+        )
 
-    except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
-        return jsonify(error="NBA API request timed out. Please try again later."), 408
-    except Exception as e:
-        return jsonify(error=str(e)), 500
+    except Exception:
+        # Log the full stack trace and render a graceful page
+        app.logger.exception("player_stats: unexpected error")
+        return render_fallback("Unexpected error")
 
 @app.route('/player_profile/<player_name>')
 def get_player_profile(player_name):
