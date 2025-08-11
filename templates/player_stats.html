@@ -524,12 +524,16 @@
               </a>
             </td>
             <td>
-              <img src="{{ stat.team_logo }}" alt="{{ stat.team_for }}" class="team-logo" />
-              <strong>{{ stat.team_for }}</strong>
+              <a href="{{ url_for('get_team_profile', team_search_term=stat.team_for) }}" class="logo-link">
+                <img src="{{ stat.team_logo }}" alt="{{ stat.team_for }}" class="team-logo" />
+                <strong>{{ stat.team_for }}</strong>
+              </a>
             </td>
             <td>
-              <img src="{{ stat.opposing_team_logo }}" alt="{{ stat.team_against }}" class="team-logo" />
-              <strong>{{ stat.team_against }}</strong>
+              <a href="{{ url_for('get_team_profile', team_search_term=stat.team_against) }}" class="logo-link">
+                <img src="{{ stat.opposing_team_logo }}" alt="{{ stat.team_against }}" class="team-logo" />
+                <strong>{{ stat.team_against }}</strong>
+              </a>
             </td>
             <td>{{ stat.minutes }}</td>
             <td class="stat-highlight">{{ stat.points }}</td>
