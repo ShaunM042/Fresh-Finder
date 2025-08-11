@@ -130,6 +130,45 @@
       }
 
       /* Enhanced No Results State */
+      /* Pagination Controls */
+      .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-top: 20px;
+        padding: 20px;
+      }
+
+      .page-btn {
+        padding: 10px 20px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .page-btn:hover:not(:disabled) {
+        background: #45a049;
+        transform: translateY(-2px);
+      }
+
+      .page-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      #pageInfo {
+        font-weight: 600;
+        color: #333;
+      }
       .no-results-state {
         text-align: center;
         padding: 60px 20px;
@@ -383,9 +422,9 @@
           <th>+/-</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="teamStatsBody">
         {% for game in stats %}
-        <tr>
+        <tr class="game-row">
           <td>{{ game.game_date }}</td>
           <td>
             <a
@@ -424,6 +463,17 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <button id="prevPage" class="page-btn" disabled>
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <span id="pageInfo">Page 1 of 1</span>
+      <button id="nextPage" class="page-btn" disabled>
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
 
     <!-- Team Stats Visualizations -->
     <div class="stats-visualizations">
@@ -563,6 +613,40 @@
       };
 
       let trendsChart, shootingAnalysisChart, summaryChart;
+
+      // Simple pagination for team stats table
+      let tsCurrentPage = 1;
+      let tsItemsPerPage = 10;
+      let tsAllRows = [];
+      let tsVisibleRows = [];
+
+      function tsUpdateDisplay() {
+        tsAllRows.forEach(r => r.style.display = 'none');
+        const totalPages = Math.max(1, Math.ceil(tsAllRows.length / tsItemsPerPage));
+        if (tsCurrentPage > totalPages) tsCurrentPage = totalPages;
+        const start = (tsCurrentPage - 1) * tsItemsPerPage;
+        const end = Math.min(start + tsItemsPerPage, tsAllRows.length);
+        tsVisibleRows = tsAllRows.slice(start, end);
+        tsVisibleRows.forEach(r => r.style.display = 'table-row');
+        document.getElementById('pageInfo').textContent = `Page ${tsCurrentPage} of ${totalPages}`;
+        document.getElementById('prevPage').disabled = tsCurrentPage <= 1;
+        document.getElementById('nextPage').disabled = tsCurrentPage >= totalPages;
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const body = document.getElementById('teamStatsBody');
+        if (body) {
+          tsAllRows = Array.from(body.querySelectorAll('.game-row'));
+          tsUpdateDisplay();
+          document.getElementById('prevPage').addEventListener('click', function() {
+            if (tsCurrentPage > 1) { tsCurrentPage--; tsUpdateDisplay(); }
+          });
+          document.getElementById('nextPage').addEventListener('click', function() {
+            const totalPages = Math.max(1, Math.ceil(tsAllRows.length / tsItemsPerPage));
+            if (tsCurrentPage < totalPages) { tsCurrentPage++; tsUpdateDisplay(); }
+          });
+        }
+      });
 
       // Initialize Performance Trends Chart
       function initTrendsChart() {
