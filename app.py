@@ -715,7 +715,8 @@ def get_advanced_player_stats(player_id, season=None):
             'efg_percent': round(efg_pct, 2),
             'games_played': row.get('GP', 0),
             'minutes_per_game': round(row.get('MIN', 0) / max(1, row.get('GP', 1)), 1),
-            'usage_rate': 0  # Would need team data for accurate calculation
+            'usage_rate': 0,  # Would need team data for accurate calculation
+            'win_shares': round(row.get('WS', 0), 2) if 'WS' in row else None
         }
         
     except Exception as e:
