@@ -60,9 +60,9 @@ form {
 
 input[type="date"],
 input[type="text"] {
-    padding: 20px;
-    margin-right: 20px;
-    font-size: 24px;
+    padding: 14px;
+    margin-right: 16px;
+    font-size: 18px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     width: 200px;
@@ -77,8 +77,8 @@ input[type="date"]:focus {
 }
 
 input[type="submit"] {
-    padding: 20px 40px;
-    font-size: 24px;
+    padding: 14px 28px;
+    font-size: 18px;
     background-color: #4caf50;
     color: white;
     border: none;
@@ -133,7 +133,7 @@ button:focus-visible {
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 32px;
     color: #333;
 }
 
@@ -277,16 +277,16 @@ input[type="submit"]:active {
 
 .recent-games th,
 .recent-games td {
-    padding: 20px;
+    padding: 16px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .recent-games th {
     background-color: #4caf50;
     color: white;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .recent-games img {
@@ -302,7 +302,7 @@ button:hover {
 }
 
 .player-headshot {
-    width: 50px;
+    width: auto;
     height: 250px;
     display: block;
     margin-left: 20px;
