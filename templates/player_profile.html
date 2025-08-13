@@ -309,13 +309,6 @@
               >Team Search</a
             >
           </li>
-          <li>
-            <a
-              href="{{ url_for('team_search') }}"
-              class="{% if request.endpoint == 'team_search' %}active{% endif %}"
-              >Team Search</a
-            >
-          </li>
         </ul>
       </div>
     </nav>
@@ -404,7 +397,8 @@
               <span class="metric-title">Win Shares</span>
             </div>
             <div class="metric-value">
-              {{ advanced_stats.win_shares if advanced_stats.win_shares is not none else 'N/A' }}
+              {{ advanced_stats.win_shares if advanced_stats.win_shares is not
+              none else 'N/A' }}
             </div>
             <div class="metric-description">Estimated wins contributed</div>
           </div>

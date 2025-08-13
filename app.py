@@ -743,6 +743,7 @@ def get_advanced_team_stats(team_id, season=None):
             'off_rating': round(row.get('OFF_RATING', 0), 1),
             'def_rating': round(row.get('DEF_RATING', 0), 1),
             'net_rating': round(row.get('NET_RATING', 0), 1),
+            'pace': round(row.get('PACE', 0), 1),
             'reb_percent': round(row.get('REB_PCT', 0), 1),
             'ast_percent': round(row.get('AST_PCT', 0), 1),
             'ts_percent': round(row.get('TS_PCT', 0) * 100, 1),
