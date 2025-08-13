@@ -463,20 +463,24 @@
           <tr>
             <td>{{ game.date }}</td>
             <td>
-              <img
-                src="{{ game.team_for_logo }}"
-                alt="{{ game.team_for }} logo"
-                class="team-logo-small"
-              />
-              {{ game.team_for }}
+              <a href="{{ url_for('get_team_profile', team_search_term=game.team_for) }}" class="logo-link">
+                <img
+                  src="{{ game.team_for_logo }}"
+                  alt="{{ game.team_for }} logo"
+                  class="team-logo-small"
+                />
+                {{ game.team_for }}
+              </a>
             </td>
             <td>
-              <img
-                src="{{ game.team_against_logo }}"
-                alt="{{ game.team_against }} logo"
-                class="team-logo-small"
-              />
-              {{ game.team_against }}
+              <a href="{{ url_for('get_team_profile', team_search_term=game.team_against) }}" class="logo-link">
+                <img
+                  src="{{ game.team_against_logo }}"
+                  alt="{{ game.team_against }} logo"
+                  class="team-logo-small"
+                />
+                {{ game.team_against }}
+              </a>
             </td>
             <td>{{ game.minutes }}</td>
             <td>{{ game.points }}</td>
