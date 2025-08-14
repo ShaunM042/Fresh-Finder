@@ -405,6 +405,17 @@
 
           <div class="metric-card">
             <div class="metric-header">
+              <i class="fas fa-percentage"></i>
+              <span class="metric-title">WS per 48</span>
+            </div>
+            <div class="metric-value">
+              {{ advanced_stats.ws_per_48 if advanced_stats.ws_per_48 is not none else 'N/A' }}
+            </div>
+            <div class="metric-description">Win Shares per 48 minutes</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
               <i class="fas fa-gamepad"></i>
               <span class="metric-title">Games Played</span>
             </div>
@@ -463,7 +474,10 @@
           <tr>
             <td>{{ game.date }}</td>
             <td>
-              <a href="{{ url_for('get_team_profile', team_search_term=game.team_for) }}" class="logo-link">
+              <a
+                href="{{ url_for('get_team_profile', team_search_term=game.team_for) }}"
+                class="logo-link"
+              >
                 <img
                   src="{{ game.team_for_logo }}"
                   alt="{{ game.team_for }} logo"
@@ -473,7 +487,10 @@
               </a>
             </td>
             <td>
-              <a href="{{ url_for('get_team_profile', team_search_term=game.team_against) }}" class="logo-link">
+              <a
+                href="{{ url_for('get_team_profile', team_search_term=game.team_against) }}"
+                class="logo-link"
+              >
                 <img
                   src="{{ game.team_against_logo }}"
                   alt="{{ game.team_against }} logo"
