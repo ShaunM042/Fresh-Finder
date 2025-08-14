@@ -15,6 +15,23 @@
 - **Hosting:** Render.com
 - **Other:** python-dotenv for environment variable management
 
+## ✅ Production Notes
+- All routes support a debug JSON mode via `?debug=1` or `Accept: application/json`.
+- Global error handler logs tracebacks and returns JSON if debug mode is enabled.
+- HTTP retries configured for NBA API requests.
+
+## 📦 Install
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+```
+
+## ▶️ Run
+```bash
+python app.py  # Runs on port 5002
+```
+
 ## ⚙️ Setup (Local Development)
 
 1. **Clone the repo:**

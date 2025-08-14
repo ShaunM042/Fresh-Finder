@@ -11,6 +11,7 @@ import requests
 import pandas as pd
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, redirect, url_for
+from urllib3.util.retry import Retry
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints import (
     playergamelog, commonplayerinfo, playercareerstats,
@@ -257,7 +258,7 @@ def configure_nba_api():
     })
     # Increase timeout to 60 seconds
     adapter = requests.adapters.HTTPAdapter(
-        max_retries=requests.adapters.Retry(
+        max_retries=Retry(
             total=3,
             backoff_factor=1,
             status_forcelist=[429, 500, 502, 503, 504]
@@ -332,10 +333,12 @@ def index():
 
 @app.route('/autocomplete')
 def autocomplete():
-    term = request.args.get('term')
+    term = (request.args.get('term') or '').strip()
+    if not term:
+        return jsonify([])
     player_results = players.find_players_by_full_name(term)
     team_results = teams.find_teams_by_full_name(term)
-    results = [player['full_name'] for player in player_results] + [team['full_name'] for team in team_results]
+    results = [player.get('full_name') for player in player_results] + [team.get('full_name') for team in team_results]
     return jsonify(results)
 
 @app.route('/get_search_type')
@@ -779,7 +782,7 @@ def get_advanced_team_stats(team_id, season=None):
 
 @app.route('/team_autocomplete')
 def team_autocomplete():
-    term = request.args.get('term').lower()
+    term = (request.args.get('term') or '').lower()
     teams_list = teams.get_teams()
     
     results = [
