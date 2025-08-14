@@ -271,6 +271,13 @@ configure_nba_api()
 
 app = Flask(__name__, template_folder='templates')
 
+# Utility: decide if client wants JSON debug output
+def wants_json_response():
+    try:
+        return request.args.get('debug') == '1' or 'application/json' in (request.headers.get('Accept') or '')
+    except Exception:
+        return False
+
 # Clear expired cache on app startup
 @app.before_request
 def startup():
@@ -886,62 +893,100 @@ def team_stats():
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
 
+    def render_team_fallback(stats=None, message=None):
+        if message:
+            app.logger.info("team_stats fallback: %s", message)
+        if wants_json_response():
+            return jsonify({
+                'ok': False,
+                'route': '/team_stats',
+                'error': message or 'No stats found',
+                'team_name': team_name,
+                'start_date': start_date,
+                'end_date': end_date,
+                'stats': stats or []
+            }), 200
+        return render_template("team_stats.html", stats=(stats or []))
+
     if not team_name:
-        return render_template("team_stats.html", stats=[])
+        return render_team_fallback(message="Missing team name")
 
     nba_teams = teams.get_teams()
     team = next((t for t in nba_teams if t['abbreviation'].lower() == team_name.lower() or t['full_name'].lower() == team_name.lower()), None)
 
     if not team:
-        return render_template("team_stats.html", stats=[])
+        return render_team_fallback(message="Team not found")
 
-    team_id = team['id']
-    team_abbreviation = team['abbreviation']
+    team_id = team.get('id')
+    team_abbreviation = team.get('abbreviation', '')
 
     try:
         games_df, used_season = get_team_data_with_fallback(team_id, teamgamelog.TeamGameLog, season_type_all_star='Regular Season')
+        if games_df is None or games_df.empty:
+            return render_team_fallback(message="No games found")
+
         games_df['GAME_DATE'] = pd.to_datetime(games_df['GAME_DATE'])
 
         if start_date and end_date:
-            start = pd.to_datetime(start_date)
-            end = pd.to_datetime(end_date)
+            try:
+                start = pd.to_datetime(start_date)
+                end = pd.to_datetime(end_date)
+            except Exception:
+                app.logger.exception("team_stats: invalid date format")
+                return render_team_fallback(message="Invalid date format")
             games_df = games_df[(games_df['GAME_DATE'] >= start) & (games_df['GAME_DATE'] <= end)]
 
         if games_df.empty:
-            return render_template("team_stats.html", stats=[])
+            return render_team_fallback(message="No games in date range")
 
-        if 'TEAM_ABBREVIATION' not in games_df.columns:
-            games_df['TEAM_ABBREVIATION'] = games_df['MATCHUP'].apply(lambda x: x.split(' ')[0])
+        if 'TEAM_ABBREVIATION' not in games_df.columns and 'MATCHUP' in games_df.columns:
+            games_df['TEAM_ABBREVIATION'] = games_df['MATCHUP'].apply(lambda x: str(x).split(' ')[0] if isinstance(x, str) else '')
 
         team_games = []
         for _, row in games_df.iterrows():
+            opponent_abbrev = str(row.get('MATCHUP', '')).split(' ')[-1]
             team_games.append({
-                "game_date": row["GAME_DATE"].strftime("%b %d, %Y"),
+                "game_date": row.get("GAME_DATE").strftime("%b %d, %Y") if isinstance(row.get("GAME_DATE"), pd.Timestamp) else str(row.get("GAME_DATE", "")),
                 "team": team_abbreviation,
                 "team_logo": TEAM_LOGOS.get(team_abbreviation, ""),
-                "opponent": row["MATCHUP"].split(" ")[-1],
-                "opponent_logo": TEAM_LOGOS.get(row["MATCHUP"].split(" ")[-1], ""),
-                "points": row["PTS"],
-                "rebounds": row["REB"],
-                "assists": row["AST"],
-                "fg_percent": round(row["FG_PCT"] * 100, 1),
-                "threep_percent": round(row["FG3_PCT"] * 100, 1),
-                "ft_percent": round(row["FT_PCT"] * 100, 1),
-                "plus_minus": row["PLUS_MINUS"],
+                "opponent": opponent_abbrev,
+                "opponent_logo": TEAM_LOGOS.get(opponent_abbrev, ""),
+                "points": row.get("PTS", 0),
+                "rebounds": row.get("REB", 0),
+                "assists": row.get("AST", 0),
+                "fg_percent": round((row.get("FG_PCT", 0) or 0) * 100, 1),
+                "threep_percent": round((row.get("FG3_PCT", 0) or 0) * 100, 1),
+                "ft_percent": round((row.get("FT_PCT", 0) or 0) * 100, 1),
+                "plus_minus": row.get("PLUS_MINUS", 0),
             })
 
+        if wants_json_response():
+            return jsonify({'ok': True, 'route': '/team_stats', 'team': team_abbreviation, 'season': used_season, 'count': len(team_games), 'stats': team_games}), 200
         return render_template("team_stats.html", stats=team_games)
 
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        traceback.print_exc()
+        app.logger.exception("team_stats: unexpected error")
+        if wants_json_response():
+            return jsonify({'ok': False, 'route': '/team_stats', 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return render_team_fallback(message="Unexpected error")
 @app.route('/search_team_stats', methods=['POST'])
 def search_team_stats():
-    team_abbreviation = request.form['team_name'].upper()
-    start_date = pd.to_datetime(request.form['start_date'])
-    end_date = pd.to_datetime(request.form['end_date'])
-
     try:
+        team_abbreviation = (request.form.get('team_name') or '').upper()
+        start_date_raw = request.form.get('start_date')
+        end_date_raw = request.form.get('end_date')
+
+        if not team_abbreviation:
+            raise ValueError('Missing team abbreviation')
+        start_date = pd.to_datetime(start_date_raw)
+        end_date = pd.to_datetime(end_date_raw)
+
         df, used_season = get_league_data_with_fallback(teamgamelog.TeamGameLog)
+        if df is None or df.empty:
+            if wants_json_response():
+                return jsonify({'ok': True, 'route': '/search_team_stats', 'stats': []}), 200
+            return render_template('team_stats.html', stats=[])
         df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
 
         team_df = df[(df['TEAM_ABBREVIATION'] == team_abbreviation) & 
@@ -949,29 +994,36 @@ def search_team_stats():
                      (df['GAME_DATE'] <= end_date)]
 
         if team_df.empty:
+            if wants_json_response():
+                return jsonify({'ok': True, 'route': '/search_team_stats', 'stats': []}), 200
             return render_template('team_stats.html', stats=[])
 
         stats = []
         for _, row in team_df.iterrows():
+            opp = str(row.get('MATCHUP', '')).split(' ')[-1]
             stats.append({
                 'game_date': row['GAME_DATE'].strftime('%B %d, %Y'),
-                'team': row['TEAM_ABBREVIATION'],
-                'team_logo': TEAM_LOGOS.get(row['TEAM_ABBREVIATION'], ''),
-                'opponent': row['MATCHUP'].split(' ')[-1],
-                'opponent_logo': TEAM_LOGOS.get(row['MATCHUP'].split(' ')[-1], ''),
-                'points': row['PTS'],
-                'rebounds': row['REB'],
-                'assists': row['AST'],
-                'fg_percent': round(row['FG_PCT'] * 100, 1),
-                'threep_percent': round(row['FG3_PCT'] * 100, 1),
-                'ft_percent': round(row['FT_PCT'] * 100, 1),
+                'team': row.get('TEAM_ABBREVIATION', ''),
+                'team_logo': TEAM_LOGOS.get(row.get('TEAM_ABBREVIATION', ''), ''),
+                'opponent': opp,
+                'opponent_logo': TEAM_LOGOS.get(opp, ''),
+                'points': row.get('PTS', 0),
+                'rebounds': row.get('REB', 0),
+                'assists': row.get('AST', 0),
+                'fg_percent': round((row.get('FG_PCT', 0) or 0) * 100, 1),
+                'threep_percent': round((row.get('FG3_PCT', 0) or 0) * 100, 1),
+                'ft_percent': round((row.get('FT_PCT', 0) or 0) * 100, 1),
                 'plus_minus': row.get('PLUS_MINUS', 'N/A')
             })
 
+        if wants_json_response():
+            return jsonify({'ok': True, 'route': '/search_team_stats', 'count': len(stats), 'stats': stats}), 200
         return render_template('team_stats.html', stats=stats)
 
     except Exception as e:
-        return jsonify(error=str(e))
+        traceback.print_exc()
+        app.logger.exception('search_team_stats: unexpected error')
+        return (jsonify({'ok': False, 'route': '/search_team_stats', 'error': str(e), 'traceback': traceback.format_exc()}), 500) if wants_json_response() else (render_template('team_stats.html', stats=[]), 200)
 @app.route('/team_stats_stretch', methods=['GET'])
 def team_stats_stretch():
     try:
@@ -985,6 +1037,8 @@ def team_stats_stretch():
             start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
 
         if not (team_abbreviation and start_date and end_date):
+            if wants_json_response():
+                return jsonify({'ok': True, 'route': '/team_stats_stretch', 'stats': []}), 200
             return render_template('team_stats.html', stats=[])
 
         # Get all NBA teams
@@ -992,6 +1046,8 @@ def team_stats_stretch():
         selected_team = next((team for team in all_teams if team['abbreviation'].lower() == team_abbreviation.lower()), None)
 
         if not selected_team:
+            if wants_json_response():
+                return jsonify({'ok': True, 'route': '/team_stats_stretch', 'stats': []}), 200
             return render_template('team_stats.html', stats=[])
 
         team_id = selected_team['id']
@@ -1006,6 +1062,8 @@ def team_stats_stretch():
         filtered = df[(df['GAME_DATE'] >= start_dt) & (df['GAME_DATE'] <= end_dt)]
 
         if filtered.empty:
+            if wants_json_response():
+                return jsonify({'ok': True, 'route': '/team_stats_stretch', 'stats': []}), 200
             return render_template('team_stats.html', stats=[])
 
         stats = []
@@ -1025,10 +1083,14 @@ def team_stats_stretch():
                 'opponent_logo': '',  
             })
 
+        if wants_json_response():
+            return jsonify({'ok': True, 'route': '/team_stats_stretch', 'team': selected_team.get('abbreviation'), 'count': len(stats), 'stats': stats}), 200
         return render_template('team_stats.html', stats=stats)
 
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        traceback.print_exc()
+        app.logger.exception('team_stats_stretch: unexpected error')
+        return (jsonify({'ok': False, 'route': '/team_stats_stretch', 'error': str(e), 'traceback': traceback.format_exc()}), 500) if wants_json_response() else (render_template('team_stats.html', stats=[]), 200)
 @app.route('/favicon.ico')
 def favicon():
     return '', 204
