@@ -499,6 +499,8 @@ def get_player_stats():
 def get_player_profile(player_name):
     player_info = players.find_players_by_full_name(player_name)
     if not player_info:
+        if wants_json_response():
+            return jsonify({'ok': False, 'route': '/player_profile', 'error': 'Player not found', 'player_name': player_name}), 404
         return jsonify(message="Player not found"), 404
 
     player_id = player_info[0]['id']
@@ -554,6 +556,10 @@ def get_player_profile(player_name):
                              advanced_stats=advanced_stats)
 
     except Exception as e:
+        traceback.print_exc()
+        app.logger.exception('player_profile: unexpected error')
+        if wants_json_response():
+            return jsonify({'ok': False, 'route': '/player_profile', 'error': str(e), 'traceback': traceback.format_exc()}), 500
         return jsonify(error=str(e)), 500
 
 @app.route('/team_profile/<team_search_term>')
@@ -853,6 +859,8 @@ def get_player_stats_average():
 def game_box_score(game_id, player_name):
     player_info = players.find_players_by_full_name(player_name)
     if not player_info:
+        if wants_json_response():
+            return jsonify({'ok': False, 'route': '/game_box_score', 'error': 'Player not found', 'player_name': player_name}), 404
         return jsonify(message="Player not found"), 404
 
     player_id = player_info[0]['id']
@@ -887,6 +895,10 @@ def game_box_score(game_id, player_name):
         return render_template('game_box_score.html', game_stats=game_stats)
 
     except Exception as e:
+        traceback.print_exc()
+        app.logger.exception('game_box_score: unexpected error')
+        if wants_json_response():
+            return jsonify({'ok': False, 'route': '/game_box_score', 'error': str(e), 'traceback': traceback.format_exc()}), 500
         return jsonify(error=str(e)), 500
 @app.route('/team_stats')
 def team_stats():
@@ -1099,6 +1111,14 @@ def favicon():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    traceback.print_exc()
+    app.logger.exception('global 500 error')
+    if wants_json_response():
+        return jsonify({'ok': False, 'route': 'internal', 'error': str(e), 'traceback': traceback.format_exc()}), 500
+    return jsonify(error='Internal Server Error'), 500
 
 if __name__ == '__main__':
     print("App started, current directory:", os.getcwd())
