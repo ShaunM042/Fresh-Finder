@@ -485,6 +485,7 @@
           <option value="trends">Performance Trends</option>
           <option value="shooting">Shooting Analysis</option>
           <option value="summary">Game Summary</option>
+          <option value="advanced">Advanced Summary</option>
         </select>
       </div>
 
@@ -510,6 +511,15 @@
           style="display: none"
         >
           <canvas id="summaryChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Advanced Summary (Radar) Chart -->
+        <div
+          id="advanced-chart-container"
+          class="chart-container"
+          style="display: none"
+        >
+          <canvas id="advancedChart" width="400" height="200"></canvas>
         </div>
       </div>
 
@@ -612,7 +622,7 @@
         plus_minus: {{ stats | map(attribute='plus_minus') | list | tojson }}
       };
 
-      let trendsChart, shootingAnalysisChart, summaryChart;
+      let trendsChart, shootingAnalysisChart, summaryChart, advancedChart;
 
       // Simple pagination for team stats table
       let tsCurrentPage = 1;
@@ -798,6 +808,46 @@
         });
       }
 
+      // Initialize Advanced Radar Chart (averages)
+      function initAdvancedChart() {
+        const ctx = document.getElementById('advancedChart').getContext('2d');
+        const avgPoints = statsData.points.reduce((a, b) => a + b, 0) / statsData.points.length;
+        const avgRebounds = statsData.rebounds.reduce((a, b) => a + b, 0) / statsData.rebounds.length;
+        const avgAssists = statsData.assists.reduce((a, b) => a + b, 0) / statsData.assists.length;
+        const avgFGPercent = statsData.fg_percent.reduce((a, b) => a + b, 0) / statsData.fg_percent.length;
+        const avg3PPercent = statsData.threep_percent.reduce((a, b) => a + b, 0) / statsData.threep_percent.length;
+        const avgFTPercent = statsData.ft_percent.reduce((a, b) => a + b, 0) / statsData.ft_percent.length;
+
+        advancedChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['Points', 'Rebounds', 'Assists', 'FG%', '3P%', 'FT%'],
+            datasets: [{
+              label: 'Advanced Summary (Averages)',
+              data: [avgPoints, avgRebounds, avgAssists, avgFGPercent, avg3PPercent, avgFTPercent],
+              borderColor: '#4caf50',
+              backgroundColor: 'rgba(76, 175, 80, 0.2)',
+              pointBackgroundColor: '#4caf50',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Advanced Team Summary'
+              }
+            },
+            scales: {
+              r: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
       // Chart switching functionality
       document.getElementById('stats-chart-type').addEventListener('change', function() {
         const chartType = this.value;
@@ -820,6 +870,9 @@
             break;
           case 'summary':
             if (!summaryChart) initSummaryChart();
+            break;
+          case 'advanced':
+            if (!advancedChart) initAdvancedChart();
             break;
         }
       });
