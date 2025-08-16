@@ -831,18 +831,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="team-game-json" type="application/json">
+      {
+        "dates": {{ recent_games | map(attribute='date') | list | tojson }},
+        "points": {{ recent_games | map(attribute='points') | list | tojson }},
+        "rebounds": {{ recent_games | map(attribute='rebounds') | list | tojson }},
+        "assists": {{ recent_games | map(attribute='assists') | list | tojson }},
+        "fg_percent": {{ recent_games | map(attribute='fg_percent') | list | tojson }},
+        "threep_percent": {{ recent_games | map(attribute='threep_percent') | list | tojson }},
+        "ft_percent": {{ recent_games | map(attribute='ft_percent') | list | tojson }},
+        "results": {{ recent_games | map(attribute='result') | list | tojson }}
+      }
+    </script>
     <script>
       // Team data for visualizations
-      const gameData = {
-        dates: {{ recent_games | map(attribute='date') | list | tojson }},
-        points: {{ recent_games | map(attribute='points') | list | tojson }},
-        rebounds: {{ recent_games | map(attribute='rebounds') | list | tojson }},
-        assists: {{ recent_games | map(attribute='assists') | list | tojson }},
-        fg_percent: {{ recent_games | map(attribute='fg_percent') | list | tojson }},
-        threep_percent: {{ recent_games | map(attribute='threep_percent') | list | tojson }},
-        ft_percent: {{ recent_games | map(attribute='ft_percent') | list | tojson }},
-        results: {{ recent_games | map(attribute='result') | list | tojson }}
-      };
+      const gameData = JSON.parse(document.getElementById('team-game-json').textContent);
 
       // Chart instances
       let performanceChart, shootingChart, winlossChart, comparisonChart;
