@@ -279,6 +279,11 @@ def wants_json_response():
     except Exception:
         return False
 
+# Lightweight health endpoint for uptime checks
+@app.route('/healthz')
+def healthz():
+    return jsonify({"ok": True, "service": "fresh-finder"}), 200
+
 # Clear expired cache on app startup
 @app.before_request
 def startup():
