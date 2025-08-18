@@ -3,6 +3,7 @@ import os
 import json
 import hashlib
 import time
+import logging
 from datetime import datetime, timedelta
 import traceback
 
@@ -271,6 +272,13 @@ load_dotenv()
 configure_nba_api()
 
 app = Flask(__name__, template_folder='templates')
+
+# Configure application logging to stdout with timestamps
+if not app.logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s'))
+    app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
 
 # Utility: decide if client wants JSON debug output
 def wants_json_response():
