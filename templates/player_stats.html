@@ -822,6 +822,19 @@
           behavior: 'smooth'
         });
       });
+      // Client latency telemetry: send duration from nav start to load
+      (function sendLatency() {
+        try {
+          const start = Number(sessionStorage.getItem('ff_nav_start') || 0);
+          const route = sessionStorage.getItem('ff_nav_route') || 'player_stats';
+          if (start) {
+            const ms = Date.now() - start;
+            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms })], { type: 'application/json' }));
+            sessionStorage.removeItem('ff_nav_start');
+            sessionStorage.removeItem('ff_nav_route');
+          }
+        } catch (e) { /* no-op */ }
+      })();
     </script>
   </body>
 </html>

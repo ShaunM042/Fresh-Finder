@@ -479,6 +479,7 @@
             $.get("/autocomplete", { term: req.term }, res);
           },
           minLength: 2,
+          delay: 350,
         });
 
         $("#team-name").autocomplete({
@@ -486,6 +487,7 @@
             $.get("/team_autocomplete", { term: req.term }, res);
           },
           minLength: 2,
+          delay: 350,
         });
 
         $("#player-search-form").submit(function (e) {
@@ -497,6 +499,10 @@
           // Show loading indicator
           $("#player-loading").show();
           $("button[type='submit']", this).prop("disabled", true);
+
+          // Mark navigation start for client latency telemetry
+          sessionStorage.setItem('ff_nav_start', String(Date.now()));
+          sessionStorage.setItem('ff_nav_route', 'player_stats');
 
           const url = `/player_stats?player_name=${encodeURIComponent(
             name
@@ -515,6 +521,10 @@
           // Show loading indicator
           $("#team-loading").show();
           $("button[type='submit']", this).prop("disabled", true);
+
+          // Mark navigation start for client latency telemetry
+          sessionStorage.setItem('ff_nav_start', String(Date.now()));
+          sessionStorage.setItem('ff_nav_route', 'team_stats');
 
           const url = `/team_stats?team_name=${encodeURIComponent(
             name
@@ -535,6 +545,10 @@
           $("#player-loading").show();
           $(this).prop("disabled", true);
 
+          // Mark navigation start for client latency telemetry
+          sessionStorage.setItem('ff_nav_start', String(Date.now()));
+          sessionStorage.setItem('ff_nav_route', 'player_profile');
+
           window.location.href = `/player_profile/${encodeURIComponent(name)}`;
         });
 
@@ -548,6 +562,10 @@
           // Show loading indicator
           $("#team-loading").show();
           $(this).prop("disabled", true);
+
+          // Mark navigation start for client latency telemetry
+          sessionStorage.setItem('ff_nav_start', String(Date.now()));
+          sessionStorage.setItem('ff_nav_route', 'team_profile');
 
           window.location.href = `/team_profile/${encodeURIComponent(name)}`;
         });

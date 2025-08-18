@@ -610,7 +610,7 @@
       });
 
       {% if stats %}
-      // Team stats data for visualizations
+      // Team stats data for visualizations (embed as direct JS object)
       const statsData = {
         dates: {{ stats | map(attribute='game_date') | list | tojson }},
         points: {{ stats | map(attribute='points') | list | tojson }},
@@ -883,6 +883,19 @@
           initTrendsChart();
         }
       });
+      // Client latency telemetry: send duration from nav start to load
+      (function sendLatency() {
+        try {
+          const start = Number(sessionStorage.getItem('ff_nav_start') || 0);
+          const route = sessionStorage.getItem('ff_nav_route') || 'team_stats';
+          if (start) {
+            const ms = Date.now() - start;
+            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms })], { type: 'application/json' }));
+            sessionStorage.removeItem('ff_nav_start');
+            sessionStorage.removeItem('ff_nav_route');
+          }
+        } catch (e) { /* no-op */ }
+      })();
       {% endif %}
     </script>
   </body>

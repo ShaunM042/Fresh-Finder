@@ -336,6 +336,20 @@ def cache_stats():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/metrics/client-latency', methods=['POST'])
+def client_latency():
+    try:
+        data = request.get_json(silent=True) or {}
+        route = data.get('route')
+        ms = data.get('ms')
+        ua = request.headers.get('User-Agent', '')
+        app.logger.info(f"client_latency route=%s ms=%s ua=%s", route, ms, ua)
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        app.logger.exception('client_latency: failed')
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
