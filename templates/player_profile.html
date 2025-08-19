@@ -320,7 +320,8 @@
         <img
           class="player-headshot"
           src="{{ url_for('static', filename='player_images/' + profile.name.replace(' ', '-') + '.jpg') }}"
-          onerror="this.onerror=null; this.src='{{ url_for('static', filename='player_images/default.jpg') }}';"
+          data-fallback="{{ url_for('static', filename='player_images/default.jpg') }}"
+          onerror="this.onerror=null; this.src=this.dataset.fallback;"
           alt="{{ profile.name }} headshot"
         />
         <div class="profile-info">
@@ -443,7 +444,7 @@
             {% set per_rating = (advanced_stats.per / 30 * 100) | round | int %}
             <div
               class="rating-fill"
-              style="width: {{ per_rating if per_rating <= 100 else 100 }}%"
+              data-percent="{{ per_rating if per_rating <= 100 else 100 }}"
             ></div>
             <span class="rating-text">
               {% if advanced_stats.per >= 25 %}Elite {% elif advanced_stats.per
@@ -531,45 +532,70 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="recent-games-json" type="application/json">
+      {
+        "labels": {{ recent_games | map(attribute='date') | list | tojson }},
+        "points": {{ recent_games | map(attribute='points') | list | tojson }},
+        "assists": {{ recent_games | map(attribute='assists') | list | tojson }},
+        "rebounds": {{ recent_games | map(attribute='rebounds') | list | tojson }}
+      }
+    </script>
     <script>
-      const labels = {{ recent_games | map(attribute='date') | list | tojson }};
+      // Parse chart data embedded as JSON
+      const recentDataEl = document.getElementById("recent-games-json");
+      const recentData = JSON.parse(recentDataEl.textContent);
+      const labels = recentData.labels;
       const metrics = {
-        points: {{ recent_games | map(attribute='points') | list | tojson }},
-        assists: {{ recent_games | map(attribute='assists') | list | tojson }},
-        rebounds: {{ recent_games | map(attribute='rebounds') | list | tojson }}
+        points: recentData.points,
+        assists: recentData.assists,
+        rebounds: recentData.rebounds,
       };
 
-      const ctx = document.getElementById('pointsChart').getContext('2d');
+      const ctx = document.getElementById("pointsChart").getContext("2d");
       const pointsChart = new Chart(ctx, {
-        type: 'line',
+        type: "line",
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Points per Game',
-            data: metrics.points,
-            backgroundColor: 'rgba(76, 175, 80, 0.2)',
-            borderColor: 'rgba(76, 175, 80, 1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.2
-          }]
+          datasets: [
+            {
+              label: "Points per Game",
+              data: metrics.points,
+              backgroundColor: "rgba(76, 175, 80, 0.2)",
+              borderColor: "rgba(76, 175, 80, 1)",
+              borderWidth: 2,
+              fill: true,
+              tension: 0.2,
+            },
+          ],
         },
         options: {
           responsive: true,
           scales: {
             y: {
-              beginAtZero: true
-            }
-          }
-        }
+              beginAtZero: true,
+            },
+          },
+        },
       });
 
-      document.getElementById('metric-selector').addEventListener('change', function () {
-        const selectedMetric = this.value;
-        pointsChart.data.datasets[0].data = metrics[selectedMetric];
-        pointsChart.data.datasets[0].label = `${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} per Game`;
-        pointsChart.update();
-      });
+      document
+        .getElementById("metric-selector")
+        .addEventListener("change", function () {
+          const selectedMetric = this.value;
+          pointsChart.data.datasets[0].data = metrics[selectedMetric];
+          pointsChart.data.datasets[0].label = `${
+            selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)
+          } per Game`;
+          pointsChart.update();
+        });
+
+      // Apply rating bar width from data attribute to avoid template code in CSS
+      (function applyRatingWidth() {
+        const rf = document.querySelector(".rating-fill");
+        if (rf && rf.dataset.percent) {
+          rf.style.width = rf.dataset.percent + "%";
+        }
+      })();
     </script>
 
     <!-- Dark Mode Toggle Script -->

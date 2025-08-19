@@ -577,26 +577,42 @@
         </a>
       </div>
     </div>
+    {% endif %} {% if stats %}
+    <script id="team-stats-json" type="application/json">
+      {
+        "dates": {{ stats | map(attribute='game_date') | list | tojson }},
+        "points": {{ stats | map(attribute='points') | list | tojson }},
+        "rebounds": {{ stats | map(attribute='rebounds') | list | tojson }},
+        "assists": {{ stats | map(attribute='assists') | list | tojson }},
+        "fg_percent": {{ stats | map(attribute='fg_percent') | list | tojson }},
+        "threep_percent": {{ stats | map(attribute='threep_percent') | list | tojson }},
+        "ft_percent": {{ stats | map(attribute='ft_percent') | list | tojson }},
+        "plus_minus": {{ stats | map(attribute='plus_minus') | list | tojson }}
+      }
+    </script>
     {% endif %}
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      document.getElementById('team-stats-form').addEventListener('submit', function(e) {
-        document.getElementById('team-stats-loading').style.display = 'block';
-        const submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-      });
+      document
+        .getElementById("team-stats-form")
+        .addEventListener("submit", function (e) {
+          document.getElementById("team-stats-loading").style.display = "block";
+          const submitBtn = this.querySelector('button[type="submit"]');
+          submitBtn.disabled = true;
+        });
 
       // Auto-fill default date ranges (last 7 days)
-      window.addEventListener('DOMContentLoaded', function() {
+      window.addEventListener("DOMContentLoaded", function () {
         const today = new Date();
         const sevenDaysAgo = new Date(today);
         sevenDaysAgo.setDate(today.getDate() - 7);
 
-        const formatDate = (date) => date.toISOString().split('T')[0];
+        const formatDate = (date) => date.toISOString().split("T")[0];
 
         // Set default dates for team stats search
-        const startDateInput = document.querySelector('input[name="start_date"]');
+        const startDateInput = document.querySelector(
+          'input[name="start_date"]'
+        );
         const endDateInput = document.querySelector('input[name="end_date"]');
 
         if (startDateInput && !startDateInput.value) {
@@ -606,298 +622,311 @@
           endDateInput.value = formatDate(today);
         }
 
-        console.log('Team stats: Default date ranges set to last 7 days');
+        console.log("Team stats: Default date ranges set to last 7 days");
       });
 
-      {% if stats %}
-      // Team stats data for visualizations (embed as direct JS object)
-      const statsData = {
-        dates: {{ stats | map(attribute='game_date') | list | tojson }},
-        points: {{ stats | map(attribute='points') | list | tojson }},
-        rebounds: {{ stats | map(attribute='rebounds') | list | tojson }},
-        assists: {{ stats | map(attribute='assists') | list | tojson }},
-        fg_percent: {{ stats | map(attribute='fg_percent') | list | tojson }},
-        threep_percent: {{ stats | map(attribute='threep_percent') | list | tojson }},
-        ft_percent: {{ stats | map(attribute='ft_percent') | list | tojson }},
-        plus_minus: {{ stats | map(attribute='plus_minus') | list | tojson }}
-      };
+      // Guard all chart logic behind runtime JSON presence
+      (function initTeamStatsCharts() {
+        const jsonEl = document.getElementById("team-stats-json");
+        if (!jsonEl) return;
+        const statsData = JSON.parse(jsonEl.textContent);
 
-      let trendsChart, shootingAnalysisChart, summaryChart, advancedChart;
+        let trendsChart, shootingAnalysisChart, summaryChart, advancedChart;
 
-      // Simple pagination for team stats table
-      let tsCurrentPage = 1;
-      let tsItemsPerPage = 10;
-      let tsAllRows = [];
-      let tsVisibleRows = [];
+        // Simple pagination for team stats table
+        let tsCurrentPage = 1;
+        let tsItemsPerPage = 10;
+        let tsAllRows = [];
+        let tsVisibleRows = [];
 
-      function tsUpdateDisplay() {
-        tsAllRows.forEach(r => r.style.display = 'none');
-        const totalPages = Math.max(1, Math.ceil(tsAllRows.length / tsItemsPerPage));
-        if (tsCurrentPage > totalPages) tsCurrentPage = totalPages;
-        const start = (tsCurrentPage - 1) * tsItemsPerPage;
-        const end = Math.min(start + tsItemsPerPage, tsAllRows.length);
-        tsVisibleRows = tsAllRows.slice(start, end);
-        tsVisibleRows.forEach(r => r.style.display = 'table-row');
-        document.getElementById('pageInfo').textContent = `Page ${tsCurrentPage} of ${totalPages}`;
-        document.getElementById('prevPage').disabled = tsCurrentPage <= 1;
-        document.getElementById('nextPage').disabled = tsCurrentPage >= totalPages;
-      }
-
-      document.addEventListener('DOMContentLoaded', function() {
-        const body = document.getElementById('teamStatsBody');
-        if (body) {
-          tsAllRows = Array.from(body.querySelectorAll('.game-row'));
-          tsUpdateDisplay();
-          document.getElementById('prevPage').addEventListener('click', function() {
-            if (tsCurrentPage > 1) { tsCurrentPage--; tsUpdateDisplay(); }
-          });
-          document.getElementById('nextPage').addEventListener('click', function() {
-            const totalPages = Math.max(1, Math.ceil(tsAllRows.length / tsItemsPerPage));
-            if (tsCurrentPage < totalPages) { tsCurrentPage++; tsUpdateDisplay(); }
-          });
+        function tsUpdateDisplay() {
+          tsAllRows.forEach((r) => (r.style.display = "none"));
+          const totalPages = Math.max(
+            1,
+            Math.ceil(tsAllRows.length / tsItemsPerPage)
+          );
+          if (tsCurrentPage > totalPages) tsCurrentPage = totalPages;
+          const start = (tsCurrentPage - 1) * tsItemsPerPage;
+          const end = Math.min(start + tsItemsPerPage, tsAllRows.length);
+          tsVisibleRows = tsAllRows.slice(start, end);
+          tsVisibleRows.forEach((r) => (r.style.display = "table-row"));
+          const pageInfo = document.getElementById("pageInfo");
+          if (pageInfo)
+            pageInfo.textContent = `Page ${tsCurrentPage} of ${totalPages}`;
+          const prev = document.getElementById("prevPage");
+          const next = document.getElementById("nextPage");
+          if (prev) prev.disabled = tsCurrentPage <= 1;
+          if (next) next.disabled = tsCurrentPage >= totalPages;
         }
-      });
 
-      // Initialize Performance Trends Chart
-      function initTrendsChart() {
-        const ctx = document.getElementById('trendsChart').getContext('2d');
-        trendsChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: statsData.dates,
-            datasets: [
-              {
-                label: 'Points',
-                data: statsData.points,
-                borderColor: '#4caf50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.3
-              },
-              {
-                label: 'Rebounds',
-                data: statsData.rebounds,
-                borderColor: '#2196f3',
-                backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                borderWidth: 3,
-                fill: false,
-                tension: 0.3
-              },
-              {
-                label: 'Assists',
-                data: statsData.assists,
-                borderColor: '#ff9800',
-                backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                borderWidth: 3,
-                fill: false,
-                tension: 0.3
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Team Performance Over Time'
-              },
-              legend: {
-                position: 'top'
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
-      }
-
-      // Initialize Shooting Analysis Chart
-      function initShootingAnalysisChart() {
-        const ctx = document.getElementById('shootingAnalysisChart').getContext('2d');
-        shootingAnalysisChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: statsData.dates,
-            datasets: [
-              {
-                label: 'Field Goal %',
-                data: statsData.fg_percent,
-                backgroundColor: 'rgba(76, 175, 80, 0.8)',
-                borderColor: '#4caf50',
-                borderWidth: 1
-              },
-              {
-                label: '3-Point %',
-                data: statsData.threep_percent,
-                backgroundColor: 'rgba(33, 150, 243, 0.8)',
-                borderColor: '#2196f3',
-                borderWidth: 1
-              },
-              {
-                label: 'Free Throw %',
-                data: statsData.ft_percent,
-                backgroundColor: 'rgba(255, 152, 0, 0.8)',
-                borderColor: '#ff9800',
-                borderWidth: 1
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Shooting Percentages Breakdown'
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                  callback: function(value) {
-                    return value + '%';
-                  }
+        document.addEventListener("DOMContentLoaded", function () {
+          const body = document.getElementById("teamStatsBody");
+          if (body) {
+            tsAllRows = Array.from(body.querySelectorAll(".game-row"));
+            tsUpdateDisplay();
+            const prev = document.getElementById("prevPage");
+            const next = document.getElementById("nextPage");
+            if (prev)
+              prev.addEventListener("click", function () {
+                if (tsCurrentPage > 1) {
+                  tsCurrentPage--;
+                  tsUpdateDisplay();
                 }
-              }
-            }
+              });
+            if (next)
+              next.addEventListener("click", function () {
+                const totalPages = Math.max(
+                  1,
+                  Math.ceil(tsAllRows.length / tsItemsPerPage)
+                );
+                if (tsCurrentPage < totalPages) {
+                  tsCurrentPage++;
+                  tsUpdateDisplay();
+                }
+              });
           }
         });
-      }
 
-      // Initialize Summary Chart
-      function initSummaryChart() {
-        const ctx = document.getElementById('summaryChart').getContext('2d');
-        const avgPoints = statsData.points.reduce((a, b) => a + b, 0) / statsData.points.length;
-        const avgRebounds = statsData.rebounds.reduce((a, b) => a + b, 0) / statsData.rebounds.length;
-        const avgAssists = statsData.assists.reduce((a, b) => a + b, 0) / statsData.assists.length;
-        const avgFGPercent = statsData.fg_percent.reduce((a, b) => a + b, 0) / statsData.fg_percent.length;
-
-        summaryChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Points', 'Rebounds', 'Assists', 'FG%'],
-            datasets: [{
-              data: [avgPoints, avgRebounds, avgAssists, avgFGPercent],
-              backgroundColor: [
-                '#4caf50',
-                '#2196f3',
-                '#ff9800',
-                '#9c27b0'
+        function initTrendsChart() {
+          const el = document.getElementById("trendsChart");
+          if (!el) return;
+          const ctx = el.getContext("2d");
+          trendsChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: statsData.dates,
+              datasets: [
+                {
+                  label: "Points",
+                  data: statsData.points,
+                  borderColor: "#4caf50",
+                  backgroundColor: "rgba(76, 175, 80, 0.1)",
+                  borderWidth: 3,
+                  fill: true,
+                  tension: 0.3,
+                },
+                {
+                  label: "Rebounds",
+                  data: statsData.rebounds,
+                  borderColor: "#2196f3",
+                  backgroundColor: "rgba(33, 150, 243, 0.1)",
+                  borderWidth: 3,
+                  fill: false,
+                  tension: 0.3,
+                },
+                {
+                  label: "Assists",
+                  data: statsData.assists,
+                  borderColor: "#ff9800",
+                  backgroundColor: "rgba(255, 152, 0, 0.1)",
+                  borderWidth: 3,
+                  fill: false,
+                  tension: 0.3,
+                },
               ],
-              borderWidth: 2,
-              borderColor: '#fff'
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Average Performance Distribution'
-              },
-              legend: {
-                position: 'bottom'
-              }
-            }
-          }
-        });
-      }
-
-      // Initialize Advanced Radar Chart (averages)
-      function initAdvancedChart() {
-        const ctx = document.getElementById('advancedChart').getContext('2d');
-        const avgPoints = statsData.points.reduce((a, b) => a + b, 0) / statsData.points.length;
-        const avgRebounds = statsData.rebounds.reduce((a, b) => a + b, 0) / statsData.rebounds.length;
-        const avgAssists = statsData.assists.reduce((a, b) => a + b, 0) / statsData.assists.length;
-        const avgFGPercent = statsData.fg_percent.reduce((a, b) => a + b, 0) / statsData.fg_percent.length;
-        const avg3PPercent = statsData.threep_percent.reduce((a, b) => a + b, 0) / statsData.threep_percent.length;
-        const avgFTPercent = statsData.ft_percent.reduce((a, b) => a + b, 0) / statsData.ft_percent.length;
-
-        advancedChart = new Chart(ctx, {
-          type: 'radar',
-          data: {
-            labels: ['Points', 'Rebounds', 'Assists', 'FG%', '3P%', 'FT%'],
-            datasets: [{
-              label: 'Advanced Summary (Averages)',
-              data: [avgPoints, avgRebounds, avgAssists, avgFGPercent, avg3PPercent, avgFTPercent],
-              borderColor: '#4caf50',
-              backgroundColor: 'rgba(76, 175, 80, 0.2)',
-              pointBackgroundColor: '#4caf50',
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Advanced Team Summary'
-              }
             },
-            scales: {
-              r: {
-                beginAtZero: true
-              }
+            options: {
+              responsive: true,
+              plugins: {
+                title: { display: true, text: "Team Performance Over Time" },
+                legend: { position: "top" },
+              },
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+
+        function initShootingAnalysisChart() {
+          const el = document.getElementById("shootingAnalysisChart");
+          if (!el) return;
+          const ctx = el.getContext("2d");
+          shootingAnalysisChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: statsData.dates,
+              datasets: [
+                {
+                  label: "Field Goal %",
+                  data: statsData.fg_percent,
+                  backgroundColor: "rgba(76, 175, 80, 0.8)",
+                  borderColor: "#4caf50",
+                  borderWidth: 1,
+                },
+                {
+                  label: "3-Point %",
+                  data: statsData.threep_percent,
+                  backgroundColor: "rgba(33, 150, 243, 0.8)",
+                  borderColor: "#2196f3",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Free Throw %",
+                  data: statsData.ft_percent,
+                  backgroundColor: "rgba(255, 152, 0, 0.8)",
+                  borderColor: "#ff9800",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Shooting Percentages Breakdown",
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  max: 100,
+                  ticks: {
+                    callback: function (value) {
+                      return value + "%";
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        function initSummaryChart() {
+          const el = document.getElementById("summaryChart");
+          if (!el) return;
+          const ctx = el.getContext("2d");
+          const avg = (arr) =>
+            arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
+          const avgPoints = avg(statsData.points);
+          const avgRebounds = avg(statsData.rebounds);
+          const avgAssists = avg(statsData.assists);
+          const avgFGPercent = avg(statsData.fg_percent);
+
+          summaryChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Points", "Rebounds", "Assists", "FG%"],
+              datasets: [
+                {
+                  data: [avgPoints, avgRebounds, avgAssists, avgFGPercent],
+                  backgroundColor: ["#4caf50", "#2196f3", "#ff9800", "#9c27b0"],
+                  borderWidth: 2,
+                  borderColor: "#fff",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Average Performance Distribution",
+                },
+                legend: { position: "bottom" },
+              },
+            },
+          });
+        }
+
+        function initAdvancedChart() {
+          const el = document.getElementById("advancedChart");
+          if (!el) return;
+          const ctx = el.getContext("2d");
+          const avg = (arr) =>
+            arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
+          const avgPoints = avg(statsData.points);
+          const avgRebounds = avg(statsData.rebounds);
+          const avgAssists = avg(statsData.assists);
+          const avgFGPercent = avg(statsData.fg_percent);
+          const avg3PPercent = avg(statsData.threep_percent);
+          const avgFTPercent = avg(statsData.ft_percent);
+
+          advancedChart = new Chart(ctx, {
+            type: "radar",
+            data: {
+              labels: ["Points", "Rebounds", "Assists", "FG%", "3P%", "FT%"],
+              datasets: [
+                {
+                  label: "Advanced Summary (Averages)",
+                  data: [
+                    avgPoints,
+                    avgRebounds,
+                    avgAssists,
+                    avgFGPercent,
+                    avg3PPercent,
+                    avgFTPercent,
+                  ],
+                  borderColor: "#4caf50",
+                  backgroundColor: "rgba(76, 175, 80, 0.2)",
+                  pointBackgroundColor: "#4caf50",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                title: { display: true, text: "Advanced Team Summary" },
+              },
+              scales: { r: { beginAtZero: true } },
+            },
+          });
+        }
+
+        const selector = document.getElementById("stats-chart-type");
+        if (selector) {
+          selector.addEventListener("change", function () {
+            const chartType = this.value;
+            document
+              .querySelectorAll(".chart-container")
+              .forEach((container) => {
+                container.style.display = "none";
+              });
+            const container = document.getElementById(
+              chartType + "-chart-container"
+            );
+            if (container) container.style.display = "block";
+            switch (chartType) {
+              case "trends":
+                if (!trendsChart) initTrendsChart();
+                break;
+              case "shooting":
+                if (!shootingAnalysisChart) initShootingAnalysisChart();
+                break;
+              case "summary":
+                if (!summaryChart) initSummaryChart();
+                break;
+              case "advanced":
+                if (!advancedChart) initAdvancedChart();
+                break;
             }
-          }
-        });
-      }
+          });
+        }
 
-      // Chart switching functionality
-      document.getElementById('stats-chart-type').addEventListener('change', function() {
-        const chartType = this.value;
-
-        // Hide all chart containers
-        document.querySelectorAll('.chart-container').forEach(container => {
-          container.style.display = 'none';
+        document.addEventListener("DOMContentLoaded", function () {
+          if (document.getElementById("trendsChart")) initTrendsChart();
         });
 
-        // Show selected chart container
-        document.getElementById(chartType + '-chart-container').style.display = 'block';
-
-        // Initialize chart if not already done
-        switch(chartType) {
-          case 'trends':
-            if (!trendsChart) initTrendsChart();
-            break;
-          case 'shooting':
-            if (!shootingAnalysisChart) initShootingAnalysisChart();
-            break;
-          case 'summary':
-            if (!summaryChart) initSummaryChart();
-            break;
-          case 'advanced':
-            if (!advancedChart) initAdvancedChart();
-            break;
-        }
-      });
-
-      // Initialize default chart on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('trendsChart')) {
-          initTrendsChart();
-        }
-      });
-      // Client latency telemetry: send duration from nav start to load
-      (function sendLatency() {
-        try {
-          const start = Number(sessionStorage.getItem('ff_nav_start') || 0);
-          const route = sessionStorage.getItem('ff_nav_route') || 'team_stats';
-          if (start) {
-            const ms = Date.now() - start;
-            const phase = localStorage.getItem('ff_phase') || 'post';
-            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms, phase })], { type: 'application/json' }));
-            sessionStorage.removeItem('ff_nav_start');
-            sessionStorage.removeItem('ff_nav_route');
-          }
-        } catch (e) { /* no-op */ }
+        (function sendLatency() {
+          try {
+            const start = Number(sessionStorage.getItem("ff_nav_start") || 0);
+            const route =
+              sessionStorage.getItem("ff_nav_route") || "team_stats";
+            if (start) {
+              const ms = Date.now() - start;
+              const phase = localStorage.getItem("ff_phase") || "post";
+              navigator.sendBeacon(
+                "/metrics/client-latency",
+                new Blob([JSON.stringify({ route, ms, phase })], {
+                  type: "application/json",
+                })
+              );
+              sessionStorage.removeItem("ff_nav_start");
+              sessionStorage.removeItem("ff_nav_route");
+            }
+          } catch (e) {}
+        })();
       })();
-      {% endif %}
     </script>
   </body>
 </html>

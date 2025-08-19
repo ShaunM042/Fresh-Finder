@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Team Profile</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
@@ -329,8 +333,12 @@
       }
 
       @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       .loading-indicator p {
@@ -543,13 +551,23 @@
         </div>
         <ul class="menu">
           <li>
-            <a href="{{ url_for('landing') }}" class="{% if request.endpoint == 'landing' %}active{% endif %}">Player Profile</a>
+            <a
+              href="{{ url_for('landing') }}"
+              class="{% if request.endpoint == 'landing' %}active{% endif %}"
+              >Player Profile</a
+            >
           </li>
           <li>
-            <a href="{{ url_for('team_search') }}" class="{% if request.endpoint == 'team_search' %}active{% endif %}">Team Search</a>
+            <a
+              href="{{ url_for('team_search') }}"
+              class="{% if request.endpoint == 'team_search' %}active{% endif %}"
+              >Team Search</a
+            >
           </li>
           <li>
-            <a href="{{ url_for('landing') }}" class="highlighted-link">Back to Search</a>
+            <a href="{{ url_for('landing') }}" class="highlighted-link"
+              >Back to Search</a
+            >
           </li>
         </ul>
       </div>
@@ -558,7 +576,6 @@
     <div class="container">
       <div class="team-header">
         <img src="{{ team_info.logo }}" alt="Logo of {{ team_info.name }}" />
-        </a>
       </div>
 
       <div class="team-info">
@@ -582,7 +599,13 @@
           </tr>
           {% for player in roster %}
           <tr>
-            <td><a href="/player_profile/{{ player.player_name }}" title="View {{ player.player_name }}'s profile">{{ player.player_name }}</a></td>
+            <td>
+              <a
+                href="/player_profile/{{ player.player_name }}"
+                title="View {{ player.player_name }}'s profile"
+                >{{ player.player_name }}</a
+              >
+            </td>
             <td>{{ player.position }}</td>
             <td>{{ player.height }}</td>
             <td>{{ player.weight }}</td>
@@ -595,29 +618,53 @@
       <!-- Enhanced Team Stats Search Section -->
       <div class="team-search-section">
         <h2><i class="fas fa-search"></i> Team Statistics Search</h2>
-        <p class="search-description">Search for detailed team statistics by date range</p>
-        
+        <p class="search-description">
+          Search for detailed team statistics by date range
+        </p>
+
         <div class="search-forms">
           <div class="search-form-container">
             <h3>Game-by-Game Stats</h3>
             <form id="team-game-stats-form" class="team-search-form">
-              <input type="hidden" id="team-abbrev" value="{{ team_info.abbreviation }}">
-              
+              <input
+                type="hidden"
+                id="team-abbrev"
+                value="{{ team_info.abbreviation }}"
+              />
+
               <div class="date-inputs">
                 <div class="input-group">
-                  <label for="game-start-date"><i class="fas fa-calendar-alt"></i> Start Date</label>
-                  <input type="date" id="game-start-date" name="start_date" required>
+                  <label for="game-start-date"
+                    ><i class="fas fa-calendar-alt"></i> Start Date</label
+                  >
+                  <input
+                    type="date"
+                    id="game-start-date"
+                    name="start_date"
+                    required
+                  />
                 </div>
                 <div class="input-group">
-                  <label for="game-end-date"><i class="fas fa-calendar-alt"></i> End Date</label>
-                  <input type="date" id="game-end-date" name="end_date" required>
+                  <label for="game-end-date"
+                    ><i class="fas fa-calendar-alt"></i> End Date</label
+                  >
+                  <input
+                    type="date"
+                    id="game-end-date"
+                    name="end_date"
+                    required
+                  />
                 </div>
               </div>
-              
+
               <button type="submit" class="search-btn">
                 <i class="fas fa-chart-line"></i> Get Game Stats
               </button>
-              <div class="loading-indicator" id="game-stats-loading" style="display: none;">
+              <div
+                class="loading-indicator"
+                id="game-stats-loading"
+                style="display: none"
+              >
                 <div class="spinner"></div>
                 <p>Loading game statistics...</p>
               </div>
@@ -629,37 +676,64 @@
             <div class="quick-stats">
               <div class="stat-item">
                 <span class="stat-label">Offensive Rating</span>
-                <span class="stat-value">{{ advanced_stats.off_rating|round(1) if advanced_stats.off_rating != 'N/A' else 'N/A' }}</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.off_rating|round(1) if
+                  advanced_stats.off_rating != 'N/A' else 'N/A' }}</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Defensive Rating</span>
-                <span class="stat-value">{{ advanced_stats.def_rating|round(1) if advanced_stats.def_rating != 'N/A' else 'N/A' }}</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.def_rating|round(1) if
+                  advanced_stats.def_rating != 'N/A' else 'N/A' }}</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Net Rating</span>
-                <span class="stat-value {{ 'positive' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating < 0 else '' }}">
-                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating > 0 else advanced_stats.net_rating|round(1) if advanced_stats.net_rating != 'N/A' else 'N/A' }}
+                <span
+                  class="stat-value {{ 'positive' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating != 'N/A' and advanced_stats.net_rating < 0 else '' }}"
+                >
+                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if
+                  advanced_stats.net_rating != 'N/A' and
+                  advanced_stats.net_rating > 0 else
+                  advanced_stats.net_rating|round(1) if
+                  advanced_stats.net_rating != 'N/A' else 'N/A' }}
                 </span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">True Shooting %</span>
-                <span class="stat-value">{{ advanced_stats.ts_percent|round(1) if advanced_stats.ts_percent != 'N/A' else 'N/A' }}%</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.ts_percent|round(1) if
+                  advanced_stats.ts_percent != 'N/A' else 'N/A' }}%</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Effective FG %</span>
-                <span class="stat-value">{{ advanced_stats.effective_fg_pct|round(1) if advanced_stats.effective_fg_pct else 'N/A' }}%</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.effective_fg_pct|round(1) if
+                  advanced_stats.effective_fg_pct else 'N/A' }}%</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Pace</span>
-                <span class="stat-value">{{ advanced_stats.pace|round(1) if advanced_stats.pace else 'N/A' }}</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.pace|round(1) if advanced_stats.pace else
+                  'N/A' }}</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Turnover %</span>
-                <span class="stat-value">{{ advanced_stats.turnover_pct|round(1) if advanced_stats.turnover_pct else 'N/A' }}%</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.turnover_pct|round(1) if
+                  advanced_stats.turnover_pct else 'N/A' }}%</span
+                >
               </div>
               <div class="stat-item">
                 <span class="stat-label">Win %</span>
-                <span class="stat-value">{{ advanced_stats.win_percentage|round(1) if advanced_stats.win_percentage else 'N/A' }}%</span>
+                <span class="stat-value"
+                  >{{ advanced_stats.win_percentage|round(1) if
+                  advanced_stats.win_percentage else 'N/A' }}%</span
+                >
               </div>
             </div>
           </div>
@@ -669,7 +743,7 @@
       <!-- Comprehensive Advanced Analytics Section -->
       <div class="advanced-analytics">
         <h2><i class="fas fa-chart-bar"></i> Comprehensive Team Analytics</h2>
-        
+
         <div class="analytics-grid">
           <!-- Offensive Metrics -->
           <div class="analytics-section">
@@ -677,23 +751,38 @@
             <div class="metrics-list">
               <div class="metric-row">
                 <span class="metric-name">Offensive Rating</span>
-                <span class="metric-value offensive">{{ advanced_stats.off_rating|round(1) if advanced_stats.off_rating else 'N/A' }}</span>
+                <span class="metric-value offensive"
+                  >{{ advanced_stats.off_rating|round(1) if
+                  advanced_stats.off_rating else 'N/A' }}</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">True Shooting %</span>
-                <span class="metric-value">{{ advanced_stats.ts_percent|round(1) if advanced_stats.ts_percent else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.ts_percent|round(1) if
+                  advanced_stats.ts_percent else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Effective FG %</span>
-                <span class="metric-value">{{ advanced_stats.effective_fg_pct|round(1) if advanced_stats.effective_fg_pct else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.effective_fg_pct|round(1) if
+                  advanced_stats.effective_fg_pct else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Assist %</span>
-                <span class="metric-value">{{ advanced_stats.ast_percent|round(1) if advanced_stats.ast_percent else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.ast_percent|round(1) if
+                  advanced_stats.ast_percent else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Turnover %</span>
-                <span class="metric-value turnover">{{ advanced_stats.turnover_pct|round(1) if advanced_stats.turnover_pct else 'N/A' }}%</span>
+                <span class="metric-value turnover"
+                  >{{ advanced_stats.turnover_pct|round(1) if
+                  advanced_stats.turnover_pct else 'N/A' }}%</span
+                >
               </div>
             </div>
           </div>
@@ -704,19 +793,31 @@
             <div class="metrics-list">
               <div class="metric-row">
                 <span class="metric-name">Defensive Rating</span>
-                <span class="metric-value defensive">{{ advanced_stats.def_rating|round(1) if advanced_stats.def_rating else 'N/A' }}</span>
+                <span class="metric-value defensive"
+                  >{{ advanced_stats.def_rating|round(1) if
+                  advanced_stats.def_rating else 'N/A' }}</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Steal %</span>
-                <span class="metric-value">{{ advanced_stats.steal_pct|round(1) if advanced_stats.steal_pct else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.steal_pct|round(1) if
+                  advanced_stats.steal_pct else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Block %</span>
-                <span class="metric-value">{{ advanced_stats.block_pct|round(1) if advanced_stats.block_pct else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.block_pct|round(1) if
+                  advanced_stats.block_pct else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Rebounding %</span>
-                <span class="metric-value">{{ advanced_stats.reb_percent|round(1) if advanced_stats.reb_percent else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.reb_percent|round(1) if
+                  advanced_stats.reb_percent else 'N/A' }}%</span
+                >
               </div>
             </div>
           </div>
@@ -727,26 +828,46 @@
             <div class="metrics-list">
               <div class="metric-row">
                 <span class="metric-name">Net Rating</span>
-                <span class="metric-value {{ 'positive' if advanced_stats.net_rating and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating and advanced_stats.net_rating < 0 else '' }}">
-                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if advanced_stats.net_rating and advanced_stats.net_rating > 0 else advanced_stats.net_rating|round(1) if advanced_stats.net_rating else 'N/A' }}
+                <span
+                  class="metric-value {{ 'positive' if advanced_stats.net_rating and advanced_stats.net_rating > 0 else 'negative' if advanced_stats.net_rating and advanced_stats.net_rating < 0 else '' }}"
+                >
+                  {{ ('+' + advanced_stats.net_rating|round(1)|string) if
+                  advanced_stats.net_rating and advanced_stats.net_rating > 0
+                  else advanced_stats.net_rating|round(1) if
+                  advanced_stats.net_rating else 'N/A' }}
                 </span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Win Percentage</span>
-                <span class="metric-value">{{ advanced_stats.win_percentage|round(1) if advanced_stats.win_percentage else 'N/A' }}%</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.win_percentage|round(1) if
+                  advanced_stats.win_percentage else 'N/A' }}%</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Wins - Losses</span>
-                <span class="metric-value">{{ advanced_stats.wins if advanced_stats.wins else '0' }} - {{ advanced_stats.losses if advanced_stats.losses else '0' }}</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.wins if advanced_stats.wins else '0' }} -
+                  {{ advanced_stats.losses if advanced_stats.losses else '0'
+                  }}</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Pace</span>
-                <span class="metric-value">{{ advanced_stats.pace|round(1) if advanced_stats.pace else 'N/A' }}</span>
+                <span class="metric-value"
+                  >{{ advanced_stats.pace|round(1) if advanced_stats.pace else
+                  'N/A' }}</span
+                >
               </div>
               <div class="metric-row">
                 <span class="metric-name">Plus/Minus</span>
-                <span class="metric-value {{ 'positive' if advanced_stats.plus_minus and advanced_stats.plus_minus > 0 else 'negative' if advanced_stats.plus_minus and advanced_stats.plus_minus < 0 else '' }}">
-                  {{ ('+' + advanced_stats.plus_minus|round(1)|string) if advanced_stats.plus_minus and advanced_stats.plus_minus > 0 else advanced_stats.plus_minus|round(1) if advanced_stats.plus_minus else 'N/A' }}
+                <span
+                  class="metric-value {{ 'positive' if advanced_stats.plus_minus and advanced_stats.plus_minus > 0 else 'negative' if advanced_stats.plus_minus and advanced_stats.plus_minus < 0 else '' }}"
+                >
+                  {{ ('+' + advanced_stats.plus_minus|round(1)|string) if
+                  advanced_stats.plus_minus and advanced_stats.plus_minus > 0
+                  else advanced_stats.plus_minus|round(1) if
+                  advanced_stats.plus_minus else 'N/A' }}
                 </span>
               </div>
             </div>
@@ -789,7 +910,7 @@
       <!-- Advanced Team Visualizations -->
       <div class="team-visualizations">
         <h2><i class="fas fa-chart-bar"></i> Team Performance Analytics</h2>
-        
+
         <div class="chart-controls">
           <div class="chart-selector">
             <label for="chart-type">Select Visualization:</label>
@@ -810,19 +931,31 @@
           </div>
 
           <!-- Shooting Percentages Chart -->
-          <div id="shooting-chart-container" class="chart-section" style="display: none;">
+          <div
+            id="shooting-chart-container"
+            class="chart-section"
+            style="display: none"
+          >
             <h3>Shooting Percentages Over Time</h3>
             <canvas id="shootingChart" width="400" height="200"></canvas>
           </div>
 
           <!-- Win/Loss Pattern Chart -->
-          <div id="winloss-chart-container" class="chart-section" style="display: none;">
+          <div
+            id="winloss-chart-container"
+            class="chart-section"
+            style="display: none"
+          >
             <h3>Recent Win/Loss Pattern</h3>
             <canvas id="winlossChart" width="400" height="200"></canvas>
           </div>
 
           <!-- Advanced Metrics Chart -->
-          <div id="comparison-chart-container" class="chart-section" style="display: none;">
+          <div
+            id="comparison-chart-container"
+            class="chart-section"
+            style="display: none"
+          >
             <h3>Advanced Team Metrics</h3>
             <canvas id="comparisonChart" width="400" height="200"></canvas>
           </div>
@@ -831,6 +964,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="team-advanced-json" type="application/json">
+      {
+        "labels": ["Off Rating", "Def Rating", "Net Rating", "TS%", "Reb%", "Ast%"],
+        "data": [
+          {{ advanced_stats.off_rating if advanced_stats.off_rating != 'N/A' else 0 }},
+          {{ advanced_stats.def_rating if advanced_stats.def_rating != 'N/A' else 0 }},
+          {{ advanced_stats.net_rating if advanced_stats.net_rating != 'N/A' else 0 }},
+          {{ (advanced_stats.ts_percent * 100) if advanced_stats.ts_percent != 'N/A' else 0 }},
+          {{ advanced_stats.reb_percent if advanced_stats.reb_percent != 'N/A' else 0 }},
+          {{ advanced_stats.ast_percent if advanced_stats.ast_percent != 'N/A' else 0 }}
+        ]
+      }
+    </script>
     <script id="team-game-json" type="application/json">
       {
         "dates": {{ recent_games | map(attribute='date') | list | tojson }},
@@ -845,155 +991,165 @@
     </script>
     <script>
       // Team data for visualizations
-      const gameData = JSON.parse(document.getElementById('team-game-json').textContent);
+      const gameData = JSON.parse(
+        document.getElementById("team-game-json").textContent
+      );
 
       // Chart instances
       let performanceChart, shootingChart, winlossChart, comparisonChart;
 
       // Initialize Performance Trends Chart
       function initPerformanceChart() {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const ctx = document
+          .getElementById("performanceChart")
+          .getContext("2d");
         performanceChart = new Chart(ctx, {
-          type: 'line',
+          type: "line",
           data: {
             labels: gameData.dates,
             datasets: [
               {
-                label: 'Points',
+                label: "Points",
                 data: gameData.points,
-                borderColor: '#4caf50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderColor: "#4caf50",
+                backgroundColor: "rgba(76, 175, 80, 0.1)",
                 borderWidth: 3,
                 fill: true,
                 tension: 0.3,
                 pointRadius: 5,
-                pointHoverRadius: 8
+                pointHoverRadius: 8,
               },
               {
-                label: 'Rebounds',
+                label: "Rebounds",
                 data: gameData.rebounds,
-                borderColor: '#2196f3',
-                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                borderColor: "#2196f3",
+                backgroundColor: "rgba(33, 150, 243, 0.1)",
                 borderWidth: 3,
                 fill: false,
                 tension: 0.3,
                 pointRadius: 5,
-                pointHoverRadius: 8
+                pointHoverRadius: 8,
               },
               {
-                label: 'Assists',
+                label: "Assists",
                 data: gameData.assists,
-                borderColor: '#ff9800',
-                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                borderColor: "#ff9800",
+                backgroundColor: "rgba(255, 152, 0, 0.1)",
                 borderWidth: 3,
                 fill: false,
                 tension: 0.3,
                 pointRadius: 5,
-                pointHoverRadius: 8
-              }
-            ]
+                pointHoverRadius: 8,
+              },
+            ],
           },
           options: {
             responsive: true,
             plugins: {
               legend: {
-                position: 'top',
-                labels: { usePointStyle: true }
+                position: "top",
+                labels: { usePointStyle: true },
               },
               title: {
                 display: true,
-                text: 'Team Performance Metrics'
-              }
+                text: "Team Performance Metrics",
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
-                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                grid: { color: "rgba(0, 0, 0, 0.1)" },
               },
               x: {
-                grid: { color: 'rgba(0, 0, 0, 0.1)' }
-              }
+                grid: { color: "rgba(0, 0, 0, 0.1)" },
+              },
             },
             interaction: {
               intersect: false,
-              mode: 'index'
-            }
-          }
+              mode: "index",
+            },
+          },
         });
       }
 
       // Initialize Shooting Percentages Chart
       function initShootingChart() {
-        const ctx = document.getElementById('shootingChart').getContext('2d');
+        const ctx = document.getElementById("shootingChart").getContext("2d");
         shootingChart = new Chart(ctx, {
-          type: 'bar',
+          type: "bar",
           data: {
             labels: gameData.dates,
             datasets: [
               {
-                label: 'Field Goal %',
+                label: "Field Goal %",
                 data: gameData.fg_percent,
-                backgroundColor: 'rgba(76, 175, 80, 0.8)',
-                borderColor: '#4caf50',
-                borderWidth: 1
+                backgroundColor: "rgba(76, 175, 80, 0.8)",
+                borderColor: "#4caf50",
+                borderWidth: 1,
               },
               {
-                label: '3-Point %',
+                label: "3-Point %",
                 data: gameData.threep_percent,
-                backgroundColor: 'rgba(33, 150, 243, 0.8)',
-                borderColor: '#2196f3',
-                borderWidth: 1
+                backgroundColor: "rgba(33, 150, 243, 0.8)",
+                borderColor: "#2196f3",
+                borderWidth: 1,
               },
               {
-                label: 'Free Throw %',
+                label: "Free Throw %",
                 data: gameData.ft_percent,
-                backgroundColor: 'rgba(255, 152, 0, 0.8)',
-                borderColor: '#ff9800',
-                borderWidth: 1
-              }
-            ]
+                backgroundColor: "rgba(255, 152, 0, 0.8)",
+                borderColor: "#ff9800",
+                borderWidth: 1,
+              },
+            ],
           },
           options: {
             responsive: true,
             plugins: {
-              legend: { position: 'top' },
+              legend: { position: "top" },
               title: {
                 display: true,
-                text: 'Shooting Efficiency Trends'
-              }
+                text: "Shooting Efficiency Trends",
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
                 max: 100,
                 ticks: {
-                  callback: function(value) {
-                    return value + '%';
-                  }
-                }
-              }
-            }
-          }
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
+              },
+            },
+          },
         });
       }
 
       // Initialize Win/Loss Pattern Chart
       function initWinLossChart() {
-        const ctx = document.getElementById('winlossChart').getContext('2d');
-        const winLossData = gameData.results.map(result => result === 'W' ? 1 : 0);
-        const colors = gameData.results.map(result => result === 'W' ? '#4caf50' : '#f44336');
-        
+        const ctx = document.getElementById("winlossChart").getContext("2d");
+        const winLossData = gameData.results.map((result) =>
+          result === "W" ? 1 : 0
+        );
+        const colors = gameData.results.map((result) =>
+          result === "W" ? "#4caf50" : "#f44336"
+        );
+
         winlossChart = new Chart(ctx, {
-          type: 'bar',
+          type: "bar",
           data: {
             labels: gameData.dates,
-            datasets: [{
-              label: 'Game Results',
-              data: winLossData,
-              backgroundColor: colors,
-              borderColor: colors,
-              borderWidth: 1
-            }]
+            datasets: [
+              {
+                label: "Game Results",
+                data: winLossData,
+                backgroundColor: colors,
+                borderColor: colors,
+                borderWidth: 1,
+              },
+            ],
           },
           options: {
             responsive: true,
@@ -1001,8 +1157,8 @@
               legend: { display: false },
               title: {
                 display: true,
-                text: 'Win/Loss Streak Analysis'
-              }
+                text: "Win/Loss Streak Analysis",
+              },
             },
             scales: {
               y: {
@@ -1010,127 +1166,135 @@
                 max: 1,
                 ticks: {
                   stepSize: 1,
-                  callback: function(value) {
-                    return value === 1 ? 'Win' : 'Loss';
-                  }
-                }
-              }
-            }
-          }
+                  callback: function (value) {
+                    return value === 1 ? "Win" : "Loss";
+                  },
+                },
+              },
+            },
+          },
         });
       }
 
       // Initialize Advanced Metrics Chart
       function initComparisonChart() {
-        const ctx = document.getElementById('comparisonChart').getContext('2d');
-        const advancedStats = {
-          'Off Rating': {{ advanced_stats.off_rating if advanced_stats.off_rating != 'N/A' else 0 }},
-          'Def Rating': {{ advanced_stats.def_rating if advanced_stats.def_rating != 'N/A' else 0 }},
-          'Net Rating': {{ advanced_stats.net_rating if advanced_stats.net_rating != 'N/A' else 0 }},
-          'TS%': {{ (advanced_stats.ts_percent * 100) if advanced_stats.ts_percent != 'N/A' else 0 }},
-          'Reb%': {{ advanced_stats.reb_percent if advanced_stats.reb_percent != 'N/A' else 0 }},
-          'Ast%': {{ advanced_stats.ast_percent if advanced_stats.ast_percent != 'N/A' else 0 }}
-        };
+        const ctx = document.getElementById("comparisonChart").getContext("2d");
+        const advEl = document.getElementById("team-advanced-json");
+        const adv = advEl
+          ? JSON.parse(advEl.textContent)
+          : { labels: [], data: [] };
 
         comparisonChart = new Chart(ctx, {
-          type: 'radar',
+          type: "radar",
           data: {
-            labels: Object.keys(advancedStats),
-            datasets: [{
-              label: '{{ team_info.name }}',
-              data: Object.values(advancedStats),
-              borderColor: '#4caf50',
-              backgroundColor: 'rgba(76, 175, 80, 0.2)',
-              borderWidth: 2,
-              pointBackgroundColor: '#4caf50',
-              pointBorderColor: '#fff',
-              pointRadius: 5
-            }]
+            labels: adv.labels,
+            datasets: [
+              {
+                label: "{{ team_info.name }}",
+                data: adv.data,
+                borderColor: "#4caf50",
+                backgroundColor: "rgba(76, 175, 80, 0.2)",
+                borderWidth: 2,
+                pointBackgroundColor: "#4caf50",
+                pointBorderColor: "#fff",
+                pointRadius: 5,
+              },
+            ],
           },
           options: {
             responsive: true,
             plugins: {
               title: {
                 display: true,
-                text: 'Team Advanced Analytics'
-              }
+                text: "Team Advanced Analytics",
+              },
             },
             scales: {
               r: {
                 beginAtZero: true,
-                ticks: { display: false }
-              }
-            }
-          }
+                ticks: { display: false },
+              },
+            },
+          },
         });
       }
 
       // Chart switching functionality
-      document.getElementById('chart-type').addEventListener('change', function() {
-        const chartType = this.value;
-        
-        // Hide all chart containers
-        document.querySelectorAll('.chart-section').forEach(section => {
-          section.style.display = 'none';
+      document
+        .getElementById("chart-type")
+        .addEventListener("change", function () {
+          const chartType = this.value;
+
+          // Hide all chart containers
+          document.querySelectorAll(".chart-section").forEach((section) => {
+            section.style.display = "none";
+          });
+
+          // Show selected chart container
+          document.getElementById(
+            chartType + "-chart-container"
+          ).style.display = "block";
+
+          // Initialize chart if not already done
+          switch (chartType) {
+            case "performance":
+              if (!performanceChart) initPerformanceChart();
+              break;
+            case "shooting":
+              if (!shootingChart) initShootingChart();
+              break;
+            case "winloss":
+              if (!winlossChart) initWinLossChart();
+              break;
+            case "comparison":
+              if (!comparisonChart) initComparisonChart();
+              break;
+          }
         });
-        
-        // Show selected chart container
-        document.getElementById(chartType + '-chart-container').style.display = 'block';
-        
-        // Initialize chart if not already done
-        switch(chartType) {
-          case 'performance':
-            if (!performanceChart) initPerformanceChart();
-            break;
-          case 'shooting':
-            if (!shootingChart) initShootingChart();
-            break;
-          case 'winloss':
-            if (!winlossChart) initWinLossChart();
-            break;
-          case 'comparison':
-            if (!comparisonChart) initComparisonChart();
-            break;
-        }
-      });
 
       // Initialize default chart on page load
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         initPerformanceChart();
       });
 
       // Auto-fill default date ranges (last 7 days) for search form
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         const today = new Date();
         const sevenDaysAgo = new Date(today);
         sevenDaysAgo.setDate(today.getDate() - 7);
 
-        const formatDate = (date) => date.toISOString().split('T')[0];
+        const formatDate = (date) => date.toISOString().split("T")[0];
 
-        const gameStartDate = document.getElementById('game-start-date');
-        const gameEndDate = document.getElementById('game-end-date');
-        
+        const gameStartDate = document.getElementById("game-start-date");
+        const gameEndDate = document.getElementById("game-end-date");
+
         if (gameStartDate) gameStartDate.value = formatDate(sevenDaysAgo);
         if (gameEndDate) gameEndDate.value = formatDate(today);
       });
 
       // Handle team game stats form submission
-      document.getElementById('team-game-stats-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const teamAbbrev = document.getElementById('team-abbrev').value;
-        const startDate = document.getElementById('game-start-date').value;
-        const endDate = document.getElementById('game-end-date').value;
-        
-        // Show loading indicator
-        document.getElementById('game-stats-loading').style.display = 'block';
-        const submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        
-        // Redirect to team stats page with parameters
-        const url = `/team_stats?team_name=${encodeURIComponent(teamAbbrev)}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
-        window.location.href = url;
-      });
+      document
+        .getElementById("team-game-stats-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const teamAbbrev = document.getElementById("team-abbrev").value;
+          const startDate = document.getElementById("game-start-date").value;
+          const endDate = document.getElementById("game-end-date").value;
+
+          // Show loading indicator
+          document.getElementById("game-stats-loading").style.display = "block";
+          const submitBtn = this.querySelector('button[type="submit"]');
+          submitBtn.disabled = true;
+
+          // Redirect to team stats page with parameters
+          const url = `/team_stats?team_name=${encodeURIComponent(
+            teamAbbrev
+          )}&start_date=${encodeURIComponent(
+            startDate
+          )}&end_date=${encodeURIComponent(endDate)}`;
+          window.location.href = url;
+        });
     </script>
   </body>
 </html>
