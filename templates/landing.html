@@ -355,7 +355,7 @@
       </div>
 
       <!-- Simple phase toggle for measurement (baseline vs post) -->
-      <div style="margin:20px;">
+      <div style="margin: 20px">
         <label for="ff-phase-select">Measurement phase:</label>
         <select id="ff-phase-select">
           <option value="baseline">baseline</option>
@@ -487,18 +487,30 @@
         $("#team-start-date").val(formatDate(sevenDaysAgo));
         $("#team-end-date").val(formatDate(today));
 
-        (function initPlayerAutocomplete(){
+        (function initPlayerAutocomplete() {
           let lastRequestTs = 0;
           $("#player-name").autocomplete({
             source: function (req, res) {
               lastRequestTs = Date.now();
-              $.get("/autocomplete", { term: req.term }, function(data){
+              $.get("/autocomplete", { term: req.term }, function (data) {
                 res(data);
                 // Telemetry for autocomplete time
                 try {
                   const ms = Date.now() - lastRequestTs;
-                  navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route: 'player_autocomplete', ms, phase: (localStorage.getItem('ff_phase')||'post') })], { type: 'application/json' }));
-                } catch(e) {}
+                  navigator.sendBeacon(
+                    "/metrics/client-latency",
+                    new Blob(
+                      [
+                        JSON.stringify({
+                          route: "player_autocomplete",
+                          ms,
+                          phase: localStorage.getItem("ff_phase") || "post",
+                        }),
+                      ],
+                      { type: "application/json" }
+                    )
+                  );
+                } catch (e) {}
               });
             },
             minLength: 2,
@@ -506,18 +518,30 @@
           });
         })();
 
-        (function initTeamAutocomplete(){
+        (function initTeamAutocomplete() {
           let lastRequestTs = 0;
           $("#team-name").autocomplete({
             source: function (req, res) {
               lastRequestTs = Date.now();
-              $.get("/team_autocomplete", { term: req.term }, function(data){
+              $.get("/team_autocomplete", { term: req.term }, function (data) {
                 res(data);
                 // Telemetry for autocomplete time
                 try {
                   const ms = Date.now() - lastRequestTs;
-                  navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route: 'team_autocomplete', ms, phase: (localStorage.getItem('ff_phase')||'post') })], { type: 'application/json' }));
-                } catch(e) {}
+                  navigator.sendBeacon(
+                    "/metrics/client-latency",
+                    new Blob(
+                      [
+                        JSON.stringify({
+                          route: "team_autocomplete",
+                          ms,
+                          phase: localStorage.getItem("ff_phase") || "post",
+                        }),
+                      ],
+                      { type: "application/json" }
+                    )
+                  );
+                } catch (e) {}
               });
             },
             minLength: 2,
@@ -605,12 +629,12 @@
           window.location.href = `/team_profile/${encodeURIComponent(name)}`;
         });
         // Persist phase selection
-        const sel = document.getElementById('ff-phase-select');
+        const sel = document.getElementById("ff-phase-select");
         if (sel) {
-          const cur = localStorage.getItem('ff_phase') || 'post';
+          const cur = localStorage.getItem("ff_phase") || "post";
           sel.value = cur;
-          sel.addEventListener('change', function(){
-            localStorage.setItem('ff_phase', this.value);
+          sel.addEventListener("change", function () {
+            localStorage.setItem("ff_phase", this.value);
           });
         }
       });
