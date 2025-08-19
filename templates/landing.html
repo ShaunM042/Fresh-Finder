@@ -342,26 +342,11 @@
     </style>
   </head>
   <body>
-    <button
-      class="dark-mode-toggle"
-      onclick="toggleDarkMode()"
-      title="Toggle Dark Mode"
-    >
-      <i class="fas fa-moon" id="theme-icon"></i>
-    </button>
     <div class="navbar">
       <div class="logo">
         <i class="fas fa-basketball-ball"></i> Fresh Finder
       </div>
 
-      <!-- Simple phase toggle for measurement (baseline vs post) -->
-      <div style="margin: 20px">
-        <label for="ff-phase-select">Measurement phase:</label>
-        <select id="ff-phase-select">
-          <option value="baseline">baseline</option>
-          <option value="post" selected>post</option>
-        </select>
-      </div>
     </div>
 
     <div class="main-content">
@@ -504,7 +489,6 @@
                         JSON.stringify({
                           route: "player_autocomplete",
                           ms,
-                          phase: localStorage.getItem("ff_phase") || "post",
                         }),
                       ],
                       { type: "application/json" }
@@ -535,7 +519,6 @@
                         JSON.stringify({
                           route: "team_autocomplete",
                           ms,
-                          phase: localStorage.getItem("ff_phase") || "post",
                         }),
                       ],
                       { type: "application/json" }
@@ -628,15 +611,6 @@
 
           window.location.href = `/team_profile/${encodeURIComponent(name)}`;
         });
-        // Persist phase selection
-        const sel = document.getElementById("ff-phase-select");
-        if (sel) {
-          const cur = localStorage.getItem("ff_phase") || "post";
-          sel.value = cur;
-          sel.addEventListener("change", function () {
-            localStorage.setItem("ff_phase", this.value);
-          });
-        }
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -684,42 +658,5 @@
       });
     </script>
 
-    <!-- Dark Mode Toggle Script -->
-    <script>
-      // Dark mode functionality
-      function toggleDarkMode() {
-        const body = document.body;
-        const themeIcon = document.getElementById("theme-icon");
-
-        body.classList.toggle("dark-mode");
-
-        // Update icon based on current theme
-        if (body.classList.contains("dark-mode")) {
-          themeIcon.className = "fas fa-sun";
-          localStorage.setItem("theme", "dark");
-        } else {
-          themeIcon.className = "fas fa-moon";
-          localStorage.setItem("theme", "light");
-        }
-      }
-
-      // Load saved theme on page load
-      function loadTheme() {
-        const savedTheme = localStorage.getItem("theme");
-        const body = document.body;
-        const themeIcon = document.getElementById("theme-icon");
-
-        if (savedTheme === "dark") {
-          body.classList.add("dark-mode");
-          themeIcon.className = "fas fa-sun";
-        } else {
-          body.classList.remove("dark-mode");
-          themeIcon.className = "fas fa-moon";
-        }
-      }
-
-      // Initialize theme when page loads
-      document.addEventListener("DOMContentLoaded", loadTheme);
-    </script>
   </body>
 </html>

@@ -425,9 +425,6 @@
     </style>
   </head>
   <body id="top">
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
-      <i class="fas fa-moon" id="theme-icon"></i>
-    </button>
     <div id="spinner" class="spinner"></div>
     <h1>Fresh Finder</h1>
     <p style="text-align: center; color: #555; font-size: 14px;">
@@ -770,40 +767,6 @@
         visibleRows.forEach(row => tableBody.appendChild(row));
       }
 
-      // Dark mode functionality
-      function toggleDarkMode() {
-        const body = document.body;
-        const themeIcon = document.getElementById('theme-icon');
-        
-        body.classList.toggle('dark-mode');
-        
-        // Update icon based on current theme
-        if (body.classList.contains('dark-mode')) {
-          themeIcon.className = 'fas fa-sun';
-          localStorage.setItem('theme', 'dark');
-        } else {
-          themeIcon.className = 'fas fa-moon';
-          localStorage.setItem('theme', 'light');
-        }
-      }
-
-      // Load saved theme on page load
-      function loadTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const body = document.body;
-        const themeIcon = document.getElementById('theme-icon');
-        
-        if (savedTheme === 'dark') {
-          body.classList.add('dark-mode');
-          themeIcon.className = 'fas fa-sun';
-        } else {
-          body.classList.remove('dark-mode');
-          themeIcon.className = 'fas fa-moon';
-        }
-      }
-
-      // Initialize theme when page loads
-      document.addEventListener('DOMContentLoaded', loadTheme);
 
       // Back to Top Button Functionality
       const backToTopBtn = document.getElementById('backToTopBtn');
@@ -829,8 +792,7 @@
           const route = sessionStorage.getItem('ff_nav_route') || 'player_stats';
           if (start) {
             const ms = Date.now() - start;
-            const phase = localStorage.getItem('ff_phase') || 'post';
-            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms, phase })], { type: 'application/json' }));
+            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms })], { type: 'application/json' }));
             sessionStorage.removeItem('ff_nav_start');
             sessionStorage.removeItem('ff_nav_route');
           }
