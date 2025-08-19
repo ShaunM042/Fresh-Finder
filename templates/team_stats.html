@@ -890,7 +890,8 @@
           const route = sessionStorage.getItem('ff_nav_route') || 'team_stats';
           if (start) {
             const ms = Date.now() - start;
-            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms })], { type: 'application/json' }));
+            const phase = localStorage.getItem('ff_phase') || 'post';
+            navigator.sendBeacon('/metrics/client-latency', new Blob([JSON.stringify({ route, ms, phase })], { type: 'application/json' }));
             sessionStorage.removeItem('ff_nav_start');
             sessionStorage.removeItem('ff_nav_route');
           }

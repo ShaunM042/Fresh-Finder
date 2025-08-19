@@ -340,13 +340,97 @@ def cache_stats():
 def client_latency():
     try:
         data = request.get_json(silent=True) or {}
-        route = data.get('route')
-        ms = data.get('ms')
+        route = (data.get('route') or '').strip()
+        ms = float(data.get('ms') or 0)
+        phase = (data.get('phase') or '').strip() or 'post'
         ua = request.headers.get('User-Agent', '')
-        app.logger.info(f"client_latency route=%s ms=%s ua=%s", route, ms, ua)
+
+        record = {
+            'ts': datetime.utcnow().isoformat() + 'Z',
+            'route': route,
+            'ms': ms,
+            'phase': phase,
+            'ua': ua[:120]
+        }
+        # Persist to cache/latency.jsonl
+        try:
+            ensure_cache_directory()
+            metrics_path = os.path.join(CACHE_DIR, 'latency.jsonl')
+            with open(metrics_path, 'a') as f:
+                f.write(json.dumps(record) + '\n')
+        except Exception:
+            app.logger.exception('client_latency: persist failed')
+
+        app.logger.info("client_latency route=%s ms=%.1f phase=%s", route, ms, phase)
         return jsonify({"ok": True}), 200
     except Exception as e:
         app.logger.exception('client_latency: failed')
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+def _median(values):
+    if not values:
+        return None
+    values = sorted(values)
+    n = len(values)
+    mid = n // 2
+    if n % 2 == 1:
+        return values[mid]
+    return (values[mid - 1] + values[mid]) / 2.0
+
+
+@app.route('/admin/latency-stats')
+def latency_stats():
+    try:
+        metrics_path = os.path.join(CACHE_DIR, 'latency.jsonl')
+        if not os.path.exists(metrics_path):
+            return jsonify({"ok": True, "message": "no data"}), 200
+
+        by_route_phase = {}
+        with open(metrics_path, 'r') as f:
+            for line in f:
+                try:
+                    rec = json.loads(line)
+                    route = rec.get('route') or 'unknown'
+                    phase = rec.get('phase') or 'post'
+                    ms = float(rec.get('ms') or 0)
+                    key = (route, phase)
+                    by_route_phase.setdefault(key, []).append(ms)
+                except Exception:
+                    continue
+
+        results = {}
+        improvements = {}
+        for (route, phase), arr in by_route_phase.items():
+            results.setdefault(route, {})[phase] = {
+                'count': len(arr),
+                'median_ms': round(_median(arr), 1) if arr else None
+            }
+        # Compute improvement where both phases exist
+        for route, data in results.items():
+            base = data.get('baseline', {}).get('median_ms')
+            post = data.get('post', {}).get('median_ms')
+            if base and post and base > 0:
+                improvements[route] = round((1 - (post / base)) * 100.0, 1)
+
+        overall = None
+        # Overall: median of all baselines vs medians of all posts if available
+        base_meds = [d['baseline']['median_ms'] for r, d in results.items() if d.get('baseline', {}).get('median_ms')]
+        post_meds = [d['post']['median_ms'] for r, d in results.items() if d.get('post', {}).get('median_ms')]
+        if base_meds and post_meds:
+            b = _median(base_meds)
+            p = _median(post_meds)
+            if b and p and b > 0:
+                overall = round((1 - (p / b)) * 100.0, 1)
+
+        return jsonify({
+            'ok': True,
+            'routes': results,
+            'improvement_percent_by_route': improvements,
+            'overall_improvement_percent': overall
+        }), 200
+    except Exception as e:
+        app.logger.exception('latency_stats: failed')
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
