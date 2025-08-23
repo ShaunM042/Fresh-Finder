@@ -28,9 +28,10 @@ CACHE_DIR = 'cache'
 CACHE_DURATION = 3600  # 1 hour in seconds
 
 def ensure_cache_directory():
-    """Ensure cache directory exists"""
+    """Ensure cache directory exists and is properly configured"""
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
+        print(f"Created cache directory: {CACHE_DIR}")
 
 def generate_cache_key(*args, **kwargs):
     """Generate a unique cache key based on function arguments"""
