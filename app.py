@@ -1213,7 +1213,9 @@ def server_error(e):
     return jsonify(error='Internal Server Error'), 500
 
 if __name__ == '__main__':
-    print("App started, current directory:", os.getcwd())
+    # Development startup with diagnostic information
+    print("Fresh Finder NBA App started, current directory:", os.getcwd())
     print("Templates folder exists:", os.path.isdir('templates'))
     print("player_profile.html exists:", os.path.isfile('templates/player_profile.html'))
+    # Run Flask development server on port 5002 with debug mode enabled
     app.run(debug=True, port=5002)
