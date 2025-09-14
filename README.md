@@ -22,6 +22,8 @@
 - All routes support a debug JSON mode via `?debug=1` or `Accept: application/json`.
 - Global error handler logs tracebacks and returns JSON if debug mode is enabled.
 - HTTP retries configured for NBA API requests.
+- Intelligent caching system reduces API calls and improves performance.
+- Error logging and graceful fallbacks for API timeouts.
 
 ## Install
 
